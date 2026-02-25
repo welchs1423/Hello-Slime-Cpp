@@ -10,6 +10,8 @@ int main(){
     
     int playerHp = 100;
     int slimeHp = 30;
+    int potions = 3; // 물약 갯수
+
     srand(time(0));
 
     cout << "=== 야생의 슬라임과 조우했습니다! ===" << endl;
@@ -28,6 +30,15 @@ int main(){
         } else if(choice == 2){
             cout << "무사히 도망쳤습니다..." << endl;
             break;
+        } else if (choice == 3){
+            if(potions > 0){
+                playerHp += 30;
+                if(playerHp > 100) playerHp = 100;
+                potions--;
+                cout << "물약을 마셨습니다! HP가 30 회복되었습니다. (남은 물약: )" << potions << ")" << endl;
+            } else{
+                cout << "물약이 없습니다!" << endl;
+            }
         } else {
             cout << "잘못된 입력입니다." << endl;
         }
