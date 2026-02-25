@@ -9,9 +9,8 @@ int main(){
     system("chcp 65001");
     
     int playerHp = 100;
-    int slimeHp = 30;
+    int slimeHp = 80;
     int potions = 3; // 물약 갯수
-
     srand(time(0));
 
     cout << "=== 야생의 슬라임과 조우했습니다! ===" << endl;
@@ -25,8 +24,21 @@ int main(){
 
         if (choice == 1) {
             int damage = rand() % 10 + 10;
+            int critChance = rand() % 100;
+
+            if(critChance < 20){
+                damage *= 2;
+                cout << "크리티컬 히트!! 슬라임의 급소를 찔러 " << damage << "의 엄청난 피해를 입혔습니다!" << endl;
+            } else {
+                cout << "슬라임을 공격해서 " << damage << "의 피해를 입혔습니다." << endl;
+            }
+
             slimeHp -= damage;
-            cout << "슬라임을 공격해서 " << damage << "의 피해를 입혔습니다!" << endl;
+            if(slimeHp > 0){
+                int slimeDamage = rand() % 5 + 5;
+                playerHp -= slimeDamage;
+                cout << "슬라임의 반격! " << slimeDamage << "의 피해를 입었습니다." << endl;
+            }
         } else if(choice == 2){
             cout << "무사히 도망쳤습니다..." << endl;
             break;
@@ -45,5 +57,7 @@ int main(){
     }
 
     if(slimeHp <= 0) cout << "\n축하합니다! 슬라임을 물리쳤습니다!" << endl;
+    else if(playerHp <= 0) cout << "\n 플레이어가 쓰러졌습니다... 눈앞이 깜깜해집니다." << endl;
+    
     return 0;
 }
