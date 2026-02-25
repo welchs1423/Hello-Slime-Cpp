@@ -18,7 +18,7 @@ int main(){
 
     while (playerHp > 0 && slimeHp > 0){
         cout << "\n[현재 상태] 플레이어 HP: " << playerHp << " / 슬라임 HP: " << slimeHp << endl;
-        cout << "1. 공격하기 2. 도망가기\n선택: ";
+        cout << "1. 공격하기  2. 도망가기  3. 물약 마시기(남은 개수: " << potions << ")\n선택: ";
 
         int choice;
         cin >> choice;
