@@ -2,6 +2,7 @@
 My first toy project to understand the procedural and object-oriented flow of C++ in a VSC environment.
 
 ## Changelog
+- **2026-02-27:** Added Player HP display during combat for better visibility.
 - **2026-02-27:** Applied ANSI Escape Codes to colorize UI elements (HP, Gold, Damage) for better UX.
 - **2026-02-27:** Added UI polish (Console Screen Clear) and expanded Shop items (Steel Sword).
 - **2026-02-27:** Added Dungeon Floor progression and King Slime Boss battles.
