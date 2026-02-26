@@ -9,3 +9,12 @@ main
 
 # VS Code settings
 .vscode/
+
+# Local Save Data
+savefile.txt
+
+# Executables
+main
+main.exe
+graphic_test
+graphic_test.exe
