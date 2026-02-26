@@ -11,15 +11,18 @@ Player::Player() {
     maxHp = 100;
     hp = 100;
     potions = 3;
+    gold = 0;   // Starts with 0 Gold
+    weaponDamage = 0;   // Starts with bare hands
 }
 
 int Player::attack() {
-    int damage = rand() % 10 + 10 + (level * 2);
+    // Basic damage + level scailing + weapon damage
+    int damage = rand() % 10 + 10 + (level * 2) + weaponDamage;
     int critChance = rand() % 100;
 
     if (critChance < 20) {
         damage *= 2;
-        cout << "⚡ CRITICAL HIT!! You pierced the slime's weak spot for " << damage << " damage!" << endl;
+        cout << "CRITICAL HIT!! You pierced the slime's weak spot for " << damage << " damage!" << endl;
     } else {
         cout << "You attacked the slime and dealt " << damage << " damage." << endl;
     }
@@ -52,12 +55,14 @@ void Player::gainExp(int amount) {
         maxHp += 20;
         hp = maxHp;
         potions++;
-        cout << "✨ LEVEL UP! You are now Lv." << level << "! (Max HP increased, HP fully restored, gained 1 Potion)" << endl;
+        cout << "LEVEL UP! You are now Lv." << level << "! (Max HP increased, HP fully restored, gained 1 Potion)" << endl;
     }
 }
 
 void Player::printStatus() {
-    cout << "\n[Lv." << level << " Player] HP: " << hp << "/" << maxHp << " | EXP: " << exp << "/100" << endl;
+    // Display Gold and Weapon Damage
+    cout << "\n[Lv." << level << " Player] HP: " << hp << "/" << maxHp
+        << " | EXP: " << exp << "/100 | Gold: " << gold << "G | Weapon ATK: " << weaponDamage << endl;
 }
 
 void Player::save() {
@@ -65,9 +70,9 @@ void Player::save() {
     if (fout.is_open()) {
         fout << level << " " << exp << " " << maxHp << " " << hp << " " << potions;
         fout.close();
-        cout << "💾 Game saved successfully!" << endl;
+        cout << "Game saved successfully!" << endl;
     } else {
-        cout << "❌ Failed to create save file." << endl;
+        cout << "Failed to create save file." << endl;
     }
 }
 
@@ -76,10 +81,10 @@ bool Player::load() {
     if (fin.is_open()) {
         fin >> level >> exp >> maxHp >> hp >> potions;
         fin.close();
-        cout << "📂 Saved game loaded successfully!" << endl;
+        cout << "Saved game loaded successfully!" << endl;
         return true;
     } else {
-        cout << "❌ No save file found. Starting a new game." << endl;
+        cout << "No save file found. Starting a new game." << endl;
         return false;
     }
 }

@@ -8,6 +8,8 @@ public:
     int maxHp;
     int hp;
     int potions;
+    int gold;   // Added Gold
+    int weaponDamage;   // Added Weapon Damage
 
     Player(); 
     int attack(); 
