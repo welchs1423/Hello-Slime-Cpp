@@ -11,13 +11,32 @@ Player::Player() {
     exp = 0;
     maxHp = 100;
     hp = 100;
-    maxMp = 50; // ✨ Starts with 50 MP
+    maxMp = 50;         // Starts with 50 MP
     mp = 50;
     potions = 3;
+    manaPotions = 1;    // 마나 포션 1개 서비스
     gold = 0;         
     weaponDamage = 0; 
     armorDefense = 0;   // Starts with 0 Defense (No armor)
     dungeonFloor = 1; 
+    
+    registerStats();    // 생성 시점에 모든 변수 등록
+}
+
+void Player::registerStats() {
+    // 여기에만 변수를 추가하면 save/load에 자동으로 반영
+    stats["level"] = &level;
+    stats["exp"] = &exp;
+    stats["maxHp"] = &maxHp;
+    stats["hp"] = &hp;
+    stats["maxMp"] = &maxMp;
+    stats["mp"] = &mp;
+    stats["potions"] = &potions;
+    stats["manaPotions"] = &manaPotions;
+    stats["gold"] = &gold;
+    stats["weaponDamage"] = &weaponDamage;
+    stats["armorDefense"] = &armorDefense;
+    stats["dungeonFloor"] = &dungeonFloor;
 }
 
 int Player::attack() {
@@ -66,6 +85,17 @@ void Player::heal() {
     }
 }
 
+void Player::restoreMp(){
+    if(manaPotions > 0){
+        mp += 30;
+        if(mp > maxMp) mp = maxMp;
+        manaPotions--;
+        cout << CYAN << "You Drank a Mana Potion! Mp recovered. (Mana Potions left: " << manaPotions << ")" << RESET << endl;
+    } else {
+        cout << RED << "You searched your bag, but you have no mana potions left!" << RESET << endl;
+    }
+}
+
 void Player::gainExp(int amount) {
     exp += amount;
     cout << CYAN << "Gained " << amount << " EXP." << RESET << endl;
@@ -89,28 +119,35 @@ void Player::printStatus() {
          << " | EXP: " << CYAN << exp << "/100" << RESET
          << " | Gold: " << YELLOW << gold << "G" << RESET << endl;
     cout << "Weapon ATK: +" << weaponDamage << " | Armor DEF: +" << armorDefense << " | Dungeon Floor: " << CYAN << dungeonFloor << RESET << endl;
+    cout << "Items: [HP Potion x" << potions << "] [MP Potion x" << manaPotions << "]" << endl;
 }
 
 void Player::save() {
-    ofstream fout("savefile.txt"); 
-    if (fout.is_open()) {
-        fout << level << " " << exp << " " << maxHp << " " << hp << " " << maxMp << " " << mp << " " << potions << " " << gold << " " << weaponDamage << " " << armorDefense << " " << dungeonFloor;
+    ofstream fout("savefile.txt");
+    if (fout.is_open()){
+        // 리스트를 돌면서 이름 값 형태로 저장
+        for(auto const& [name, ptr] : stats){
+            fout << name << " " << *ptr << endl;
+        }
         fout.close();
-        cout << GREEN << "💾 Game saved successfully!" << RESET << endl;
-    } else {
-        cout << RED << "❌ Failed to create save file." << RESET << endl;
+        cout << "Game saved automatically!" << endl;
     }
 }
 
 bool Player::load() {
-    ifstream fin("savefile.txt"); 
-    if (fin.is_open()) {
-        fin >> level >> exp >> maxHp >> hp >> maxMp >> mp >> potions >> gold >> weaponDamage >> armorDefense >> dungeonFloor;
+    ifstream fin("savefile.txt");
+    if(fin.is_open()){
+        string name;
+        int value;
+        // 파일에서 이름을 읽고, 그 이름에 해당하는 주소에 값을 넣음
+        while (fin >> name >> value){
+            if (stats.find(name) != stats.end()){
+                *(stats[name]) = value;
+            }
+        }
         fin.close();
-        cout << GREEN << "📂 Saved game loaded successfully!" << RESET << endl;
+        cout << "All stats loaded successfully!" << endl;
         return true;
-    } else {
-        cout << RED << "❌ No save file found. Starting a new game." << RESET << endl;
-        return false;
     }
+    return false;
 }

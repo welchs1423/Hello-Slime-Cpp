@@ -28,7 +28,7 @@ void Battle::start(Player& player) {
              << " | MP: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
         cout << "[Enemy] HP: " << RED << slime.hp << RESET << endl;
         
-        cout << "1. Attack  2. Magic (20MP)  3. Run  4. Potion (" << player.potions << ")\nSelect: ";
+        cout << "1. Attack  2. Magic (20MP)  3. Run  4. HP Potion (" << player.potions << ")  5. MP Potion (" << player.manaPotions << ")\nSelect: ";
         
         int combatChoice;
         cin >> combatChoice;
@@ -56,6 +56,8 @@ void Battle::start(Player& player) {
             inCombat = false;
         } else if (combatChoice == 4) {
             player.heal();
+        } else if (combatChoice == 5){
+            player.restoreMp();
         } else {
             cout << "Invalid input." << endl;
         }
