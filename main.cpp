@@ -10,7 +10,16 @@ int main() {
     system("chcp 65001");
     srand(time(0)); 
 
-    Player player; // 설계도를 바탕으로 실제 플레이어 객체 생성!
+    Player player; // 설계도를 바탕으로 실제 플레이어 객체 생성
+
+    cout << "=== 슬라임 헌터 키우기 ===" << endl;
+    cout << "1. 새로 시작하기 2. 이어하기\n선택: ";
+    int startChoice;
+    cin >> startChoice;
+
+    if(startChoice == 2){
+        player.load(); // 파일에서 능력치 불러오기
+    }
 
     cout << "=== 끝없는 슬라임 사냥터에 입장했습니다! ===" << endl;
 
@@ -23,7 +32,7 @@ int main() {
         while (player.hp > 0 && slime.hp > 0) {
             player.printStatus();
             cout << "[슬라임] HP: " << slime.hp << endl;
-            cout << "1. 공격하기  2. 도망가기  3. 물약 마시기(남은 개수: " << player.potions << ")\n선택: ";
+            cout << "1. 공격하기  2. 도망가기  3. 물약 마시기(남은 개수: " << player.potions << ") 4. 저장하기\n선택: ";
             
             int choice;
             cin >> choice;
@@ -41,6 +50,8 @@ int main() {
                 return 0; 
             } else if (choice == 3) {
                 player.heal(); // 회복 함수 호출
+            } else if (choice == 4){
+                player.save();  // 저장 기능 실행
             } else {
                 cout << "잘못된 입력입니다." << endl;
             }

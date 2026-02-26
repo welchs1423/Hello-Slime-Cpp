@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
 
 using namespace std;
 
@@ -63,4 +64,30 @@ void Player::gainExp(int amount){
 // 6. 상태 출력 로직
 void Player::printStatus(){
     cout << "\n[Lv. " << level << " 플레이어] HP: " << hp << "/" << maxHp << "|EXP: " << exp << "/100" << endl;
+}
+
+// 게임 저장하기 (파일 쓰기)
+void Player::save(){
+    ofstream fout("savefile.txt");
+    if(fout.is_open()){
+        fout << level << " " << exp << " " << maxHp << " " << hp << " " << potions;
+        fout.close();
+        cout << "게임이 성공적으로 저장되었습니다!" << endl;
+    } else {
+        cout << "저장 파일을 생성하는데 실패했습니다." << endl;
+    }
+}
+
+// 게임 불러오기 (파일 읽기)
+bool Player::load(){
+    ifstream fin("savefile.txt");
+    if(fin.is_open()){
+        fin >> level >> exp >> maxHp >> hp >> potions;
+        fin.close();
+        cout << "저장된 게임을 성공적으로 불러왔습니다!" << endl;
+        return true;
+    } else {
+        cout << "저장된 파일이 없습니다. 새로 시작합니다." << endl;
+        return false;
+    }
 }

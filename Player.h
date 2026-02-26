@@ -15,6 +15,10 @@ public:
     void heal();    // 물약 먹는 함수
     void gainExp(int amount);   // 경험치 얻고 레벨업 체크하는 함수
     void printStatus(); // 현재 상태를 출력하는 함수
+
+    // 파일 저장 및 불러오기 기능 추가
+    void save();
+    bool load();
 };
 
 #endif
