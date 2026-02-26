@@ -1,13 +1,14 @@
 # Hello Slime CPP
-VSC 환경에서 C++ 절차적 프로그래밍의 흐름을 이해하기 위해 만든 첫 토이 프로젝트입니다.
+My first toy project to understand the procedural and object-oriented flow of C++ in a VSC environment.
 
-## 수정 내역 (Changelog)
-- **2026-02-27:** fstream을 활용한 게임 데이터 저장(Save) 및 불러오기(Load) 기능 구현
-- **2026-02-27:** Slime 클래스 분리 및 Player 클래스 구조 고도화 완료
-- **2026-02-27:** 헤더(.h)와 소스(.cpp) 파일 분리를 통한 객체지향적 코드 모듈화 적용 (Player 클래스 도입)
-- **2026-02-26:** 무한 사냥터 루프 적용 및 경험치(EXP) 기반 레벨업 시스템 추가
-- **2026-02-25:** 플레이어 공격 시 20% 확률로 발동하는 치명타(Critical Hit) 시스템 추가
-- **2026-02-25:** 회복 물약 시스템(최대 체력 제한 및 횟수 제한) 추가
-- **2026-02-25:** .gitignore 파일 세팅 및 폴더 환경 최적화
-- **2026-02-25:** 터미널 환경 한글 깨짐 현상 해결 (chcp 65001 적용)
-- **2026-02-25:** 슬라임과의 턴제 전투 기본 루프(while, if, 난수 생성) 구현 및 초기 세팅
+## Changelog
+- **2026-02-27:** Localized all code comments and console outputs to English.
+- **2026-02-27:** Implemented Game Save/Load feature using `fstream`.
+- **2026-02-27:** Refactored `Slime` class and finalized OOP modularization.
+- **2026-02-27:** Separated header (`.h`) and source (`.cpp`) files for `Player` class.
+- **2026-02-26:** Added infinite dungeon loop and EXP-based level-up system.
+- **2026-02-25:** Added Critical Hit system (20% chance).
+- **2026-02-25:** Added Healing Potion system (Max HP cap & usage limits).
+- **2026-02-25:** Set up `.gitignore` and optimized project folder.
+- **2026-02-25:** Fixed terminal encoding issues (applied `chcp 65001`).
+- **2026-02-25:** Implemented basic turn-based battle loop with wild slimes.

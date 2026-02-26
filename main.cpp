@@ -7,63 +7,64 @@
 using namespace std;
 
 int main() {
+    // Keeps UTF-8 encoding just in case
     system("chcp 65001");
     srand(time(0)); 
 
-    Player player; // 설계도를 바탕으로 실제 플레이어 객체 생성
+    Player player; 
 
-    cout << "=== 슬라임 헌터 키우기 ===" << endl;
-    cout << "1. 새로 시작하기 2. 이어하기\n선택: ";
+    cout << "=== Slime Hunter RPG ===" << endl;
+    cout << "1. New Game  2. Continue\nSelect: ";
     int startChoice;
     cin >> startChoice;
 
-    if(startChoice == 2){
-        player.load(); // 파일에서 능력치 불러오기
+    if (startChoice == 2) {
+        player.load(); 
     }
 
-    cout << "=== 끝없는 슬라임 사냥터에 입장했습니다! ===" << endl;
+    cout << "\n=== Entered the Endless Slime Dungeon! ===" << endl;
 
     while (player.hp > 0) {
-        Slime slime(player.level); // 슬라임 객체 생성
-
+        Slime slime(player.level); 
+        
         cout << "\n=========================================" << endl;
-        cout << "야생의 슬라임(HP: " << slime.hp << ")이 나타났다!" << endl;
+        cout << "A wild Slime (HP: " << slime.hp << ") appeared!" << endl;
 
         while (player.hp > 0 && slime.hp > 0) {
-            player.printStatus();
-            cout << "[슬라임] HP: " << slime.hp << endl;
-            cout << "1. 공격하기  2. 도망가기  3. 물약 마시기(남은 개수: " << player.potions << ") 4. 저장하기\n선택: ";
+            player.printStatus(); 
+            cout << "[Slime] HP: " << slime.hp << endl;
+            cout << "1. Attack  2. Run  3. Potion (" << player.potions << ")  4. Save\nSelect: ";
             
             int choice;
             cin >> choice;
 
             if (choice == 1) {
-                int damage = player.attack();
+                int damage = player.attack(); 
                 slime.takeDamage(damage);
 
                 if (slime.hp > 0) {
-                    int slimeDamage = rand() % 5 + 5 + player.level; 
-                    player.takeDamage(slimeDamage);
+                    int slimeDamage = slime.attack(); 
+                    player.takeDamage(slimeDamage); 
                 }
             } else if (choice == 2) {
-                cout << "전투에서 도망쳤습니다... 사냥터를 빠져나갑니다." << endl;
+                cout << "You successfully ran away... Leaving the dungeon." << endl;
                 return 0; 
             } else if (choice == 3) {
-                player.heal(); // 회복 함수 호출
-            } else if (choice == 4){
-                player.save();  // 저장 기능 실행
+                player.heal(); 
+            } else if (choice == 4) {
+                player.save(); 
             } else {
-                cout << "잘못된 입력입니다." << endl;
+                cout << "Invalid input. Please try again." << endl;
             }
         }
 
         if (slime.hp <= 0) {
-            cout << "\n 슬라임을 물리쳤습니다!" << endl;
-            player.gainExp(50);
+            cout << "\n🎉 You defeated the Slime!" << endl;
+            player.gainExp(50); 
         }
     }
 
-    if (player.hp <= 0) cout << "\n 플레이어가 쓰러졌습니다... 눈앞이 깜깜해집니다. 게임 오버." << endl;
+    if (player.hp <= 0) cout << "\n💀 The player has fallen... Game Over." << endl;
     
     return 0;
 }

@@ -9,14 +9,14 @@ public:
     int hp;
     int potions;
 
-    Player();   // 기본 세팅을 해주는 생성자
-    int attack();   // 공격하고 데미지를 반환하는 함수
-    void takeDamage(int damage);    // 피해를 입는 함수
-    void heal();    // 물약 먹는 함수
-    void gainExp(int amount);   // 경험치 얻고 레벨업 체크하는 함수
-    void printStatus(); // 현재 상태를 출력하는 함수
+    Player(); 
+    int attack(); 
+    void takeDamage(int damage); 
+    void heal(); 
+    void gainExp(int amount); 
+    void printStatus(); 
 
-    // 파일 저장 및 불러오기 기능 추가
+    // File I/O for Save & Load
     void save();
     bool load();
 };
