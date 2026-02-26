@@ -1,161 +1,176 @@
-#include "Player.h"
-#include "Colors.h" 
+#include "../include/Player.h"
+#include "../include/Job.h"
+#include "../include/Colors.h"
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
-#include <fstream> 
 
 using namespace std;
 
 Player::Player() {
+    name = "Hero";
     level = 1;
-    exp = 0;
-    maxHp = 100;
-    hp = 100;
-    maxMp = 50;         // Starts with 50 MP
-    mp = 50;
-    potions = 3;
-    manaPotions = 1;    // 마나 포션 1개 서비스
-    gold = 0;         
-    weaponDamage = 0; 
-    armorDefense = 0;   // Starts with 0 Defense (No armor)
+    maxHp = 100; hp = 100;
+    maxMp = 50;  mp = 50;
+    weaponDamage = 5;
+    armorDefense = 0;
+    exp = 0; maxExp = 100;
+    gold = 100;
+    potions = 3; manaPotions = 1;
     dungeonFloor = 1;
-    weaponLevel = 0;    // 초기 강화 0
-    armorLevel = 0;     // 초기 방어구 강화 0
-    
-    registerStats();    // 생성 시점에 모든 변수 등록
+    weaponLevel = 0;
+    armorLevel = 0;
+    jobClass = 0;
+    job = nullptr;
+
+    updateJobLogic(); // 직업 객체 초기화
+    registerStats();  // 저장 레지스트리 등록
 }
 
+Player::~Player() {
+    if (job) delete job; // 메모리 누수 방지
+}
+
+// ✨ 자동 저장/불러오기 레지스트리
 void Player::registerStats() {
-    // 여기에만 변수를 추가하면 save/load에 자동으로 반영
     stats["level"] = &level;
-    stats["exp"] = &exp;
     stats["maxHp"] = &maxHp;
     stats["hp"] = &hp;
     stats["maxMp"] = &maxMp;
     stats["mp"] = &mp;
-    stats["potions"] = &potions;
-    stats["manaPotions"] = &manaPotions;
-    stats["gold"] = &gold;
     stats["weaponDamage"] = &weaponDamage;
     stats["armorDefense"] = &armorDefense;
+    stats["exp"] = &exp;
+    stats["maxExp"] = &maxExp;
+    stats["gold"] = &gold;
+    stats["potions"] = &potions;
+    stats["manaPotions"] = &manaPotions;
     stats["dungeonFloor"] = &dungeonFloor;
     stats["weaponLevel"] = &weaponLevel;
     stats["armorLevel"] = &armorLevel;
+    stats["jobClass"] = &jobClass;
 }
 
+// ✨ 직업 객체 교체
+void Player::updateJobLogic() {
+    if (job) delete job;
+    if (jobClass == 1) job = new Warrior();
+    else if (jobClass == 2) job = new Mage();
+    else if (jobClass == 3) job = new Rogue();
+    else job = new Beginner();
+}
+
+// ✨ 게임 시작 시 직업 선택
+void Player::chooseClass() {
+    system("cls");
+    cout << CYAN << "\n=== ✨ 직업을 선택하세요 ✨ ===" << RESET << endl;
+    cout << "1. 🗡️ 전사 (보너스: 최대 체력 +50, 공격력 +5)\n";
+    cout << "2. 🧙 마법사 (보너스: 최대 마나 +50, 강력한 마법 데미지)\n";
+    cout << "3. 🗡️ 도적 (보너스: 크리티컬 확률 40%)\n";
+    cout << "선택: ";
+    cin >> jobClass;
+
+    updateJobLogic();
+    job->applyBonus(maxHp, hp, maxMp, mp, weaponDamage);
+
+    cout << YELLOW << "\n당신은 이제 위대한 [" << job->getName() << "] 입니다!" << RESET << endl;
+    cout << "엔터를 누르면 모험을 시작합니다...";
+    cin.ignore();
+    cin.get();
+}
+
+// ✨ 상태창 출력
+void Player::printStatus() {
+    cout << "\n[" << CYAN << "Lv." << level << " " << job->getName() << RESET << "] "
+         << "HP: " << GREEN << hp << "/" << maxHp << RESET << " | "
+         << "MP: " << CYAN << mp << "/" << maxMp << RESET << " | "
+         << "EXP: " << YELLOW << exp << "/" << maxExp << RESET << endl;
+    cout << "ATK: " << weaponDamage << " (+" << weaponLevel * 5 << ") | "
+         << "DEF: " << armorDefense << " (+" << armorLevel * 3 << ") | "
+         << "Gold: " << YELLOW << gold << "G" << RESET << endl;
+}
+
+// ✨ 공격 (Job에게 위임)
 int Player::attack() {
-    // 강화 레벨 당 데미지 5씩 추가 가중치
-    int bonusDamage = weaponLevel * 5;
-    int damage = rand() % 10 + 10 + (level * 2) + weaponDamage + bonusDamage;
-    int critChance = rand() % 100;
-
-    if (critChance < 20) {
-        damage *= 2;
-        cout << YELLOW << "⚡ CRITICAL HIT!! [+" << weaponLevel << " Weapon] dealt " << damage << " damage!" << RESET << endl;
-    } else {
-        cout << "You attacked with [+" << weaponLevel << " Weapon] and dealt " << damage << " damage." << endl;
-    }
-    return damage;
+    return job->attack(level, weaponDamage, weaponLevel);
 }
 
-// ✨ Magic Skill Logic
+// ✨ 마법 공격 (Job에게 위임)
 int Player::magicAttack() {
     if (mp >= 20) {
-        mp -= 20; // 마나 20 소모
-        int damage = (rand() % 15 + 20 + (level * 3) + weaponDamage) * 2; // 일반 공격보다 훨씬 강력함
-        cout << CYAN << "🔥 FIREBALL!! You cast a powerful magic spell for " << damage << " damage! (-20 MP)" << RESET << endl;
-        return damage;
+        mp -= 20;
+        return job->magicAttack(level, weaponDamage);
     } else {
-        cout << RED << "❌ Not enough MP to cast magic!" << RESET << endl;
-        return -1; // 마나가 부족하면 -1 반환
+        cout << RED << "❌ 마나가 부족합니다!" << RESET << endl;
+        return -1;
     }
 }
 
+// ✨ 피격 (방어구 강화 수치 반영)
 void Player::takeDamage(int damage) {
-    // 강화 1단계당 데미지 3 추가 감소
-    int bonusDefense = armorLevel * 3;
-    // 방어력(Armor) 적용 로직
+    int bonusDefense = armorLevel * 3; 
     int actualDamage = damage - armorDefense - bonusDefense;
-    if(actualDamage < 0) actualDamage = 0;  // 방어력이 너무 높아도 데미지가 마이너스가 되진 않게 처리
+    if(actualDamage < 0) actualDamage = 0; 
 
     hp -= actualDamage;
-    cout << RED << "Enemy attacks! You took " << actualDamage << " damage. (Mitigated " << armorDefense + bonusDefense << " DMG)" << RESET << endl;
+    cout << RED << "적의 공격! " << actualDamage << "의 데미지를 입었습니다. (방어력으로 " << armorDefense + bonusDefense << " 감소)" << RESET << endl;
 }
 
 void Player::heal() {
     if (potions > 0) {
-        hp += 30;
-        if (hp > maxHp) hp = maxHp;
         potions--;
-        cout << GREEN << "You drank a potion! HP recovered. (Potions left: " << potions << ")" << RESET << endl;
-    } else {
-        cout << RED << "You searched your bag, but you have no potions left!" << RESET << endl;
-    }
+        hp += 50;
+        if (hp > maxHp) hp = maxHp;
+        cout << GREEN << "포션을 사용했습니다! (+50 HP) 남은 포션: " << potions << RESET << endl;
+    } else cout << RED << "포션이 부족합니다!" << RESET << endl;
 }
 
-void Player::restoreMp(){
-    if(manaPotions > 0){
-        mp += 30;
-        if(mp > maxMp) mp = maxMp;
+void Player::restoreMp() {
+    if (manaPotions > 0) {
         manaPotions--;
-        cout << CYAN << "You Drank a Mana Potion! Mp recovered. (Mana Potions left: " << manaPotions << ")" << RESET << endl;
-    } else {
-        cout << RED << "You searched your bag, but you have no mana potions left!" << RESET << endl;
-    }
+        mp += 50;
+        if (mp > maxMp) mp = maxMp;
+        cout << CYAN << "마나 포션을 사용했습니다! (+50 MP) 남은 마나 포션: " << manaPotions << RESET << endl;
+    } else cout << RED << "마나 포션이 부족합니다!" << RESET << endl;
 }
 
 void Player::gainExp(int amount) {
     exp += amount;
-    cout << CYAN << "Gained " << amount << " EXP." << RESET << endl;
-
-    if (exp >= 100) {
-        level++;
-        exp -= 100;
-        maxHp += 20;
-        hp = maxHp;
-        maxMp += 10; // 레벨업 시 최대 마나 증가
-        mp = maxMp;  // 마나 풀 회복
-        potions++;
-        cout << YELLOW << "✨ LEVEL UP! You are now Lv." << level << "! (Max HP/MP increased, fully restored, gained 1 Potion)" << RESET << endl;
-    }
+    cout << YELLOW << amount << "의 경험치를 획득했습니다!" << RESET << endl;
+    if (exp >= maxExp) levelUp();
 }
 
-void Player::printStatus() {
-    cout << "\n[" << CYAN << "Lv." << level << " Player" << RESET << "] "
-         << "HP: " << GREEN << hp << "/" << maxHp << RESET
-         << " | MP: " << CYAN << mp << "/" << maxMp << RESET // ✨ Display MP
-         << " | EXP: " << CYAN << exp << "/100" << RESET
-         << " | Gold: " << YELLOW << gold << "G" << RESET << endl;
-    cout << "Weapon ATK: +" << weaponDamage << " | Armor DEF: +" << armorDefense << " | Dungeon Floor: " << CYAN << dungeonFloor << RESET << endl;
-    cout << "Items: [HP Potion x" << potions << "] [MP Potion x" << manaPotions << "]" << endl;
+void Player::levelUp() {
+    level++;
+    exp -= maxExp;
+    maxExp += 50;
+    maxHp += 20; hp = maxHp;
+    maxMp += 10; mp = maxMp;
+    weaponDamage += 2;
+    cout << GREEN << "🎉 레벨 업! Lv." << level << "이 되었습니다!" << RESET << endl;
 }
 
 void Player::save() {
-    ofstream fout("savefile.txt");
-    if (fout.is_open()){
-        // 리스트를 돌면서 이름 값 형태로 저장
-        for(auto const& [name, ptr] : stats){
-            fout << name << " " << *ptr << endl;
+    ofstream outFile("savefile.txt");
+    if (outFile.is_open()) {
+        for (auto const& [key, val] : stats) {
+            outFile << key << " " << *val << "\n";
         }
-        fout.close();
-        cout << "Game saved automatically!" << endl;
-    }
+        outFile.close();
+        cout << GREEN << "💾 게임이 성공적으로 저장되었습니다." << RESET << endl;
+    } else cout << RED << "❌ 저장 파일을 열 수 없습니다!" << RESET << endl;
 }
 
-bool Player::load() {
-    ifstream fin("savefile.txt");
-    if(fin.is_open()){
-        string name;
+void Player::load() {
+    ifstream inFile("savefile.txt");
+    if (inFile.is_open()) {
+        string key;
         int value;
-        // 파일에서 이름을 읽고, 그 이름에 해당하는 주소에 값을 넣음
-        while (fin >> name >> value){
-            if (stats.find(name) != stats.end()){
-                *(stats[name]) = value;
-            }
+        while (inFile >> key >> value) {
+            if (stats.find(key) != stats.end()) *stats[key] = value;
         }
-        fin.close();
-        cout << "All stats loaded successfully!" << endl;
-        return true;
-    }
-    return false;
+        inFile.close();
+        updateJobLogic(); // ✨ 불러온 jobClass 숫자에 맞춰 직업 세팅!
+        cout << GREEN << "📂 게임을 성공적으로 불러왔습니다." << RESET << endl;
+    } else cout << RED << "❌ 저장 파일이 없습니다. 새로운 게임을 시작합니다." << RESET << endl;
 }

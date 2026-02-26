@@ -4,6 +4,7 @@ My first toy project to understand the procedural and object-oriented flow of C+
 ## Changelog
 
 ### [2026-02-27]
+- **Fixed Header Mismatch**: Synchronized `Player.h` with `Player.cpp` to resolve undefined identifier errors for new job system variables and the level-up logic.
 - **Armor Enhancement System**: Implemented armor upgrading (+3 DEF per level) and added it to the automated save registry to balance the endgame combat loop.
 - **Implemented Gacha System**: Added 'Mystery Box' to the shop with randomized rewards (Gold jackpot, potions, free weapon upgrades, or failure) to act as a gold sink and add RNG fun.
 - **Implemented Polymorphic Abilities**: Overrode `attack()` method for `Orc` and `Slime` to introduce unique monster skills (Heavy Smash, Acid Spit) without modifying combat logic.
