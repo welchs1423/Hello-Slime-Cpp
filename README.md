@@ -4,6 +4,7 @@ My first toy project to understand the procedural and object-oriented flow of C+
 ## Changelog
 
 ### [2026-02-27]
+- Added Armor Defense system and expanded Shop with Leather/Iron Armors.
 - Pivoted back to Console UI; Added MP (Mana Points) and Magic Skill system.
 - Added Player HP display during combat for better visibility.
 - Applied ANSI Escape Codes to colorize UI elements (HP, Gold, Damage) for better UX.

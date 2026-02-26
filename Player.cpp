@@ -16,6 +16,7 @@ Player::Player() {
     potions = 3;
     gold = 0;         
     weaponDamage = 0; 
+    armorDefense = 0;   // Starts with 0 Defense (No armor)
     dungeonFloor = 1; 
 }
 
@@ -46,8 +47,12 @@ int Player::magicAttack() {
 }
 
 void Player::takeDamage(int damage) {
-    hp -= damage;
-    cout << RED << "Enemy counterattacks! You took " << damage << " damage." << RESET << endl;
+    // 방어력(Armor) 적용 로직
+    int actualDamage = damage - armorDefense;
+    if(actualDamage < 0) actualDamage = 0;  // 방어력이 너무 높아도 데미지가 마이너스가 되진 않게 처리
+
+    hp -= actualDamage;
+    cout << RED << "Enemy counterattacks! You took " << actualDamage << " damage. (Mitigated " << armorDefense << " DMG)" << RESET << endl;
 }
 
 void Player::heal() {
@@ -83,13 +88,13 @@ void Player::printStatus() {
          << " | MP: " << CYAN << mp << "/" << maxMp << RESET // ✨ Display MP
          << " | EXP: " << CYAN << exp << "/100" << RESET
          << " | Gold: " << YELLOW << gold << "G" << RESET << endl;
-    cout << "Weapon ATK: +" << weaponDamage << " | Dungeon Floor: " << CYAN << dungeonFloor << RESET << endl;
+    cout << "Weapon ATK: +" << weaponDamage << " | Armor DEF: +" << armorDefense << " | Dungeon Floor: " << CYAN << dungeonFloor << RESET << endl;
 }
 
 void Player::save() {
     ofstream fout("savefile.txt"); 
     if (fout.is_open()) {
-        fout << level << " " << exp << " " << maxHp << " " << hp << " " << maxMp << " " << mp << " " << potions << " " << gold << " " << weaponDamage << " " << dungeonFloor;
+        fout << level << " " << exp << " " << maxHp << " " << hp << " " << maxMp << " " << mp << " " << potions << " " << gold << " " << weaponDamage << " " << armorDefense << " " << dungeonFloor;
         fout.close();
         cout << GREEN << "💾 Game saved successfully!" << RESET << endl;
     } else {
@@ -100,7 +105,7 @@ void Player::save() {
 bool Player::load() {
     ifstream fin("savefile.txt"); 
     if (fin.is_open()) {
-        fin >> level >> exp >> maxHp >> hp >> maxMp >> mp >> potions >> gold >> weaponDamage >> dungeonFloor;
+        fin >> level >> exp >> maxHp >> hp >> maxMp >> mp >> potions >> gold >> weaponDamage >> armorDefense >> dungeonFloor;
         fin.close();
         cout << GREEN << "📂 Saved game loaded successfully!" << RESET << endl;
         return true;

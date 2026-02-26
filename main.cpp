@@ -54,12 +54,10 @@ int main() {
 
             bool inCombat = true;
             while (inCombat && player.hp > 0 && slime.hp > 0) {
-                // ✨ Show HP and MP during combat
                 cout << "\n[" << CYAN << "Player" << RESET << "] HP: " << GREEN << player.hp << "/" << player.maxHp << RESET 
                      << " | MP: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
                 cout << "[Enemy] HP: " << RED << slime.hp << RESET << endl;
                 
-                // ✨ Added Magic menu
                 cout << "1. Attack  2. Magic (20MP)  3. Run  4. Potion (" << player.potions << ")\nSelect: ";
                 
                 int combatChoice;
@@ -75,9 +73,8 @@ int main() {
                         player.takeDamage(slimeDamage); 
                     }
                 } else if (combatChoice == 2) {
-                    // ✨ Execute Magic Attack
                     int magicDmg = player.magicAttack();
-                    if (magicDmg != -1) { // 마나가 충분해서 스킬이 나갔다면
+                    if (magicDmg != -1) { 
                         slime.takeDamage(magicDmg);
                         if (slime.hp > 0) {
                             int slimeDamage = slime.attack(); 
@@ -121,7 +118,13 @@ int main() {
             clearScreen(); 
             cout << CYAN << "\n=== 🛒 Item Shop ===" << RESET << endl;
             player.printStatus();
-            cout << "1. Buy Potion (30G)\n2. Buy Iron Sword (+10 ATK) (100G)\n3. Buy Steel Sword (+25 ATK) (250G)\n4. Leave\nSelect: ";
+            // ✨ 상점 메뉴에 방어구 추가!
+            cout << "1. Buy Potion (30G)\n";
+            cout << "2. Buy Iron Sword (+10 ATK) (100G)\n";
+            cout << "3. Buy Steel Sword (+25 ATK) (250G)\n";
+            cout << "4. Buy Leather Armor (+5 DEF) (80G)\n";
+            cout << "5. Buy Iron Armor (+15 DEF) (200G)\n";
+            cout << "6. Leave\nSelect: ";
             int shopChoice;
             cin >> shopChoice;
 
@@ -145,6 +148,18 @@ int main() {
                     cout << GREEN << "Purchased a Steel Sword! Weapon ATK is now +25." << RESET << endl;
                 } else cout << RED << "Not enough Gold!" << RESET << endl;
             } else if (shopChoice == 4) {
+                if (player.gold >= 80) {
+                    player.gold -= 80;
+                    player.armorDefense = 5;
+                    cout << GREEN << "Purchased Leather Armor! Armor DEF is now +5." << RESET << endl;
+                } else cout << RED << "Not enough Gold!" << RESET << endl;
+            } else if (shopChoice == 5) {
+                if (player.gold >= 200) {
+                    player.gold -= 200;
+                    player.armorDefense = 15;
+                    cout << GREEN << "Purchased Iron Armor! Armor DEF is now +15." << RESET << endl;
+                } else cout << RED << "Not enough Gold!" << RESET << endl;
+            } else if (shopChoice == 6) {
                 cout << "Leaving shop..." << endl;
             } else cout << RED << "Invalid input." << RESET << endl;
             
