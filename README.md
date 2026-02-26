@@ -4,6 +4,8 @@ My first toy project to understand the procedural and object-oriented flow of C+
 ## Changelog
 
 ### [2026-02-27]
+- **Expanded Bestiary**: Added 'Orc' monster using the inheritance system.
+- **Dynamic Encounter Logic**: Updated dungeon spawning to introduce tougher enemies at higher floors.
 - **Corrected Project Structure**: Moved `main.cpp` and configuration files from a literal `/Root` folder to the actual project root directory.
 - **Finalized Build Pipeline**: Confirmed the standardized g++ command with include and src pathing.
 - Implemented Weapon Enhancement system (+1, +2...) with dynamic damage scaling.
