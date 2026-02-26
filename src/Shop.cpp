@@ -10,16 +10,16 @@ void Shop::visit(Player& player) {
     cout << CYAN << "\n=== 🛒 Item Shop ===" << RESET << endl;
     player.printStatus();
     cout << "1. Buy Potion (30G)\n";
-    cout << "2. Buy Mana Potion (30G)\n";   // 신상 입고
+    cout << "2. Buy Mana Potion (30G)\n";
     cout << "3. Buy Iron Sword (+10 ATK) (100G)\n";
     cout << "4. Buy Steel Sword (+25 ATK) (250G)\n";
     cout << "5. Buy Leather Armor (+5 DEF) (80G)\n";
     cout << "6. Buy Iron Armor (+15 DEF) (200G)\n";
-    cout << "7. [Upgrade Weapon] (+5 ATK) (50G)\n"; // 신규 메뉴
+    cout << "7. [Upgrade Weapon] (+5 ATK) (50G)\n";
+    cout << "8. [Upgrade Armor] (+3 DEF) (50G)\n"; // 신규 메뉴
+    cout << "9. Buy Mystery Box (50G)\n";
+    cout << "10. Leave\nSelect: ";
 
-    // 신규 메뉴 추가
-    cout << "8. 🎁 Buy Mystery Box (50G) - Test your luck!\n"; 
-    cout << "9. Leave\nSelect: ";
     int shopChoice;
     cin >> shopChoice;
 
@@ -69,6 +69,12 @@ void Shop::visit(Player& player) {
             cout << RED << "Not enough Gold for upgrade!" << RESET << endl;
         }
     } else if (shopChoice == 8){
+        if (player.gold >= 50) {
+            player.gold -= 50;
+            player.armorLevel++;
+            cout << YELLOW << "✨ Armor Upgraded! Current: +" << player.armorLevel << RESET << endl;
+        } else cout << RED << "Not enough Gold for upgrade!" << RESET << endl;
+    } else if (shopChoice == 9) {
         if(player.gold >= 50){
             player.gold -= 50;
             cout << YELLOW << "Opening the Mystery Box..." << RESET << endl;
@@ -95,9 +101,11 @@ void Shop::visit(Player& player) {
         } else {
             cout << RED << "Not enough Gold for the Mystery Box!" << RESET << endl;
         }
-    } else if (shopChoice == 9) {
+    } else if (shopChoice == 10) {
         cout << "Leaving shop..." << endl;
-    } else cout << RED << "Invalid input." << RESET << endl;
+    } else {
+        cout << RED << "Invalid input." << RESET << endl;
+    }
     
     cout << "\nPress Enter to continue...";
     cin.ignore();

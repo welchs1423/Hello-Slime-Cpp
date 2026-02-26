@@ -20,6 +20,7 @@ Player::Player() {
     armorDefense = 0;   // Starts with 0 Defense (No armor)
     dungeonFloor = 1;
     weaponLevel = 0;    // 초기 강화 0
+    armorLevel = 0;     // 초기 방어구 강화 0
     
     registerStats();    // 생성 시점에 모든 변수 등록
 }
@@ -39,6 +40,7 @@ void Player::registerStats() {
     stats["armorDefense"] = &armorDefense;
     stats["dungeonFloor"] = &dungeonFloor;
     stats["weaponLevel"] = &weaponLevel;
+    stats["armorLevel"] = &armorLevel;
 }
 
 int Player::attack() {
@@ -70,12 +72,14 @@ int Player::magicAttack() {
 }
 
 void Player::takeDamage(int damage) {
+    // 강화 1단계당 데미지 3 추가 감소
+    int bonusDefense = armorLevel * 3;
     // 방어력(Armor) 적용 로직
-    int actualDamage = damage - armorDefense;
+    int actualDamage = damage - armorDefense - bonusDefense;
     if(actualDamage < 0) actualDamage = 0;  // 방어력이 너무 높아도 데미지가 마이너스가 되진 않게 처리
 
     hp -= actualDamage;
-    cout << RED << "Enemy counterattacks! You took " << actualDamage << " damage. (Mitigated " << armorDefense << " DMG)" << RESET << endl;
+    cout << RED << "Enemy attacks! You took " << actualDamage << " damage. (Mitigated " << armorDefense + bonusDefense << " DMG)" << RESET << endl;
 }
 
 void Player::heal() {

@@ -25,6 +25,7 @@ public:
     int armorDefense;   // Added Armor Defense
     int dungeonFloor;   // Added Dungeon Floor
     int weaponLevel;    // 추가 : 무기 강화 레벨
+    int armorLevel;     // 방어구 강화 수치
 
     Player(); 
     int attack(); 
