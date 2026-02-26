@@ -4,6 +4,10 @@ My first toy project to understand the procedural and object-oriented flow of C+
 ## Changelog
 
 ### [2026-02-27]
+- **Implemented Polymorphic Abilities**: Overrode `attack()` method for `Orc` and `Slime` to introduce unique monster skills (Heavy Smash, Acid Spit) without modifying combat logic.
+- **Architectural Refactoring**: Implemented `MonsterFactory` to decouple monster spawning from `Battle` logic.
+- **New Content**: Added `Orc` monster with higher stats for advanced dungeon floors.
+- **Directory Clean-up**: Finalized `/src` and `/include` separation for better scalability.
 - **Expanded Bestiary**: Added 'Orc' monster using the inheritance system.
 - **Dynamic Encounter Logic**: Updated dungeon spawning to introduce tougher enemies at higher floors.
 - **Corrected Project Structure**: Moved `main.cpp` and configuration files from a literal `/Root` folder to the actual project root directory.

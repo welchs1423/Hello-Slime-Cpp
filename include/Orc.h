@@ -7,6 +7,7 @@ class Orc : public Monster {
 public:
     // 고블린보다 높은 체력과 데미지를 설정
     Orc(int playerLevel);
+    int attack() override;  // 오크만의 공격 방식 선언
 };
 
 #endif
