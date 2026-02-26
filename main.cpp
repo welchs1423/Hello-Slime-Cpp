@@ -55,6 +55,8 @@ int main() {
 
             bool inCombat = true;
             while (inCombat && player.hp > 0 && slime.hp > 0) {
+                // 전투 중 내 체력(HP)을 초록색으로 표시!
+                cout << "\n[" << CYAN << "Player" << RESET << "] HP: " << GREEN << player.hp << "/" << player.maxHp << RESET << endl;
                 // ✨ Red for Enemy HP
                 cout << "\n[Enemy] HP: " << RED << slime.hp << RESET << endl;
                 cout << "1. Attack  2. Run  3. Potion (" << player.potions << ")\nSelect: ";
