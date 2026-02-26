@@ -1,164 +1,93 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <SFML/Graphics.hpp>
+#include <optional>
 #include "Player.h"
 #include "Slime.h"
-#include "Colors.h" // ✨ Import Color Palette
+#include "Colors.h"
 
 using namespace std;
-
-void clearScreen() {
-    system("cls");
-}
 
 int main() {
     system("chcp 65001");
     srand(time(0)); 
 
     Player player; 
-    bool isPlaying = true; 
+    Slime slime(player.level); 
 
-    clearScreen(); 
-    cout << CYAN << "=== Slime Hunter RPG ===" << RESET << endl;
-    cout << "1. New Game  2. Continue\nSelect: ";
-    int startChoice;
-    cin >> startChoice;
+    // 1. 2D 그래픽 창 세팅 (800 x 600)
+    sf::RenderWindow window(sf::VideoMode(sf::Vector2u(800, 600)), "Slime Hunter 2D");
 
-    if (startChoice == 2) {
-        player.load(); 
+    // 2. 슬라임 이미지 불러오기
+    sf::Texture slimeTex;
+    if (!slimeTex.loadFromFile("slime.png")) {
+        cout << RED << "❌ slime.png 파일을 찾을 수 없습니다!" << RESET << endl;
+        return -1;
     }
+    sf::Sprite slimeSprite(slimeTex);
+    slimeSprite.setScale(sf::Vector2f(0.2f, 0.2f)); // 크기 조절 (테스트때 맞춘 비율로 수정 가능)
+    slimeSprite.setPosition(sf::Vector2f(500.f, 250.f)); // 화면 오른쪽에 배치
 
-    while (isPlaying && player.hp > 0) {
-        clearScreen(); 
-        cout << "\n=== 🏡 Town Square ===" << endl;
-        player.printStatus();
-        cout << "1. Enter Dungeon  2. Visit Shop  3. Save Game  4. Quit Game\nSelect: ";
-        int townChoice;
-        cin >> townChoice;
+    // 3. 플레이어 임시 그래픽 (파란색 네모)
+    sf::RectangleShape playerShape(sf::Vector2f(100.f, 150.f));
+    playerShape.setFillColor(sf::Color::Blue);
+    playerShape.setPosition(sf::Vector2f(150.f, 250.f)); // 화면 왼쪽에 배치
 
-        if (townChoice == 1) {
-            clearScreen(); 
-            cout << "\n=== 🏰 Dungeon Floor " << player.dungeonFloor << " ===" << endl;
-            
-            Slime slime(player.level); 
-            bool isBoss = (player.dungeonFloor % 5 == 0); 
+    // 4. 게임 시작 안내
+    cout << CYAN << "=== 2D 슬라임 헌터에 오신 것을 환영합니다! ===" << RESET << endl;
+    cout << "🎮 조작법: [스페이스바]를 눌러 슬라임을 공격하세요!" << endl;
+    cout << "🚪 종료: [ESC] 키를 누르거나 창의 X 버튼을 누르세요.\n" << endl;
 
-            if (isBoss) {
-                slime.maxHp *= 3; 
-                slime.hp = slime.maxHp;
-                slime.baseDamage *= 2; 
-                // ✨ Red for Boss Warning
-                cout << RED << "🚨 WARNING! A massive KING SLIME (HP: " << slime.hp << ") blocks your path! 🚨" << RESET << endl;
-            } else {
-                cout << "A wild Slime (HP: " << RED << slime.hp << RESET << ") appeared!" << endl;
+    // 5. 실시간 게임 루프
+    while (window.isOpen() && player.hp > 0) {
+        // 이벤트 처리 (키보드 입력, 창 닫기 등)
+        while (std::optional<sf::Event> event = window.pollEvent()) {
+            if (event->is<sf::Event::Closed>()) {
+                window.close();
             }
-
-            bool inCombat = true;
-            while (inCombat && player.hp > 0 && slime.hp > 0) {
-                // 전투 중 내 체력(HP)을 초록색으로 표시!
-                cout << "\n[" << CYAN << "Player" << RESET << "] HP: " << GREEN << player.hp << "/" << player.maxHp << RESET << endl;
-                // ✨ Red for Enemy HP
-                cout << "\n[Enemy] HP: " << RED << slime.hp << RESET << endl;
-                cout << "1. Attack  2. Run  3. Potion (" << player.potions << ")\nSelect: ";
-                
-                int combatChoice;
-                cin >> combatChoice;
-
-                clearScreen(); 
-
-                if (combatChoice == 1) {
-                    int damage = player.attack(); 
-                    slime.takeDamage(damage);
-
+            
+            // 키보드가 눌렸을 때의 이벤트 처리 (SFML 3.x 방식)
+            if (const auto* keyPress = event->getIf<sf::Event::KeyPressed>()) {
+                // 스페이스바를 누르면 전투 실행!
+                if (keyPress->code == sf::Keyboard::Key::Space) {
                     if (slime.hp > 0) {
-                        int slimeDamage = slime.attack(); 
-                        player.takeDamage(slimeDamage); 
+                        cout << "\n------------------------------------" << endl;
+                        int damage = player.attack(); 
+                        slime.takeDamage(damage);
+
+                        if (slime.hp > 0) {
+                            int slimeDamage = slime.attack(); 
+                            player.takeDamage(slimeDamage); 
+                        } else {
+                            cout << YELLOW << "\n🎉 슬라임을 물리쳤습니다!" << RESET << endl;
+                            player.gainExp(50);
+                            
+                            // 새 슬라임 소환!
+                            slime = Slime(player.level); 
+                            cout << RED << "🚨 야생의 새로운 슬라임이 나타났다!" << RESET << endl;
+                        }
+                        
+                        // 체력 상태 출력
+                        cout << GREEN << "[내 HP: " << player.hp << "/" << player.maxHp << "] " << RESET;
+                        cout << RED << "[적 HP: " << slime.hp << "]" << RESET << endl;
                     }
-                } else if (combatChoice == 2) {
-                    cout << "You ran away back to town..." << endl;
-                    inCombat = false; 
-                } else if (combatChoice == 3) {
-                    player.heal(); 
-                } else {
-                    cout << "Invalid input." << endl;
+                } 
+                // ESC를 누르면 창 닫기
+                else if (keyPress->code == sf::Keyboard::Key::Escape) {
+                    window.close();
                 }
             }
-
-            if (slime.hp <= 0) {
-                if (isBoss) {
-                    cout << YELLOW << "\n👑 VICTORY! You defeated the KING SLIME!" << RESET << endl;
-                    player.gainExp(150); 
-                    int earnedGold = rand() % 50 + 50; 
-                    player.gold += earnedGold;
-                    cout << YELLOW << "💰 Looted " << earnedGold << " Gold from the Boss!" << RESET << endl;
-                } else {
-                    cout << CYAN << "\n🎉 You defeated the Slime!" << RESET << endl;
-                    player.gainExp(50); 
-                    int earnedGold = rand() % 20 + 10; 
-                    player.gold += earnedGold;
-                    cout << YELLOW << "💰 Looted " << earnedGold << " Gold!" << RESET << endl;
-                }
-                
-                player.dungeonFloor++; 
-                cout << CYAN << "You found the stairs and advanced to Floor " << player.dungeonFloor << "!" << RESET << endl;
-                
-                cout << "\nPress Enter to return to town...";
-                cin.ignore();
-                cin.get(); 
-            }
-
-        } else if (townChoice == 2) {
-            clearScreen(); 
-            cout << CYAN << "\n=== 🛒 Item Shop ===" << RESET << endl;
-            player.printStatus();
-            cout << "1. Buy Potion (30G)\n2. Buy Iron Sword (+10 ATK) (100G)\n3. Buy Steel Sword (+25 ATK) (250G)\n4. Leave\nSelect: ";
-            int shopChoice;
-            cin >> shopChoice;
-
-            clearScreen();
-            if (shopChoice == 1) {
-                if (player.gold >= 30) {
-                    player.gold -= 30;
-                    player.potions++;
-                    cout << GREEN << "Purchased a Potion! (Potions: " << player.potions << ")" << RESET << endl;
-                } else cout << RED << "Not enough Gold!" << RESET << endl;
-            } else if (shopChoice == 2) {
-                if (player.gold >= 100) {
-                    player.gold -= 100;
-                    player.weaponDamage = 10;
-                    cout << GREEN << "Purchased an Iron Sword! Weapon ATK is now +10." << RESET << endl;
-                } else cout << RED << "Not enough Gold!" << RESET << endl;
-            } else if (shopChoice == 3) {
-                if (player.gold >= 250) {
-                    player.gold -= 250;
-                    player.weaponDamage = 25;
-                    cout << GREEN << "Purchased a Steel Sword! Weapon ATK is now +25." << RESET << endl;
-                } else cout << RED << "Not enough Gold!" << RESET << endl;
-            } else if (shopChoice == 4) {
-                cout << "Leaving shop..." << endl;
-            } else cout << RED << "Invalid input." << RESET << endl;
-            
-            cout << "\nPress Enter to continue...";
-            cin.ignore();
-            cin.get();
-
-        } else if (townChoice == 3) {
-            clearScreen();
-            player.save();
-            cout << "\nPress Enter to continue...";
-            cin.ignore();
-            cin.get();
-        } else if (townChoice == 4) {
-            clearScreen();
-            cout << "Quitting game..." << endl;
-            isPlaying = false;
-        } else {
-            clearScreen();
-            cout << RED << "Invalid input." << RESET << endl;
         }
+
+        // 6. 화면 그리기 (렌더링)
+        window.clear(sf::Color(30, 30, 30)); // 짙은 회색 배경으로 지우기
+        window.draw(playerShape);            // 플레이어 그리기
+        window.draw(slimeSprite);            // 슬라임 그리기
+        window.display();                    // 모니터에 출력
     }
 
-    if (player.hp <= 0) cout << RED << "\n💀 The player has fallen... Game Over." << RESET << endl;
+    if (player.hp <= 0) cout << RED << "\n💀 플레이어가 쓰러졌습니다... Game Over." << RESET << endl;
     
     return 0;
 }
