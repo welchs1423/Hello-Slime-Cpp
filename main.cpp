@@ -1,7 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include "Player.h" // 우리가 만든 플레이어 설계도를 가져옴
+#include "Player.h"
+#include "Slime.h"
 
 using namespace std;
 
@@ -14,25 +15,26 @@ int main() {
     cout << "=== 끝없는 슬라임 사냥터에 입장했습니다! ===" << endl;
 
     while (player.hp > 0) {
-        int slimeHp = 30 + (player.level * 10); 
-        cout << "\n=========================================" << endl;
-        cout << "야생의 슬라임(HP: " << slimeHp << ")이 나타났다!" << endl;
+        Slime slime(player.level); // 슬라임 객체 생성
 
-        while (player.hp > 0 && slimeHp > 0) {
-            player.printStatus(); // 상태 출력 함수 호출
-            cout << "[슬라임] HP: " << slimeHp << endl;
+        cout << "\n=========================================" << endl;
+        cout << "야생의 슬라임(HP: " << slime.hp << ")이 나타났다!" << endl;
+
+        while (player.hp > 0 && slime.hp > 0) {
+            player.printStatus();
+            cout << "[슬라임] HP: " << slime.hp << endl;
             cout << "1. 공격하기  2. 도망가기  3. 물약 마시기(남은 개수: " << player.potions << ")\n선택: ";
             
             int choice;
             cin >> choice;
 
             if (choice == 1) {
-                int damage = player.attack(); // 공격 함수 호출 후 데미지 받아오기
-                slimeHp -= damage;
+                int damage = player.attack();
+                slime.takeDamage(damage);
 
-                if (slimeHp > 0) {
+                if (slime.hp > 0) {
                     int slimeDamage = rand() % 5 + 5 + player.level; 
-                    player.takeDamage(slimeDamage); // 피해 입는 함수 호출
+                    player.takeDamage(slimeDamage);
                 }
             } else if (choice == 2) {
                 cout << "전투에서 도망쳤습니다... 사냥터를 빠져나갑니다." << endl;
@@ -44,9 +46,9 @@ int main() {
             }
         }
 
-        if (slimeHp <= 0) {
-            cout << "\n🎉 슬라임을 물리쳤습니다!" << endl;
-            player.gainExp(50); // 경험치 획득 함수 호출
+        if (slime.hp <= 0) {
+            cout << "\n 슬라임을 물리쳤습니다!" << endl;
+            player.gainExp(50);
         }
     }
 

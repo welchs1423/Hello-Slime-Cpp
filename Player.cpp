@@ -62,5 +62,5 @@ void Player::gainExp(int amount){
 
 // 6. 상태 출력 로직
 void Player::printStatus(){
-    cout << "\n[Lv." << level << "플레이어] HP: " << hp << "/" << maxHp << "|EXP: " << exp << "/100" << endl;
+    cout << "\n[Lv. " << level << " 플레이어] HP: " << hp << "/" << maxHp << "|EXP: " << exp << "/100" << endl;
 }
