@@ -1,15 +1,10 @@
 #ifndef SLIME_H
 #define SLIME_H
+#include "Monster.h"
 
-class Slime {
+class Slime : public Monster{
 public:
-    int hp;
-    int maxHp;
-    int baseDamage;
-
-    Slime(int playerLevel); 
-    int attack(); 
-    void takeDamage(int damage); 
+    Slime(int playerLevel) : Monster("Blue Slime", 30 + (playerLevel * 10), 5 + playerLevel) {}
 };
 
 #endif
