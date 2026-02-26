@@ -4,6 +4,7 @@ My first toy project to understand the procedural and object-oriented flow of C+
 ## Changelog
 
 ### [2026-02-27]
+- Implemented Weapon Enhancement system (+1, +2...) with dynamic damage scaling.
 - Automated Save/Load system using Metadata Registry (Member Pointer Map).
 - Added Mana Potion item to Shop and Battle system to allow MP restoration.
 - Performed deep OOP refactoring: Abstracted `Shop` and `Battle` into dedicated classes to fully decouple logic from `GameManager`.

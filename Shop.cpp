@@ -15,7 +15,8 @@ void Shop::visit(Player& player) {
     cout << "4. Buy Steel Sword (+25 ATK) (250G)\n";
     cout << "5. Buy Leather Armor (+5 DEF) (80G)\n";
     cout << "6. Buy Iron Armor (+15 DEF) (200G)\n";
-    cout << "7. Leave\nSelect: ";
+    cout << "7. [Upgrade Weapon] (+5 ATK) (50G)\n"; // 신규 메뉴
+    cout << "8. Leave\nSelect: ";
     int shopChoice;
     cin >> shopChoice;
 
@@ -56,7 +57,15 @@ void Shop::visit(Player& player) {
             player.armorDefense = 15;
             cout << GREEN << "Purchased Iron Armor! Armor DEF is now +15." << RESET << endl;
         } else cout << RED << "Not enough Gold!" << RESET << endl;
-    } else if (shopChoice == 7) {
+    } else if (shopChoice == 7){
+        if (player.gold >= 50) {
+            player.gold -= 50;
+            player.weaponLevel++;
+            cout << YELLOW << "Weapon Upgraded! Current: +" << player.weaponLevel << RESET << endl;
+        } else {
+            cout << RED << "Not enough Gold for upgrade!" << RESET << endl;
+        }
+    } else if (shopChoice == 8) {
         cout << "Leaving shop..." << endl;
     } else cout << RED << "Invalid input." << RESET << endl;
     

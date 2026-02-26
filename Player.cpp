@@ -18,7 +18,8 @@ Player::Player() {
     gold = 0;         
     weaponDamage = 0; 
     armorDefense = 0;   // Starts with 0 Defense (No armor)
-    dungeonFloor = 1; 
+    dungeonFloor = 1;
+    weaponLevel = 0;    // 초기 강화 0
     
     registerStats();    // 생성 시점에 모든 변수 등록
 }
@@ -37,17 +38,20 @@ void Player::registerStats() {
     stats["weaponDamage"] = &weaponDamage;
     stats["armorDefense"] = &armorDefense;
     stats["dungeonFloor"] = &dungeonFloor;
+    stats["weaponLevel"] = &weaponLevel;
 }
 
 int Player::attack() {
-    int damage = rand() % 10 + 10 + (level * 2) + weaponDamage;
+    // 강화 레벨 당 데미지 5씩 추가 가중치
+    int bonusDamage = weaponLevel * 5;
+    int damage = rand() % 10 + 10 + (level * 2) + weaponDamage + bonusDamage;
     int critChance = rand() % 100;
 
     if (critChance < 20) {
         damage *= 2;
-        cout << YELLOW << "⚡ CRITICAL HIT!! You pierced the enemy's weak spot for " << damage << " damage!" << RESET << endl;
+        cout << YELLOW << "⚡ CRITICAL HIT!! [+" << weaponLevel << " Weapon] dealt " << damage << " damage!" << RESET << endl;
     } else {
-        cout << "You attacked and dealt " << damage << " damage." << endl;
+        cout << "You attacked with [+" << weaponLevel << " Weapon] and dealt " << damage << " damage." << endl;
     }
     return damage;
 }

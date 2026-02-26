@@ -10,7 +10,7 @@ private:
     // 변수 이름과 해당 주소를 연결하는 맵
     std::map<std::string, int*> stats;
     void registerStats();   // 스탯 등록 함수
-    
+
 public:
     int level;
     int exp;
@@ -24,6 +24,7 @@ public:
     int weaponDamage;   // Added Weapon Damage
     int armorDefense;   // Added Armor Defense
     int dungeonFloor;   // Added Dungeon Floor
+    int weaponLevel;    // 추가 : 무기 강화 레벨
 
     Player(); 
     int attack(); 
