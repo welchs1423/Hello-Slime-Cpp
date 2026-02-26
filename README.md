@@ -4,6 +4,7 @@ My first toy project to understand the procedural and object-oriented flow of C+
 ## Changelog
 
 ### [2026-02-27]
+- **Implemented Gacha System**: Added 'Mystery Box' to the shop with randomized rewards (Gold jackpot, potions, free weapon upgrades, or failure) to act as a gold sink and add RNG fun.
 - **Implemented Polymorphic Abilities**: Overrode `attack()` method for `Orc` and `Slime` to introduce unique monster skills (Heavy Smash, Acid Spit) without modifying combat logic.
 - **Architectural Refactoring**: Implemented `MonsterFactory` to decouple monster spawning from `Battle` logic.
 - **New Content**: Added `Orc` monster with higher stats for advanced dungeon floors.

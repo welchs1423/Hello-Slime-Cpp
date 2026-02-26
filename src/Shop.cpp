@@ -16,7 +16,10 @@ void Shop::visit(Player& player) {
     cout << "5. Buy Leather Armor (+5 DEF) (80G)\n";
     cout << "6. Buy Iron Armor (+15 DEF) (200G)\n";
     cout << "7. [Upgrade Weapon] (+5 ATK) (50G)\n"; // 신규 메뉴
-    cout << "8. Leave\nSelect: ";
+
+    // 신규 메뉴 추가
+    cout << "8. 🎁 Buy Mystery Box (50G) - Test your luck!\n"; 
+    cout << "9. Leave\nSelect: ";
     int shopChoice;
     cin >> shopChoice;
 
@@ -65,7 +68,34 @@ void Shop::visit(Player& player) {
         } else {
             cout << RED << "Not enough Gold for upgrade!" << RESET << endl;
         }
-    } else if (shopChoice == 8) {
+    } else if (shopChoice == 8){
+        if(player.gold >= 50){
+            player.gold -= 50;
+            cout << YELLOW << "Opening the Mystery Box..." << RESET << endl;
+
+            int roll = rand() % 100; // 0~99 랜덤 뽑기
+
+            if(roll < 10){
+                // 10% 확률: 대박! (200 골드 당첨)
+                cout << YELLOW << "JACKPOT! You found 200 Gold!" << RESET << endl;
+                player.gold += 200;
+            } else if (roll < 40){
+                // 30% 확률: 중박! (포션 세트)
+                cout << GREEN << "You found 2 HP Potions and 1 MP Potion!" << RESET << endl;
+                player.potions += 2;
+                player.manaPotions += 1;
+            } else if (roll< 70){
+                // 30% 확률: 소박! (무기 1강 무료)
+                cout << CYAN << "A magical hammer strikes! Weapon Level +1!" << RESET << endl;
+                player.weaponLevel++;
+            } else {
+                // 30% 확률 꽝!
+                cout << RED << "It's just a pile of rocks... Better luck next time." << RESET << endl;
+            }
+        } else {
+            cout << RED << "Not enough Gold for the Mystery Box!" << RESET << endl;
+        }
+    } else if (shopChoice == 9) {
         cout << "Leaving shop..." << endl;
     } else cout << RED << "Invalid input." << RESET << endl;
     
