@@ -4,6 +4,7 @@ My first toy project to understand the procedural and object-oriented flow of C+
 ## Changelog
 
 ### [2026-02-27]
+- Refactored core loop into `GameManager` class for improved modularity and cleaner `main.cpp`.
 - Added Armor Defense system and expanded Shop with Leather/Iron Armors.
 - Pivoted back to Console UI; Added MP (Mana Points) and Magic Skill system.
 - Added Player HP display during combat for better visibility.
