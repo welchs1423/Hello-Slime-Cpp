@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Colors.h" // ✨ Import Color Palette
 #include <iostream>
 #include <cstdlib>
 #include <fstream> 
@@ -11,28 +12,29 @@ Player::Player() {
     maxHp = 100;
     hp = 100;
     potions = 3;
-    gold = 0;   // Starts with 0 Gold
-    weaponDamage = 0;   // Starts with bare hands
-    dungeonFloor = 1;   // Starts at Floor 1
+    gold = 0;         
+    weaponDamage = 0; 
+    dungeonFloor = 1; 
 }
 
 int Player::attack() {
-    // Basic damage + level scailing + weapon damage
     int damage = rand() % 10 + 10 + (level * 2) + weaponDamage;
     int critChance = rand() % 100;
 
     if (critChance < 20) {
         damage *= 2;
-        cout << "CRITICAL HIT!! You pierced the slime's weak spot for " << damage << " damage!" << endl;
+        // ✨ Yellow for Critical Hits
+        cout << YELLOW << "⚡ CRITICAL HIT!! You pierced the enemy's weak spot for " << damage << " damage!" << RESET << endl;
     } else {
-        cout << "You attacked the slime and dealt " << damage << " damage." << endl;
+        cout << "You attacked and dealt " << damage << " damage." << endl;
     }
     return damage;
 }
 
 void Player::takeDamage(int damage) {
     hp -= damage;
-    cout << "Slime counterattacks! You took " << damage << " damage." << endl;
+    // ✨ Red for taking damage
+    cout << RED << "Enemy counterattacks! You took " << damage << " damage." << RESET << endl;
 }
 
 void Player::heal() {
@@ -40,15 +42,16 @@ void Player::heal() {
         hp += 30;
         if (hp > maxHp) hp = maxHp;
         potions--;
-        cout << "You drank a potion! HP recovered. (Potions left: " << potions << ")" << endl;
+        // ✨ Green for healing
+        cout << GREEN << "You drank a potion! HP recovered. (Potions left: " << potions << ")" << RESET << endl;
     } else {
-        cout << "You searched your bag, but you have no potions left!" << endl;
+        cout << RED << "You searched your bag, but you have no potions left!" << RESET << endl;
     }
 }
 
 void Player::gainExp(int amount) {
     exp += amount;
-    cout << "Gained " << amount << " EXP." << endl;
+    cout << CYAN << "Gained " << amount << " EXP." << RESET << endl;
 
     if (exp >= 100) {
         level++;
@@ -56,16 +59,18 @@ void Player::gainExp(int amount) {
         maxHp += 20;
         hp = maxHp;
         potions++;
-        cout << "LEVEL UP! You are now Lv." << level << "! (Max HP increased, HP fully restored, gained 1 Potion)" << endl;
+        // ✨ Yellow for Level Up
+        cout << YELLOW << "✨ LEVEL UP! You are now Lv." << level << "! (Max HP increased, HP fully restored, gained 1 Potion)" << RESET << endl;
     }
 }
 
 void Player::printStatus() {
-    // Display Gold and Weapon Damage
-    cout << "\n[Lv." << level << " Player] HP: " << hp << "/" << maxHp
-        << " | EXP: " << exp << "/100 | Gold: " << gold << "G" << endl;
-    // Display Floor
-    cout << "Weapon ATK: +" << weaponDamage << "| Dungeon FLoor: " << dungeonFloor << endl; 
+    // ✨ Colorful Status UI
+    cout << "\n[" << CYAN << "Lv." << level << " Player" << RESET << "] "
+         << "HP: " << GREEN << hp << "/" << maxHp << RESET
+         << " | EXP: " << CYAN << exp << "/100" << RESET
+         << " | Gold: " << YELLOW << gold << "G" << RESET << endl;
+    cout << "Weapon ATK: +" << weaponDamage << " | Dungeon Floor: " << CYAN << dungeonFloor << RESET << endl;
 }
 
 void Player::save() {
@@ -73,9 +78,9 @@ void Player::save() {
     if (fout.is_open()) {
         fout << level << " " << exp << " " << maxHp << " " << hp << " " << potions << " " << gold << " " << weaponDamage << " " << dungeonFloor;
         fout.close();
-        cout << "💾 Game saved successfully!" << endl;
+        cout << GREEN << "💾 Game saved successfully!" << RESET << endl;
     } else {
-        cout << "❌ Failed to create save file." << endl;
+        cout << RED << "❌ Failed to create save file." << RESET << endl;
     }
 }
 
@@ -84,10 +89,10 @@ bool Player::load() {
     if (fin.is_open()) {
         fin >> level >> exp >> maxHp >> hp >> potions >> gold >> weaponDamage >> dungeonFloor;
         fin.close();
-        cout << "📂 Saved game loaded successfully!" << endl;
+        cout << GREEN << "📂 Saved game loaded successfully!" << RESET << endl;
         return true;
     } else {
-        cout << "❌ No save file found. Starting a new game." << endl;
+        cout << RED << "❌ No save file found. Starting a new game." << RESET << endl;
         return false;
     }
 }
