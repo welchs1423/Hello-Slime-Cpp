@@ -2,18 +2,19 @@
 #define GAMEMANAGER_H
 
 #include "Player.h"
+#include "Shop.h"   // ✨ 상점 설계도 포함
+#include "Battle.h" // ✨ 전투 설계도 포함
+
 class GameManager {
 private:
-    Player player;  // 매니저가 플레이어 정보를 관리함
+    Player player; 
+    Shop shop;     // ✨ 상점 객체 생성
+    Battle battle; // ✨ 전투 객체 생성
     bool isPlaying;
-
-    void clearScreen();
-    void enterDungeon();    // 던전 로직
-    void visitShop();       // 상점 로직
 
 public:
     GameManager();
-    void run(); // 메인 게임 루프 실행
+    void run(); 
 };
 
 #endif
