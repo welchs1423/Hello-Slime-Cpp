@@ -2,7 +2,7 @@
 My first toy project to understand the procedural and object-oriented flow of C++ in a VSC environment.
 
 ## Changelog
-- **2026-02-27:** 🚀 Transitioned from Console to 2D Graphics using SFML 3.x! Implemented real-time window rendering and keyboard input (Spacebar to attack).
+- **2026-02-27:** Pivoted back to Console UI; Added MP (Mana Points) and Magic Skill system.
 - **2026-02-27:** Added Player HP display during combat for better visibility.
 - **2026-02-27:** Applied ANSI Escape Codes to colorize UI elements (HP, Gold, Damage) for better UX.
 - **2026-02-27:** Added UI polish (Console Screen Clear) and expanded Shop items (Steel Sword).

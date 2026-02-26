@@ -6,6 +6,8 @@ public:
     int level;
     int exp;
     int maxHp;
+    int maxMp;  // Added Max Mp
+    int mp;     // Added Current Mp
     int hp;
     int potions;
     int gold;   // Added Gold
@@ -14,6 +16,7 @@ public:
 
     Player(); 
     int attack(); 
+    int magicAttack();  // Added Magic Attack Skill
     void takeDamage(int damage); 
     void heal(); 
     void gainExp(int amount); 
