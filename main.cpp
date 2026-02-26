@@ -35,9 +35,19 @@ int main() {
         
         if(townChoice == 1){
             // Dungeon Phase
+            cout << "\n=== Dungeon Floor " << player.dungeonFloor << " ===" << endl;
+
             Slime slime(player.level);
-            cout << "\n=========================================" << endl;
-            cout << "A wild Slime (HP: " << slime.hp << ") appeared!" << endl;
+            bool isBoss = (player.dungeonFloor % 5 == 0);   // 5층마다 보스 등장
+
+            if(isBoss){
+                slime.maxHp *= 3; // 체력 3배
+                slime.hp = slime.maxHp;
+                slime.baseDamage *= 2; // 공격력 2배
+                cout << "WARNING! A massive KING SLIME (HP: " << slime.hp << ") blocks your path!" << endl;
+            } else {
+                cout << "A wild Slime (HP: " << slime.hp << ") appeared!" << endl;
+            }
 
             bool inCombat = true;
             while(inCombat && player.hp > 0 && slime.hp > 0){
@@ -66,13 +76,22 @@ int main() {
             }
 
             if(slime.hp <= 0){
-                cout << "\n You defeated the Slime!" << endl;
-                player.gainExp(50);
+                if(isBoss){
+                    cout << "\n VICTORY! You defeated the KING SLIME!" << endl;
+                    player.gainExp(150); // 보스 경험치
+                    int earnedGold = rand() % 50 + 50;  // 보스 골드 (50~99)
+                    player.gold += earnedGold;
+                    cout << "Looted " << earnedGold << " Gold from the Boss!" << endl;
+                } else {
+                    cout << "\n You defeated the Slime!" << endl;
+                    player.gainExp(50);
+                    int earnedGold = rand() % 20 + 10;
+                    player.gold += earnedGold;
+                    cout << "Looted " << earnedGold << " Gold!" << endl;
+                }
 
-                // Gold Reward
-                int earnedGold = rand() % 20 + 10; // 10 ~ 29 Gold
-                player.gold += earnedGold;
-                cout << "Looted " << earnedGold << " Gold!" << endl;
+                player.dungeonFloor++; // 다음 층으로 이동
+                cout << "You font the stairs and advanced to Floor " << player.dungeonFloor << "!" << endl;
             }
         } else if (townChoice == 2){
             // Shop Phase

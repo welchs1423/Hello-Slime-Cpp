@@ -10,6 +10,7 @@ public:
     int potions;
     int gold;   // Added Gold
     int weaponDamage;   // Added Weapon Damage
+    int dungeonFloor;   // Added Dungeon Floor
 
     Player(); 
     int attack(); 

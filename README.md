@@ -2,6 +2,7 @@
 My first toy project to understand the procedural and object-oriented flow of C++ in a VSC environment.
 
 ## Changelog
+- **2026-02-27:** Added Dungeon Floor progression and King Slime Boss battles.
 - **2026-02-27:** Added Town phase, Gold drop system, and Item Shop (Weapons/Potions).
 - **2026-02-27:** Localized all code comments and console outputs to English.
 - **2026-02-27:** Implemented Game Save/Load feature using `fstream`.

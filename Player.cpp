@@ -13,6 +13,7 @@ Player::Player() {
     potions = 3;
     gold = 0;   // Starts with 0 Gold
     weaponDamage = 0;   // Starts with bare hands
+    dungeonFloor = 1;   // Starts at Floor 1
 }
 
 int Player::attack() {
@@ -62,13 +63,15 @@ void Player::gainExp(int amount) {
 void Player::printStatus() {
     // Display Gold and Weapon Damage
     cout << "\n[Lv." << level << " Player] HP: " << hp << "/" << maxHp
-        << " | EXP: " << exp << "/100 | Gold: " << gold << "G | Weapon ATK: " << weaponDamage << endl;
+        << " | EXP: " << exp << "/100 | Gold: " << gold << "G" << endl;
+    // Display Floor
+    cout << "Weapon ATK: +" << weaponDamage << "| Dungeon FLoor: " << dungeonFloor << endl; 
 }
 
 void Player::save() {
     ofstream fout("savefile.txt"); 
     if (fout.is_open()) {
-        fout << level << " " << exp << " " << maxHp << " " << hp << " " << potions;
+        fout << level << " " << exp << " " << maxHp << " " << hp << " " << potions << gold << " " << weaponDamage << " " << dungeonFloor;
         fout.close();
         cout << "Game saved successfully!" << endl;
     } else {
@@ -79,7 +82,7 @@ void Player::save() {
 bool Player::load() {
     ifstream fin("savefile.txt"); 
     if (fin.is_open()) {
-        fin >> level >> exp >> maxHp >> hp >> potions;
+        fin >> level >> exp >> maxHp >> hp >> potions >> gold >> weaponDamage >> dungeonFloor;
         fin.close();
         cout << "Saved game loaded successfully!" << endl;
         return true;
