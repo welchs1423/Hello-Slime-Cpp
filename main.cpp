@@ -6,6 +6,11 @@
 
 using namespace std;
 
+// Function to clear the console screen (Windows)
+void clearScreen(){
+    system("cls");
+}
+
 int main() {
     // Keeps UTF-8 encoding just in case
     system("chcp 65001");
@@ -14,6 +19,7 @@ int main() {
     Player player;
     bool isPlaying = true;  // Controls the main game loop
 
+    clearScreen();  // Clear screen on startup
     cout << "=== Slime Hunter RPG ===" << endl;
     cout << "1. New Game  2. Continue\nSelect: ";
     int startChoice;
@@ -27,6 +33,7 @@ int main() {
 
     // Town Loop
     while (isPlaying && player.hp > 0) {
+        clearScreen();  // Clear screen when entering town
         cout << "\n=== Town Square ===" << endl;
         player.printStatus();
         cout << "1. Enter Dungeon 2. Visit Shop 3. Save Game 4. Quit Game\nSelect: ";
@@ -34,6 +41,7 @@ int main() {
         cin >> townChoice;
         
         if(townChoice == 1){
+            clearScreen();  // Clear screen when entering dungeon
             // Dungeon Phase
             cout << "\n=== Dungeon Floor " << player.dungeonFloor << " ===" << endl;
 
@@ -56,6 +64,8 @@ int main() {
 
                 int combatChoice;
                 cin >> combatChoice;
+
+                clearScreen();  // Clear screen after every combat action to keep it clean!
 
                 if(combatChoice == 1){
                     int damage = player.attack();
@@ -94,12 +104,14 @@ int main() {
                 cout << "You font the stairs and advanced to Floor " << player.dungeonFloor << "!" << endl;
             }
         } else if (townChoice == 2){
+            clearScreen();  // Clear screen when entering shop
             // Shop Phase
             cout << "\n === Item Shop ===" << endl;
             cout << "1. Buy Potion (30G) 2. Buy Iron Sword (+10 ATK) (100G) 3. Leave\nSelect: ";
             int shopChoice;
             cin >> shopChoice;
 
+            clearScreen();
             if(shopChoice == 1){
                 if(player.gold >= 30){
                     player.gold -= 30;
@@ -116,11 +128,17 @@ int main() {
                 cout << "Leaving shop..." << endl;
             } else cout << "invalid input." << endl;
         } else if (townChoice == 3){
+            clearScreen();
             player.save();
+            cout << "\nPress Enter to continue...";
+            cin.ignore();
+            cin.get();
         } else if (townChoice == 4){
+            clearScreen();
             cout << "Quitting game..." << endl;
             isPlaying = false;
         } else {
+            clearScreen();
             cout << "invalid input." << endl;
         }
     }

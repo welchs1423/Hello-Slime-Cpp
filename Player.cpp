@@ -71,11 +71,11 @@ void Player::printStatus() {
 void Player::save() {
     ofstream fout("savefile.txt"); 
     if (fout.is_open()) {
-        fout << level << " " << exp << " " << maxHp << " " << hp << " " << potions << gold << " " << weaponDamage << " " << dungeonFloor;
+        fout << level << " " << exp << " " << maxHp << " " << hp << " " << potions << " " << gold << " " << weaponDamage << " " << dungeonFloor;
         fout.close();
-        cout << "Game saved successfully!" << endl;
+        cout << "💾 Game saved successfully!" << endl;
     } else {
-        cout << "Failed to create save file." << endl;
+        cout << "❌ Failed to create save file." << endl;
     }
 }
 
@@ -84,10 +84,10 @@ bool Player::load() {
     if (fin.is_open()) {
         fin >> level >> exp >> maxHp >> hp >> potions >> gold >> weaponDamage >> dungeonFloor;
         fin.close();
-        cout << "Saved game loaded successfully!" << endl;
+        cout << "📂 Saved game loaded successfully!" << endl;
         return true;
     } else {
-        cout << "No save file found. Starting a new game." << endl;
+        cout << "❌ No save file found. Starting a new game." << endl;
         return false;
     }
 }
