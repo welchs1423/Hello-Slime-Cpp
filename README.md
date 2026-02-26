@@ -1,43 +1,43 @@
 # Hello Slime CPP
-My first toy project to understand the procedural and object-oriented flow of C++ in a VSC environment.
+VSC 환경에서 C++의 절차적, 객체지향적 흐름을 이해하기 위해 제작한 첫 번째 토이 프로젝트임.
 
-## Changelog
+## 업데이트 내역 (Changelog)
 
 ### [2026-02-27]
-- **Fixed Header Mismatch**: Synchronized `Player.h` with `Player.cpp` to resolve undefined identifier errors for new job system variables and the level-up logic.
-- **Armor Enhancement System**: Implemented armor upgrading (+3 DEF per level) and added it to the automated save registry to balance the endgame combat loop.
-- **Implemented Gacha System**: Added 'Mystery Box' to the shop with randomized rewards (Gold jackpot, potions, free weapon upgrades, or failure) to act as a gold sink and add RNG fun.
-- **Implemented Polymorphic Abilities**: Overrode `attack()` method for `Orc` and `Slime` to introduce unique monster skills (Heavy Smash, Acid Spit) without modifying combat logic.
-- **Architectural Refactoring**: Implemented `MonsterFactory` to decouple monster spawning from `Battle` logic.
-- **New Content**: Added `Orc` monster with higher stats for advanced dungeon floors.
-- **Directory Clean-up**: Finalized `/src` and `/include` separation for better scalability.
-- **Expanded Bestiary**: Added 'Orc' monster using the inheritance system.
-- **Dynamic Encounter Logic**: Updated dungeon spawning to introduce tougher enemies at higher floors.
-- **Corrected Project Structure**: Moved `main.cpp` and configuration files from a literal `/Root` folder to the actual project root directory.
-- **Finalized Build Pipeline**: Confirmed the standardized g++ command with include and src pathing.
-- Implemented Weapon Enhancement system (+1, +2...) with dynamic damage scaling.
-- Automated Save/Load system using Metadata Registry (Member Pointer Map).
-- Added Mana Potion item to Shop and Battle system to allow MP restoration.
-- Performed deep OOP refactoring: Abstracted `Shop` and `Battle` into dedicated classes to fully decouple logic from `GameManager`.
-- Refactored core loop into `GameManager` class for improved modularity and cleaner `main.cpp`.
-- Added Armor Defense system and expanded Shop with Leather/Iron Armors.
-- Pivoted back to Console UI; Added MP (Mana Points) and Magic Skill system.
-- Added Player HP display during combat for better visibility.
-- Applied ANSI Escape Codes to colorize UI elements (HP, Gold, Damage) for better UX.
-- Added UI polish (Console Screen Clear) and expanded Shop items (Steel Sword).
-- Added Dungeon Floor progression and King Slime Boss battles.
-- Added Town phase, Gold drop system, and Item Shop (Weapons/Potions).
-- Localized all code comments and console outputs to English.
-- Implemented Game Save/Load feature using `fstream`.
-- Refactored `Slime` class and finalized OOP modularization.
-- Separated header (`.h`) and source (`.cpp`) files for `Player` class.
+- **헤더 불일치 수정**: 새로운 직업 시스템 변수와 레벨업 로직과 관련하여 정의되지 않은 식별자 오류가 발생하던 문제를 해결하기 위해 `Player.h`와 `Player.cpp`를 동기화함.
+- **방어구 강화 시스템**: 방어구 강화(레벨당 방어력 +3) 기능을 구현하고, 후반부 전투 밸런스를 맞추기 위해 자동 저장 레지스트리에 연동함.
+- **가챠 시스템 구현**: 상점에 무작위 보상(골드 잭팟, 포션, 무료 무기 강화 또는 꽝)을 제공하는 '미스터리 박스'를 추가하여 골드 소모처를 마련하고 뽑기의 재미를 더함.
+- **다형성 스킬 구현**: 전투 로직 수정 없이 몬스터별 고유 스킬(오크의 강타, 슬라임의 산성액)을 도입하기 위해 `Orc`와 `Slime` 클래스의 `attack()` 메서드를 오버라이딩함.
+- **구조적 리팩토링**: `Battle` 로직에서 몬스터 생성 로직을 분리하기 위해 `MonsterFactory` 패턴을 도입함.
+- **신규 콘텐츠**: 상위 던전 층에서 등장하는 더 높은 스탯의 `Orc` 몬스터를 추가함.
+- **디렉토리 정리**: 프로젝트의 확장성을 위해 `/src`와 `/include` 폴더 분리 작업을 완료함.
+- **몬스터 도감 확장**: 상속 시스템을 활용해 '오크' 몬스터를 추가함.
+- **동적 조우 로직**: 던전 층수가 높아질수록 더 강력한 적이 등장하도록 몬스터 스폰 로직을 업데이트함.
+- **프로젝트 구조 수정**: 단순한 `Root` 폴더에 있던 `main.cpp` 및 설정 파일들을 실제 프로젝트 최상위 루트 디렉토리로 이동시킴.
+- **빌드 파이프라인 확정**: `include` 및 `src` 경로가 포함된 표준화된 `g++` 컴파일 명령어를 확정함.
+- 동적 데미지 스케일링이 적용된 무기 강화 시스템(+1, +2...)을 구현함.
+- 메타데이터 레지스트리(멤버 포인터 맵)를 활용한 자동 저장/불러오기 시스템을 구현함.
+- MP 회복을 위해 상점과 전투 시스템에 마나 포션 아이템을 추가함.
+- 심층적인 OOP 리팩토링: `GameManager`에서 로직을 완전히 분리하기 위해 `Shop`과 `Battle`을 전용 클래스로 추상화함.
+- 모듈성 향상과 깔끔한 `main.cpp` 관리를 위해 핵심 루프를 `GameManager` 클래스로 리팩토링함.
+- 방어력 시스템을 도입하고 상점에 가죽/철 방어구를 추가함.
+- 콘솔 UI 기반으로 방향을 재설정하고, MP(마나 포인트) 및 마법 스킬 시스템을 추가함.
+- 가시성 향상을 위해 전투 중 플레이어의 HP가 표시되도록 추가함.
+- 더 나은 UX를 위해 UI 요소(HP, 골드, 데미지)에 ANSI 이스케이프 코드를 적용하여 색상을 입힘.
+- UI 다듬기(콘솔 화면 지우기)를 적용하고 상점 아이템(강철 검)을 확장함.
+- 던전 층수 진행도 및 킹 슬라임 보스전을 추가함.
+- 마을 페이즈, 골드 드랍 시스템, 아이템 상점(무기/포션)을 추가함.
+- 모든 코드 주석 및 콘솔 출력을 영어로 지역화함.
+- `fstream`을 활용한 게임 저장/불러오기 기능을 구현함.
+- `Slime` 클래스 리팩토링 및 OOP 모듈화를 완료함.
+- `Player` 클래스의 헤더(`.h`)와 소스(`.cpp`) 파일을 분리함.
 
 ### [2026-02-26]
-- Added infinite dungeon loop and EXP-based level-up system.
+- 무한 던전 루프 및 경험치 기반의 레벨업 시스템을 추가함.
 
 ### [2026-02-25]
-- Added Critical Hit system (20% chance).
-- Added Healing Potion system (Max HP cap & usage limits).
-- Set up `.gitignore` and optimized project folder.
-- Fixed terminal encoding issues (applied `chcp 65001`).
-- Implemented basic turn-based battle loop with wild slimes.
+- 크리티컬 히트 시스템(확률 20%)을 추가함.
+- 회복 포션 시스템(최대 HP 제한 및 사용 횟수 제한)을 추가함.
+- `.gitignore` 파일을 설정하고 프로젝트 폴더를 최적화함.
+- 터미널 인코딩 문제(`chcp 65001` 적용)를 해결함.
+- 야생 슬라임과의 기본적인 턴제 전투 루프를 구현함.
