@@ -26,7 +26,7 @@ bool DungeonEvent::triggerEvent(Player& player){
         player.hp -= trapDamage;
         if (player.hp < 0) player.hp = 0;
 
-        cout << RED << "앗! 발밑에서 '딸깍' 하는 소리가 들ㄹ비니다..." << RESET << endl;
+        cout << RED << "앗! 발밑에서 '딸깍' 하는 소리가 들립니다..." << RESET << endl;
         cout << RED << "독화살 함정에 당했습니다! (-" << trapDamage << " HP)" << RESET << endl;
     } else if (eventType == 1){
         // 요정의 샘물
