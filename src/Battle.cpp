@@ -1,5 +1,6 @@
 #include "../include/Battle.h"
 #include "../include/MonsterFactory.h"
+#include "../include/DungeonEvent.h"
 #include "../include/Colors.h"
 #include <iostream>
 #include <cstdlib>
@@ -7,8 +8,26 @@
 using namespace std;
 
 void Battle::start(Player& player) {
+    // 층수 출력
     system("cls");
     cout << "\n=== 🏰 Dungeon Floor " << player.dungeonFloor << " ===" << endl;
+
+    // 보스전이 아닐 때만 30% 확률로 던전 이벤트 발생
+    bool isBoss = (player.dungeonFloor % 5 == 0);
+    if(!isBoss){
+        bool eventHappend = DungeonEvent::triggerEvent(player);
+
+        // 이벤트에서 죽었으면 전투 없이 마을로 강제 귀환
+        if (player.hp <= 0){
+            return;
+        }
+
+        // 이벤트가 발생했으면, 몬스터 조우 없이 층수만 올라감 (이벤트 자체가 하나의 층 탐험으로 간주)
+        if (eventHappend){
+            player.dungeonFloor++;
+            return;
+        }
+    }
 
     // ✨ 팩토리에게 몬스터 생성을 전적으로 맡깁니다.
     Monster* enemy = MonsterFactory::spawnMonster(player.dungeonFloor, player.level);
