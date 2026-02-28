@@ -9,12 +9,12 @@ using namespace std;
 string Beginner::getName() { return "초보자"; }
 int Beginner::attack(int level, int weaponDamage, int weaponLevel) {
     int damage = rand() % 10 + 10 + (level * 2) + weaponDamage + (weaponLevel * 5);
-    cout << "You attacked with [+" << weaponLevel << " Weapon] and dealt " << damage << " damage." << endl;
+    cout << "[+" << weaponLevel << " 무기]로 공격하여 " << damage << "의 데미지를 입혔습니다." << endl;
     return damage;
 }
 int Beginner::magicAttack(int level, int weaponDamage) {
     int damage = (rand() % 15 + 20 + (level * 3) + weaponDamage) * 2;
-    cout << CYAN << "🔥 FIREBALL!! You cast a magic spell for " << damage << " damage! (-20 MP)" << RESET << endl;
+    cout << CYAN << "🔥 파이어볼!! 마법을 시전하여 " << damage << "의 데미지를 입혔습니다! (-20 MP)" << RESET << endl;
     return damage;
 }
 
@@ -25,11 +25,11 @@ void Warrior::applyBonus(int& maxHp, int& hp, int& maxMp, int& mp, int& weaponDm
 }
 int Warrior::attack(int level, int weaponDamage, int weaponLevel) {
     int damage = rand() % 10 + 10 + (level * 2) + weaponDamage + (weaponLevel * 5);
-    cout << YELLOW << "⚔️ [전사의 일격] You attacked with [+" << weaponLevel << " Weapon] and dealt " << damage << " damage." << RESET << endl;
+    cout << YELLOW << "⚔️ [전사의 일격] [+" << weaponLevel << " 무기]로 공격하여 " << damage << "의 데미지를 입혔습니다." << RESET << endl;
     return damage;
 }
 int Warrior::magicAttack(int level, int weaponDamage) {
-    return Beginner().magicAttack(level, weaponDamage); // 마법은 초보자와 동일
+    return Beginner().magicAttack(level, weaponDamage); 
 }
 
 // --- Mage (마법사) ---
@@ -38,12 +38,12 @@ void Mage::applyBonus(int& maxHp, int& hp, int& maxMp, int& mp, int& weaponDmg) 
     maxMp += 50; mp = maxMp;
 }
 int Mage::attack(int level, int weaponDamage, int weaponLevel) {
-    return Beginner().attack(level, weaponDamage, weaponLevel); // 평타는 초보자와 동일
+    return Beginner().attack(level, weaponDamage, weaponLevel); 
 }
 int Mage::magicAttack(int level, int weaponDamage) {
     int damage = (rand() % 15 + 20 + (level * 3) + weaponDamage) * 2;
-    damage = (int)(damage * 1.5); // 마법 데미지 1.5배!
-    cout << CYAN << "☄️ [대마법사의 메테오] ULTIMATE FIREBALL dealt " << damage << " damage! (-20 MP)" << RESET << endl;
+    damage = (int)(damage * 1.5); 
+    cout << CYAN << "☄️ [대마법사의 메테오] 강력한 마법 폭발로 " << damage << "의 데미지를 입혔습니다! (-20 MP)" << RESET << endl;
     return damage;
 }
 
@@ -52,11 +52,11 @@ string Rogue::getName() { return "도적"; }
 int Rogue::attack(int level, int weaponDamage, int weaponLevel) {
     int damage = rand() % 10 + 10 + (level * 2) + weaponDamage + (weaponLevel * 5);
     int critRoll = rand() % 100;
-    if (critRoll < 40) { // 도적은 크리티컬 40%
+    if (critRoll < 40) { 
         damage *= 2;
-        cout << GREEN << "⚡ [암살자의 일격] CRITICAL HIT!! dealt " << damage << " damage!" << RESET << endl;
+        cout << GREEN << "⚡ [암살자의 일격] 크리티컬 히트!! " << damage << "의 데미지를 입혔습니다!" << RESET << endl;
     } else {
-        cout << "You attacked with [+" << weaponLevel << " Weapon] and dealt " << damage << " damage." << endl;
+        cout << "[+" << weaponLevel << " 무기]로 공격하여 " << damage << "의 데미지를 입혔습니다." << endl;
     }
     return damage;
 }

@@ -13,5 +13,5 @@ int Monster::attack(){
 
 void Monster::takeDamage(int damage){
     hp -= damage;
-    cout << name << " took " << damage << " damage. " << endl;
+    cout << name << "에게 " << damage << "의 데미지! " << endl;
 }
