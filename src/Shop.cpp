@@ -32,42 +32,50 @@ void Shop::visit(Player& player) {
 
         system("cls");
 
-        // ✨ 무한 if-else 대신 깔끔한 switch문 적용!
         switch (shopChoice) {
             case 1:
                 if (player.gold >= 30) {
                     player.gold -= 30; player.potions++;
-                    cout << GREEN << "체력 포션을 구매했습니다! (보유량: " << player.potions << ")" << RESET << endl;
+                    // ✨ 가방에 진짜 포션 객체 추가! (이름, 타입(3:소모품), 회복량, 가격)
+                    player.inventory.push_back(Item("체력 포션", 3, 50, 30));
+                    cout << GREEN << "체력 포션을 구매하여 가방에 넣었습니다! (보유량: " << player.potions << ")" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
             case 2:
                 if (player.gold >= 30) {
                     player.gold -= 30; player.manaPotions++;
-                    cout << CYAN << "마나 포션을 구매했습니다! (보유량: " << player.manaPotions << ")" << RESET << endl;
+                    player.inventory.push_back(Item("마나 포션", 3, 50, 30));
+                    cout << CYAN << "마나 포션을 구매하여 가방에 넣었습니다! (보유량: " << player.manaPotions << ")" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
             case 3:
                 if (player.gold >= 100) {
                     player.gold -= 100; player.weaponDamage = 10;
-                    cout << GREEN << "철검을 장착했습니다! (기본 공격력 +10)" << RESET << endl;
+                    // ✨ 가방에 진짜 무기 객체 추가! (이름, 타입(1:무기), 공격력, 가격)
+                    player.inventory.push_back(Item("철검", 1, 10, 100));
+                    cout << GREEN << "철검을 구매하여 장착하고, 가방에도 넣었습니다!" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
             case 4:
                 if (player.gold >= 250) {
                     player.gold -= 250; player.weaponDamage = 25;
-                    cout << GREEN << "강철검을 장착했습니다! (기본 공격력 +25)" << RESET << endl;
+                    player.inventory.push_back(Item("강철검", 1, 25, 250));
+                    cout << GREEN << "강철검을 구매하여 장착하고, 가방에도 넣었습니다!" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
             case 5:
                 if (player.gold >= 80) {
                     player.gold -= 80; player.armorDefense = 5;
-                    cout << GREEN << "가죽 갑옷을 장착했습니다! (기본 방어력 +5)" << RESET << endl;
+                    // ✨ 가방에 진짜 방어구 객체 추가! (이름, 타입(2:방어구), 방어력, 가격)
+                    player.inventory.push_back(Item("가죽 갑옷", 2, 5, 80));
+                    cout << GREEN << "가죽 갑옷을 구매하여 장착하고, 가방에도 넣었습니다!" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
             case 6:
                 if (player.gold >= 200) {
                     player.gold -= 200; player.armorDefense = 15;
-                    cout << GREEN << "철 갑옷을 장착했습니다! (기본 방어력 +15)" << RESET << endl;
+                    player.inventory.push_back(Item("철 갑옷", 2, 15, 200));
+                    cout << GREEN << "철 갑옷을 구매하여 장착하고, 가방에도 넣었습니다!" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
             case 7:
@@ -91,13 +99,19 @@ void Shop::visit(Player& player) {
                         cout << YELLOW << "🎉 잭팟! 200 골드를 발견했습니다!" << RESET << endl;
                         player.gold += 200;
                     } else if (roll < 40) {
-                        cout << GREEN << "✨ 체력 포션 2개와 마나 포션 1개를 얻었습니다!" << RESET << endl;
+                        cout << GREEN << "✨ 체력 포션 2개와 마나 포션 1개를 얻었습니다! (가방에 추가됨)" << RESET << endl;
                         player.potions += 2; player.manaPotions += 1;
+                        // 가챠 당첨 포션들도 가방에 넣어줍니다
+                        player.inventory.push_back(Item("체력 포션", 3, 50, 30));
+                        player.inventory.push_back(Item("체력 포션", 3, 50, 30));
+                        player.inventory.push_back(Item("마나 포션", 3, 50, 30));
                     } else if (roll < 70) {
                         cout << CYAN << "🔨 신비한 망치가 무기를 내리칩니다! 무기 레벨 +1!" << RESET << endl;
                         player.weaponLevel++;
                     } else {
-                        cout << RED << "😭 돌멩이뿐입니다... 다음 기회에." << RESET << endl;
+                        cout << RED << "😭 돌멩이뿐입니다... 쓸모없는 돌멩이를 가방에 챙겼습니다." << RESET << endl;
+                        // ✨ 꽝에 당첨되면 인벤토리에 쓰레기를 넣어버립니다
+                        player.inventory.push_back(Item("쓸모없는 돌멩이", 4, 0, 0));
                     }
                 } else {
                     cout << RED << "골드가 부족합니다!" << RESET << endl;
@@ -105,14 +119,13 @@ void Shop::visit(Player& player) {
                 break;
             case 10:
                 cout << "상점을 나섭니다..." << endl;
-                shopping = false; // ✨ 루프 탈출!
+                shopping = false; 
                 break;
             default:
                 cout << RED << "잘못된 입력입니다." << RESET << endl;
                 break;
         }
 
-        // 쇼핑을 계속하는 경우에만 일시정지
         if (shopping) {
             cout << "\n엔터를 누르면 상점 메뉴로 돌아갑니다...";
             cin.ignore();
