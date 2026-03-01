@@ -1,7 +1,7 @@
 #include "../include/Item.h"
 
-Item::Item(std::string n, int t, int v, int p) 
-    : name(n), type(t), effectValue(v), price(p) {}
+Item::Item(std::string n, int t, int v, int p, bool e) 
+    : name(n), type(t), effectValue(v), price(p), isEquipped(e) {}
 
 std::string Item::getTypeName() {
     if (type == 1) return "무기";

@@ -6,12 +6,14 @@
 class Item {
 public:
     std::string name;
-    int type;           // 1: 무기,  2: 방어구, 3: 소모품
-    int effectValue;    // 올려주는 수치 (공격력, 방어력, 회복량 등)
-    int price;          // 상점 가격
+    int type;        
+    int effectValue; 
+    int price;       
+    bool isEquipped;
 
-    Item(std::string n, int t, int v, int p);
-    std::string getTypeName();  // "무기", "방어구" 같은 글자를 반환
+    // ✨ 끝에 bool e = false 를 주면, 기존 상점 코드를 하나도 안 고쳐도 기본으로 '장착 안 됨' 상태로 가방에 들어갑니다!
+    Item(std::string n, int t, int v, int p, bool e = false);
+    std::string getTypeName(); 
 };
 
 #endif

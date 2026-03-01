@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <algorithm>
+#include <algorithm> 
 
 using namespace std;
 
@@ -23,11 +23,9 @@ Player::Player() {
     armorLevel = 0;
     jobClass = 0;
     job = nullptr;
+    activeQuestId = 0; 
+    questProgress = 0; 
 
-    activeQuestId = 0;
-    questProgress = 0;
-
-    // 게임 시작 시 기본 식량 제공
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
 
     updateJobLogic(); 
@@ -55,8 +53,8 @@ void Player::registerStats() {
     stats["weaponLevel"] = &weaponLevel;
     stats["armorLevel"] = &armorLevel;
     stats["jobClass"] = &jobClass;
-    stats["activeQuestId"] = &activeQuestId;
-    stats["questProgress"] = &questProgress;
+    stats["activeQuestId"] = &activeQuestId; 
+    stats["questProgress"] = &questProgress; 
 }
 
 void Player::updateJobLogic() {
@@ -93,24 +91,20 @@ void Player::printStatus() {
     cout << "ATK: " << weaponDamage << " (+" << weaponLevel * 5 << ") | "
          << "DEF: " << armorDefense << " (+" << armorLevel * 3 << ") | "
          << "Gold: " << YELLOW << gold << "G" << RESET << endl;
-
+         
     if (activeQuestId > 0) {
         cout << YELLOW << "[📜 퀘스트 진행 중] 임무 번호: " << activeQuestId 
              << " | 진척도: " << questProgress << RESET << endl;
     }
 }
 
-int Player::attack() {
-    return job->attack(level, weaponDamage, weaponLevel);
-}
+int Player::attack() { return job->attack(level, weaponDamage, weaponLevel); }
 
 int Player::magicAttack() {
     if (mp >= 20) {
-        mp -= 20;
-        return job->magicAttack(level, weaponDamage);
+        mp -= 20; return job->magicAttack(level, weaponDamage);
     } else {
-        cout << RED << "❌ 마나가 부족합니다!" << RESET << endl;
-        return -1;
+        cout << RED << "❌ 마나가 부족합니다!" << RESET << endl; return -1;
     }
 }
 
@@ -118,25 +112,20 @@ void Player::takeDamage(int damage) {
     int bonusDefense = armorLevel * 3; 
     int actualDamage = damage - armorDefense - bonusDefense;
     if(actualDamage < 0) actualDamage = 0; 
-
     hp -= actualDamage;
     cout << RED << "적의 공격! " << actualDamage << "의 데미지를 입었습니다. (방어력으로 " << armorDefense + bonusDefense << " 감소)" << RESET << endl;
 }
 
 void Player::heal() {
     if (potions > 0) {
-        potions--;
-        hp += 50;
-        if (hp > maxHp) hp = maxHp;
+        potions--; hp += 50; if (hp > maxHp) hp = maxHp;
         cout << GREEN << "포션을 사용했습니다! (+50 HP) 남은 포션: " << potions << RESET << endl;
     } else cout << RED << "포션이 부족합니다!" << RESET << endl;
 }
 
 void Player::restoreMp() {
     if (manaPotions > 0) {
-        manaPotions--;
-        mp += 50;
-        if (mp > maxMp) mp = maxMp;
+        manaPotions--; mp += 50; if (mp > maxMp) mp = maxMp;
         cout << CYAN << "마나 포션을 사용했습니다! (+50 MP) 남은 마나 포션: " << manaPotions << RESET << endl;
     } else cout << RED << "마나 포션이 부족합니다!" << RESET << endl;
 }
@@ -148,15 +137,12 @@ void Player::gainExp(int amount) {
 }
 
 void Player::levelUp() {
-    level++;
-    exp -= maxExp;
-    maxExp += 50;
-    maxHp += 20; hp = maxHp;
-    maxMp += 10; mp = maxMp;
-    weaponDamage += 2;
+    level++; exp -= maxExp; maxExp += 50;
+    maxHp += 20; hp = maxHp; maxMp += 10; mp = maxMp; weaponDamage += 2;
     cout << GREEN << "🎉 레벨 업! Lv." << level << "이 되었습니다!" << RESET << endl;
 }
 
+// ✨ 가방 시스템 (장착 로직 추가)
 void Player::openInventory() {
     bool inInventory = true;
 
@@ -166,15 +152,17 @@ void Player::openInventory() {
         
         if (inventory.empty()) {
             cout << "가방이 텅 비어있습니다." << endl;
-            cout << "\n엔터를 누르면 닫습니다...";
-            cin.ignore();
-            cin.get();
-            return; 
+            cout << "\n엔터를 누르면 닫습니다..."; cin.ignore(); cin.get(); return; 
         }
 
         cout << "총 " << inventory.size() << "개의 아이템이 있습니다.\n" << endl;
         for (size_t i = 0; i < inventory.size(); i++) {
-            cout << i + 1 << ". [" << inventory[i].getTypeName() << "] " 
+            cout << i + 1 << ". ";
+            // ✨ 장착 중인 아이템이면 앞에 [E] 마크를 붙여줍니다!
+            if (inventory[i].isEquipped) {
+                cout << GREEN << "[E] " << RESET;
+            }
+            cout << "[" << inventory[i].getTypeName() << "] " 
                  << YELLOW << inventory[i].name << RESET 
                  << " (효과: " << inventory[i].effectValue << ")" << endl;
         }
@@ -188,33 +176,47 @@ void Player::openInventory() {
         } 
         else if (choice > 0 && choice <= inventory.size()) {
             int index = choice - 1; 
-            Item selectedItem = inventory[index];
+            
+            // ✨ 배열에 직접 접근해서 장착 상태를 바꿔야 하므로 참조자(&)를 사용합니다.
+            Item& selectedItem = inventory[index]; 
 
+            // 1. 무기 장착 (가방에서 삭제 안 됨)
             if (selectedItem.type == 1) { 
+                // 기존 장착 무기 해제
+                for (auto& item : inventory) { if (item.type == 1) item.isEquipped = false; }
+                
+                selectedItem.isEquipped = true; // 새 무기 장착
                 weaponDamage = selectedItem.effectValue;
                 cout << GREEN << "\n" << selectedItem.name << "을(를) 장착했습니다! (기본 공격력 " << weaponDamage << ")" << RESET << endl;
             } 
+            // 2. 방어구 장착 (가방에서 삭제 안 됨)
             else if (selectedItem.type == 2) { 
+                // 기존 장착 방어구 해제
+                for (auto& item : inventory) { if (item.type == 2) item.isEquipped = false; }
+                
+                selectedItem.isEquipped = true; // 새 방어구 장착
                 armorDefense = selectedItem.effectValue;
                 cout << GREEN << "\n" << selectedItem.name << "을(를) 장착했습니다! (기본 방어력 " << armorDefense << ")" << RESET << endl;
             } 
+            // 3. 소모품 (사용한 뒤 가방에서 삭제됨)
             else if (selectedItem.type == 3) { 
                 hp += selectedItem.effectValue;
                 if (hp > maxHp) hp = maxHp;
                 if (potions > 0) potions--; 
                 cout << GREEN << "\n" << selectedItem.name << "을(를) 사용해 체력을 " << selectedItem.effectValue << " 회복했습니다!" << RESET << endl;
+                inventory.erase(inventory.begin() + index); // ✨ 소모품만 삭제
             } 
             else if (selectedItem.type == 4) {
                 mp += selectedItem.effectValue;
                 if (mp > maxMp) mp = maxMp;
                 if (manaPotions > 0) manaPotions--; 
                 cout << CYAN << "\n" << selectedItem.name << "을(를) 사용해 마나를 " << selectedItem.effectValue << " 회복했습니다!" << RESET << endl;
+                inventory.erase(inventory.begin() + index); // ✨ 소모품만 삭제
             } 
             else { 
                 cout << RED << "\n" << selectedItem.name << "은(는) 당장 쓸 수 없습니다. 길가에 버렸습니다." << RESET << endl;
+                inventory.erase(inventory.begin() + index); // ✨ 잡템 버리기
             }
-
-            inventory.erase(inventory.begin() + index);
 
             cout << "엔터를 누르면 계속합니다...";
             cin.ignore();
@@ -222,13 +224,12 @@ void Player::openInventory() {
         } 
         else {
             cout << RED << "잘못된 번호입니다." << RESET << endl;
-            cout << "엔터를 누르면 계속합니다...";
-            cin.ignore();
-            cin.get();
+            cout << "엔터를 누르면 계속합니다..."; cin.ignore(); cin.get();
         }
     }
 }
 
+// ✨ 세이브 (isEquipped 도 함께 저장)
 void Player::save() {
     ofstream outFile("savefile.txt");
     if (outFile.is_open()) {
@@ -236,12 +237,12 @@ void Player::save() {
             outFile << key << " " << *val << "\n";
         }
 
-        // 인벤토리 정보 저장 (개수 먼저 기록)
         outFile << "INVENTORY_SIZE " << inventory.size() << "\n";
         for (const auto& item : inventory) {
             string safeName = item.name;
-            replace(safeName.begin(), safeName.end(), ' ', '_'); // 공백을 언더바로 변환 (에러 방지)
-            outFile << safeName << " " << item.type << " " << item.effectValue << " " << item.price << "\n";
+            replace(safeName.begin(), safeName.end(), ' ', '_'); 
+            // ✨ 마지막에 item.isEquipped 추가
+            outFile << safeName << " " << item.type << " " << item.effectValue << " " << item.price << " " << item.isEquipped << "\n";
         }
 
         outFile.close();
@@ -249,27 +250,28 @@ void Player::save() {
     } else cout << RED << "❌ 저장 파일을 열 수 없습니다!" << RESET << endl;
 }
 
+// ✨ 로드 (isEquipped 도 함께 복구)
 void Player::load() {
     ifstream inFile("savefile.txt");
     if (inFile.is_open()) {
         string key;
         int value;
         
-        inventory.clear(); // 기존 가방 비우기 (중복 방지)
+        inventory.clear(); 
 
         while (inFile >> key >> value) {
             if (stats.find(key) != stats.end()) {
                 *stats[key] = value;
             } 
-            // 파일에서 INVENTORY_SIZE를 만나면 가방 복구 시작!
             else if (key == "INVENTORY_SIZE") {
                 int size = value;
                 for (int i = 0; i < size; i++) {
                     string safeName;
                     int t, v, p;
-                    inFile >> safeName >> t >> v >> p;
-                    replace(safeName.begin(), safeName.end(), '_', ' '); // 언더바를 다시 공백으로 복구
-                    inventory.push_back(Item(safeName, t, v, p));
+                    bool e; // ✨ 장착 여부
+                    inFile >> safeName >> t >> v >> p >> e;
+                    replace(safeName.begin(), safeName.end(), '_', ' '); 
+                    inventory.push_back(Item(safeName, t, v, p, e)); // ✨ e 값 넣어서 아이템 복구!
                 }
             }
         }
