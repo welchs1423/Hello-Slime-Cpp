@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <algorithm> // ✨ 문자열 치환(공백 ↔ 언더바)을 위해 추가!
 
 using namespace std;
 
@@ -23,17 +24,17 @@ Player::Player() {
     jobClass = 0;
     job = nullptr;
 
+    // 게임 시작 시 기본 식량 제공
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
 
-    updateJobLogic(); // 직업 객체 초기화
-    registerStats();  // 저장 레지스트리 등록
+    updateJobLogic(); 
+    registerStats();  
 }
 
 Player::~Player() {
-    if (job) delete job; // 메모리 누수 방지
+    if (job) delete job; 
 }
 
-// ✨ 자동 저장/불러오기 레지스트리
 void Player::registerStats() {
     stats["level"] = &level;
     stats["maxHp"] = &maxHp;
@@ -53,7 +54,6 @@ void Player::registerStats() {
     stats["jobClass"] = &jobClass;
 }
 
-// ✨ 직업 객체 교체
 void Player::updateJobLogic() {
     if (job) delete job;
     if (jobClass == 1) job = new Warrior();
@@ -62,7 +62,6 @@ void Player::updateJobLogic() {
     else job = new Beginner();
 }
 
-// ✨ 게임 시작 시 직업 선택
 void Player::chooseClass() {
     system("cls");
     cout << CYAN << "\n=== ✨ 직업을 선택하세요 ✨ ===" << RESET << endl;
@@ -81,7 +80,6 @@ void Player::chooseClass() {
     cin.get();
 }
 
-// ✨ 상태창 출력
 void Player::printStatus() {
     cout << "\n[" << CYAN << "Lv." << level << " " << job->getName() << RESET << "] "
          << "HP: " << GREEN << hp << "/" << maxHp << RESET << " | "
@@ -92,12 +90,10 @@ void Player::printStatus() {
          << "Gold: " << YELLOW << gold << "G" << RESET << endl;
 }
 
-// ✨ 공격 (Job에게 위임)
 int Player::attack() {
     return job->attack(level, weaponDamage, weaponLevel);
 }
 
-// ✨ 마법 공격 (Job에게 위임)
 int Player::magicAttack() {
     if (mp >= 20) {
         mp -= 20;
@@ -108,7 +104,6 @@ int Player::magicAttack() {
     }
 }
 
-// ✨ 피격 (방어구 강화 수치 반영)
 void Player::takeDamage(int damage) {
     int bonusDefense = armorLevel * 3; 
     int actualDamage = damage - armorDefense - bonusDefense;
@@ -152,32 +147,7 @@ void Player::levelUp() {
     cout << GREEN << "🎉 레벨 업! Lv." << level << "이 되었습니다!" << RESET << endl;
 }
 
-void Player::save() {
-    ofstream outFile("savefile.txt");
-    if (outFile.is_open()) {
-        for (auto const& [key, val] : stats) {
-            outFile << key << " " << *val << "\n";
-        }
-        outFile.close();
-        cout << GREEN << "💾 게임이 성공적으로 저장되었습니다." << RESET << endl;
-    } else cout << RED << "❌ 저장 파일을 열 수 없습니다!" << RESET << endl;
-}
-
-void Player::load() {
-    ifstream inFile("savefile.txt");
-    if (inFile.is_open()) {
-        string key;
-        int value;
-        while (inFile >> key >> value) {
-            if (stats.find(key) != stats.end()) *stats[key] = value;
-        }
-        inFile.close();
-        updateJobLogic(); // ✨ 불러온 jobClass 숫자에 맞춰 직업 세팅!
-        cout << GREEN << "📂 게임을 성공적으로 불러왔습니다." << RESET << endl;
-    } else cout << RED << "❌ 저장 파일이 없습니다. 새로운 게임을 시작합니다." << RESET << endl;
-}
-
-// ✨ 인벤토리(가방) 사용/장착 시스템
+// ✨ 가방 사용/장착 시스템 (직전 퀘스트 완료 버전)
 void Player::openInventory() {
     bool inInventory = true;
 
@@ -190,14 +160,14 @@ void Player::openInventory() {
             cout << "\n엔터를 누르면 닫습니다...";
             cin.ignore();
             cin.get();
-            return; // 가방이 비었으면 바로 나갑니다.
+            return; 
         }
 
         cout << "총 " << inventory.size() << "개의 아이템이 있습니다.\n" << endl;
         for (size_t i = 0; i < inventory.size(); i++) {
             cout << i + 1 << ". [" << inventory[i].getTypeName() << "] " 
                  << YELLOW << inventory[i].name << RESET 
-                 << " (효과 수치: " << inventory[i].effectValue << ")" << endl;
+                 << " (효과: " << inventory[i].effectValue << ")" << endl;
         }
 
         cout << "\n0. 가방 닫기\n사용/장착할 아이템 번호를 입력하세요: ";
@@ -205,38 +175,32 @@ void Player::openInventory() {
         cin >> choice;
 
         if (choice == 0) {
-            inInventory = false; // 0번을 누르면 루프 탈출
+            inInventory = false; 
         } 
         else if (choice > 0 && choice <= inventory.size()) {
-            // 사용자가 입력한 번호는 1부터 시작하므로, 배열 인덱스에 맞게 -1 해줍니다.
             int index = choice - 1; 
             Item selectedItem = inventory[index];
 
-            // 1. 무기 장착
             if (selectedItem.type == 1) { 
                 weaponDamage = selectedItem.effectValue;
                 cout << GREEN << "\n" << selectedItem.name << "을(를) 장착했습니다! (기본 공격력 " << weaponDamage << ")" << RESET << endl;
             } 
-            // 2. 방어구 장착
             else if (selectedItem.type == 2) { 
                 armorDefense = selectedItem.effectValue;
                 cout << GREEN << "\n" << selectedItem.name << "을(를) 장착했습니다! (기본 방어력 " << armorDefense << ")" << RESET << endl;
             } 
-            // 3. 소모품 사용 (포션, 빵)
             else if (selectedItem.type == 3) { 
                 hp += selectedItem.effectValue;
                 if (hp > maxHp) hp = maxHp;
-                if (potions > 0) potions--; // 기존 시스템 호환용
+                if (potions > 0) potions--; 
                 cout << GREEN << "\n" << selectedItem.name << "을(를) 사용해 체력을 " << selectedItem.effectValue << " 회복했습니다!" << RESET << endl;
             } 
-            // 4. 마나 회복 (이름 상관없이 type이 4면 무조건 마나 회복)
             else if (selectedItem.type == 4) {
                 mp += selectedItem.effectValue;
                 if (mp > maxMp) mp = maxMp;
-                if (manaPotions > 0) manaPotions--; // 기존 시스템 호환용
+                if (manaPotions > 0) manaPotions--; 
                 cout << CYAN << "\n" << selectedItem.name << "을(를) 사용해 마나를 " << selectedItem.effectValue << " 회복했습니다!" << RESET << endl;
             } 
-            // 5. 기타 잡템
             else { 
                 cout << RED << "\n" << selectedItem.name << "은(는) 당장 쓸 수 없습니다. 길가에 버렸습니다." << RESET << endl;
             }
@@ -254,4 +218,56 @@ void Player::openInventory() {
             cin.get();
         }
     }
+}
+
+// ✨ 세이브 (인벤토리 저장 추가)
+void Player::save() {
+    ofstream outFile("savefile.txt");
+    if (outFile.is_open()) {
+        for (auto const& [key, val] : stats) {
+            outFile << key << " " << *val << "\n";
+        }
+
+        // 인벤토리 정보 저장 (개수 먼저 기록)
+        outFile << "INVENTORY_SIZE " << inventory.size() << "\n";
+        for (const auto& item : inventory) {
+            string safeName = item.name;
+            replace(safeName.begin(), safeName.end(), ' ', '_'); // 공백을 언더바로 변환 (에러 방지)
+            outFile << safeName << " " << item.type << " " << item.effectValue << " " << item.price << "\n";
+        }
+
+        outFile.close();
+        cout << GREEN << "💾 게임이 성공적으로 저장되었습니다." << RESET << endl;
+    } else cout << RED << "❌ 저장 파일을 열 수 없습니다!" << RESET << endl;
+}
+
+// ✨ 로드 (인벤토리 복구 추가)
+void Player::load() {
+    ifstream inFile("savefile.txt");
+    if (inFile.is_open()) {
+        string key;
+        int value;
+        
+        inventory.clear(); // 기존 가방 비우기 (중복 방지)
+
+        while (inFile >> key >> value) {
+            if (stats.find(key) != stats.end()) {
+                *stats[key] = value;
+            } 
+            // 파일에서 INVENTORY_SIZE를 만나면 가방 복구 시작!
+            else if (key == "INVENTORY_SIZE") {
+                int size = value;
+                for (int i = 0; i < size; i++) {
+                    string safeName;
+                    int t, v, p;
+                    inFile >> safeName >> t >> v >> p;
+                    replace(safeName.begin(), safeName.end(), '_', ' '); // 언더바를 다시 공백으로 복구
+                    inventory.push_back(Item(safeName, t, v, p));
+                }
+            }
+        }
+        inFile.close();
+        updateJobLogic(); 
+        cout << GREEN << "📂 게임을 성공적으로 불러왔습니다." << RESET << endl;
+    } else cout << RED << "❌ 저장 파일이 없습니다. 새로운 게임을 시작합니다." << RESET << endl;
 }
