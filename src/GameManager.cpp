@@ -28,7 +28,7 @@ void GameManager::run() {
         cout << "\n=== 🏡 마을 광장 ===" << endl;
         player.printStatus();
         
-        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 게임 저장  5. 게임 종료\n선택: ";
+        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 가방 열기  5. 게임 저장  6. 게임 종료\n선택: ";
         
         int townChoice;
         cin >> townChoice;
@@ -40,12 +40,14 @@ void GameManager::run() {
         } else if (townChoice == 3) {
             Inn::visit(player);   
         } else if (townChoice == 4) {
+            player.openInventory(); // ✨ 가방 열기!
+        } else if (townChoice == 5) {
             system("cls");
             player.save();
             cout << "\n엔터를 누르면 계속합니다...";
             cin.ignore();
             cin.get();
-        } else if (townChoice == 5) {
+        } else if (townChoice == 6) {
             system("cls");
             cout << "게임을 종료합니다..." << endl;
             isPlaying = false;

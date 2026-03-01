@@ -3,6 +3,8 @@
 
 #include <string>
 #include <map>
+#include <vector>
+#include "Item.h"
 
 class Job; // 전방 선언 (전략 패턴을 위해 필요)
 
@@ -18,17 +20,20 @@ public:
     int weaponDamage;
     int armorDefense;
     int exp;
-    int maxExp; // 추가됨
+    int maxExp;
     int gold;
     int potions;
     int manaPotions;
     int dungeonFloor;
     int weaponLevel;
-    int armorLevel; // 추가됨
+    int armorLevel;
     
     // --- 직업 관련 변수 ---
-    int jobClass;   // 추가됨
-    Job* job;       // 추가됨
+    int jobClass;
+    Job* job;
+
+    std::vector<Item> inventory;
+    void openInventory();
 
     // --- 저장 시스템용 맵 ---
     std::map<std::string, int*> stats;

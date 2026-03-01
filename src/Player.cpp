@@ -23,6 +23,8 @@ Player::Player() {
     jobClass = 0;
     job = nullptr;
 
+    inventory.push_back(Item("초보자의 빵", 3, 20, 10));
+
     updateJobLogic(); // 직업 객체 초기화
     registerStats();  // 저장 레지스트리 등록
 }
@@ -173,4 +175,23 @@ void Player::load() {
         updateJobLogic(); // ✨ 불러온 jobClass 숫자에 맞춰 직업 세팅!
         cout << GREEN << "📂 게임을 성공적으로 불러왔습니다." << RESET << endl;
     } else cout << RED << "❌ 저장 파일이 없습니다. 새로운 게임을 시작합니다." << RESET << endl;
+}
+
+void Player::openInventory() {
+    system("cls");
+    cout << CYAN << "\n=== 가방 (인벤토리) ===" << RESET << endl;
+
+    if (inventory.empty()){
+        cout << "가방이 텅 비어있습니다." << endl;
+    } else {
+        cout << "총 " << inventory.size() << "개의 아이템이 있습니다.\n" << endl;
+        for (size_t i = 0; i < inventory.size(); i++){
+            cout << i + 1 << ". [" << inventory[i].getTypeName() << "] "
+                 << YELLOW << inventory[i].name << RESET
+                 << " (효과 수치: " << inventory[i].effectValue << ")" << endl;
+        }
+    }
+    cout << "\n엔터를 누르면 닫습니다...";
+    cin.ignore();
+    cin.get();
 }
