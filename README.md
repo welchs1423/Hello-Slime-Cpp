@@ -1,6 +1,23 @@
 # Hello Slime CPP
 VSC 환경에서 C++의 절차적, 객체지향적 흐름을 이해하기 위해 제작한 첫 번째 토이 프로젝트임.
 
+## 🛠️ 기술 스택 및 환경 (Tech Stack & Environment)
+- **Language**: C++
+- **IDE**: Visual Studio Code
+- **Compiler**: GCC (`g++`)
+- **Version Control**: Git, GitHub
+
+## 🧠 핵심 구현 기술 (Key Technologies)
+- **Object-Oriented Programming (OOP)**: 클래스 상속(Inheritance), 가상 함수(Virtual Function)를 활용한 다형성(Polymorphism), 추상화 구현.
+- **Design Patterns**: 몬스터 생성을 전담하는 팩토리 패턴(Factory Pattern) 및 직업별 전투 방식을 분리하는 전략 패턴(Strategy Pattern) 적용.
+- **Data Structures (STL)**: 
+  - `std::vector`: 인벤토리 시스템의 동적 아이템 배열 관리.
+  - `std::map`: 멤버 포인터를 활용한 세이브 데이터 메타 레지스트리 구축.
+- **File I/O**: `std::fstream`을 활용한 게임 스탯 및 동적 인벤토리 영구 저장/불러오기(Save/Load) 로직 구현.
+- **Data-Driven Design**: 매직 스트링(Magic String)을 배제하고 아이템/몬스터의 고유 `Type` 코드를 기반으로 작동하는 시스템 설계.
+
+---
+
 ## 업데이트 내역 (Changelog)
 
 ### [2026-03-01]
