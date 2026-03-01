@@ -68,7 +68,6 @@ void Battle::start(Player& player) {
     if (enemy->hp <= 0) {
         cout << YELLOW << "\n🎉 " << enemy->name << "을(를) 물리쳤습니다!" << RESET << endl;
         
-        // 1번, 2번 토벌 퀘스트 체크
         if (player.activeQuestId == 1 && enemy->name == "초록 고블린") {
             player.questProgress++;
             cout << YELLOW << "[📜 퀘스트] 초록 고블린 토벌 진행도: " << player.questProgress << "/3" << RESET << endl;
@@ -77,18 +76,43 @@ void Battle::start(Player& player) {
             cout << YELLOW << "[📜 퀘스트] 푸른 슬라임 토벌 진행도: " << player.questProgress << "/5" << RESET << endl;
         }
         
-        int expGain = (player.dungeonFloor % 5 == 0) ? 200 : 50;
+        int expGain = (isBoss) ? 200 : 50;
         player.gainExp(expGain);
         
         int goldGain = (rand() % 30 + 10) + (player.dungeonFloor * 2);
         player.gold += goldGain;
         cout << YELLOW << "💰 " << goldGain << " 골드를 획득했습니다!" << RESET << endl;
 
+        // ✨ 몬스터 전리품(Loot) 시스템 추가!
+        if (isBoss) {
+            // 보스 100% 확정 드랍: 강력한 고유 방어구 (방어력 30)
+            cout << YELLOW << "👑 보스가 빛나는 전리품을 남겼습니다!" << RESET << endl;
+            player.inventory.push_back(Item("슬라임의 왕관", 2, 30, 500));
+            cout << GREEN << "가방에 [슬라임의 왕관]이 추가되었습니다!" << RESET << endl;
+        } else {
+            // 일반 몬스터 30% 확률로 무작위 아이템 드랍
+            int dropRoll = rand() % 100;
+            if (dropRoll < 30) {
+                int itemType = rand() % 3;
+                if (itemType == 0) {
+                    player.inventory.push_back(Item("체력 포션", 3, 50, 30));
+                    cout << GREEN << "🎁 몬스터가 [체력 포션]을 떨어뜨렸습니다! (가방에 추가됨)" << RESET << endl;
+                } else if (itemType == 1) {
+                    player.inventory.push_back(Item("마나 포션", 4, 50, 30));
+                    cout << CYAN << "🎁 몬스터가 [마나 포션]을 떨어뜨렸습니다! (가방에 추가됨)" << RESET << endl;
+                } else {
+                    // 상점에서 팔지 않는 몬스터 전용 초반 무기
+                    player.inventory.push_back(Item("낡은 단검", 1, 3, 10));
+                    cout << YELLOW << "🎁 몬스터가 [낡은 단검]을 떨어뜨렸습니다! (가방에 추가됨)" << RESET << endl;
+                }
+            }
+        }
+
         player.dungeonFloor++;
-        cout << CYAN << "더 깊은 곳을 향해 " << player.dungeonFloor << "층으로 나아갑니다!" << RESET << endl;
+        cout << CYAN << "\n더 깊은 곳을 향해 " << player.dungeonFloor << "층으로 나아갑니다!" << RESET << endl;
         
         if (player.activeQuestId == 3 && player.dungeonFloor >= 5) {
-            player.questProgress = 1; // 달성 완료!
+            player.questProgress = 1; 
             cout << YELLOW << "[📜 퀘스트] 던전 5층 도달 임무 완료! 길드로 돌아가 보상을 받으세요." << RESET << endl;
         }
         
