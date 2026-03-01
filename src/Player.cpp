@@ -25,6 +25,7 @@ Player::Player() {
     job = nullptr;
     activeQuestId = 0; 
     questProgress = 0; 
+    str = 5; intel = 5; vit = 5; statPoints = 0;
 
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
 
@@ -54,7 +55,11 @@ void Player::registerStats() {
     stats["armorLevel"] = &armorLevel;
     stats["jobClass"] = &jobClass;
     stats["activeQuestId"] = &activeQuestId; 
-    stats["questProgress"] = &questProgress; 
+    stats["questProgress"] = &questProgress;
+    stats["str"] = &str;
+    stats["intel"] = &intel;
+    stats["vit"] = &vit;
+    stats["statPoints"] = &statPoints;
 }
 
 void Player::updateJobLogic() {
@@ -96,13 +101,18 @@ void Player::printStatus() {
         cout << YELLOW << "[📜 퀘스트 진행 중] 임무 번호: " << activeQuestId 
              << " | 진척도: " << questProgress << RESET << endl;
     }
+
+    cout << "[스탯] STR: " << str << " | INT: " << intel << " | VIT: " << vit 
+         << " | " << YELLOW << "남은 포인트: " << statPoints << RESET << endl;
+
+    if (activeQuestId > 0) cout << YELLOW << "[퀘스트] 임무 번호: " << activeQuestId << " | 진척도: " << questProgress << RESET << endl;
 }
 
-int Player::attack() { return job->attack(level, weaponDamage, weaponLevel); }
+int Player::attack() { return job->attack(level, weaponDamage, weaponLevel,str); }
 
 int Player::magicAttack() {
     if (mp >= 20) {
-        mp -= 20; return job->magicAttack(level, weaponDamage);
+        mp -= 20; return job->magicAttack(level, weaponDamage, intel);
     } else {
         cout << RED << "❌ 마나가 부족합니다!" << RESET << endl; return -1;
     }
@@ -138,11 +148,11 @@ void Player::gainExp(int amount) {
 
 void Player::levelUp() {
     level++; exp -= maxExp; maxExp += 50;
-    maxHp += 20; hp = maxHp; maxMp += 10; mp = maxMp; weaponDamage += 2;
-    cout << GREEN << "🎉 레벨 업! Lv." << level << "이 되었습니다!" << RESET << endl;
+    maxHp += 10; hp = maxHp; maxMp += 5; mp = maxMp;
+    statPoints += 5;
+    cout << GREEN << "레벨 업! Lv." << level << "이 되었습니다! (스탯 포인트 +5)" << RESET << endl;
 }
 
-// ✨ 가방 시스템 (장착 로직 추가)
 void Player::openInventory() {
     bool inInventory = true;
 
@@ -229,7 +239,6 @@ void Player::openInventory() {
     }
 }
 
-// ✨ 세이브 (isEquipped 도 함께 저장)
 void Player::save() {
     ofstream outFile("savefile.txt");
     if (outFile.is_open()) {
@@ -250,7 +259,6 @@ void Player::save() {
     } else cout << RED << "❌ 저장 파일을 열 수 없습니다!" << RESET << endl;
 }
 
-// ✨ 로드 (isEquipped 도 함께 복구)
 void Player::load() {
     ifstream inFile("savefile.txt");
     if (inFile.is_open()) {
@@ -279,4 +287,38 @@ void Player::load() {
         updateJobLogic(); 
         cout << GREEN << "📂 게임을 성공적으로 불러왔습니다." << RESET << endl;
     } else cout << RED << "❌ 저장 파일이 없습니다. 새로운 게임을 시작합니다." << RESET << endl;
+}
+
+void Player::allocateStats(){
+    while (statPoints > 0) {
+        system("cls");
+        cout << CYAN << "\n=== 스탯 분배 ===" << RESET << endl;
+        cout << "잔여 스탯 포인트: " << YELLOW << statPoints << RESET << "\n" << endl;
+        cout << "1. 근력(STR) 올리기 (현재 " << str << ") - 물리 공격력 증가" << endl;
+        cout << "2. 지능(INT) 올리기 (현재 " << intel << ") - 마법 공격력 및 최대 마나 증가" << endl;
+        cout << "3. 체력(VIT) 올리기 (현재 " << vit << ") - 최대 체력 증가" << endl;
+        cout << "0. 분배 종료\n 선택: ";
+
+        int choice;
+        cin >> choice;
+
+        if (choice == 0) break;
+        else if (choice == 1) {
+            str++; statPoints--;
+            cout << GREEN << "근력이 1 올랐습니다!" << RESET << endl;
+        } else if (choice == 2) {
+            intel++; statPoints--; maxMp +=5; mp += 5;
+            cout << CYAN << "지능이 1 올랐습니다! (최대 마나 +5)" << RESET << endl;
+        } else if (choice == 3) {
+            vit++; statPoints--; maxHp += 10; hp += 10;
+            cout << GREEN << "체력이 1 올랐습니다! (최대 체력 +10)" << RESET << endl;
+        } else {
+            cout << RED << "잘못된 입력입니다." << RESET << endl;
+        }
+    }
+
+    if(statPoints <= 0){
+        cout << "\n모든 스탯 포인트를 소모했습니다.\n엔터를 누르면 돌아갑니다...";
+        cin.ignore(); cin.get();
+    }
 }

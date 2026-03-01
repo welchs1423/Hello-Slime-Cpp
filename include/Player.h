@@ -12,28 +12,27 @@ class Player {
 public:
     std::string name;
     int level;
-    int maxHp;
-    int hp;
-    int maxMp;
-    int mp;
+    int maxHp; int hp;
+    int maxMp; int mp;
     int weaponDamage;
     int armorDefense;
-    int exp;
-    int maxExp;
+    int exp; int maxExp;
     int gold;
-    int potions;
-    int manaPotions;
+    int potions; int manaPotions;
     int dungeonFloor;
-    int weaponLevel;
-    int armorLevel;
+    int weaponLevel; int armorLevel;
+    
+    int str;        // 근력 (물리 공격력)
+    int intel;      // 지능 (마법 공격력 및 마나)
+    int vit;        // 체력 (최대 체력)
+    int statPoints; // 잔여 스탯 포인트
     
     int jobClass;   
     Job* job;       
 
     std::vector<Item> inventory; 
-
-    int activeQuestId;  // 0이면 진행 중인 퀘스트 없음
-    int questProgress;  // 현재 사냥한 몬스터 마리 수 등
+    int activeQuestId;  
+    int questProgress;  
 
     std::map<std::string, int*> stats;
 
@@ -44,7 +43,7 @@ public:
     void updateJobLogic(); 
     void chooseClass();    
     void openInventory();  
-    
+    void allocateStats();
     void printStatus();
     int attack();
     int magicAttack();
