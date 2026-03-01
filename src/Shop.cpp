@@ -44,7 +44,7 @@ void Shop::visit(Player& player) {
             case 2:
                 if (player.gold >= 30) {
                     player.gold -= 30; player.manaPotions++;
-                    player.inventory.push_back(Item("마나 포션", 3, 50, 30));
+                    player.inventory.push_back(Item("마나 포션", 4, 50, 30));
                     cout << CYAN << "마나 포션을 구매하여 가방에 넣었습니다! (보유량: " << player.manaPotions << ")" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
@@ -66,7 +66,6 @@ void Shop::visit(Player& player) {
             case 5:
                 if (player.gold >= 80) {
                     player.gold -= 80; player.armorDefense = 5;
-                    // ✨ 가방에 진짜 방어구 객체 추가! (이름, 타입(2:방어구), 방어력, 가격)
                     player.inventory.push_back(Item("가죽 갑옷", 2, 5, 80));
                     cout << GREEN << "가죽 갑옷을 구매하여 장착하고, 가방에도 넣었습니다!" << RESET << endl;
                 } else cout << RED << "골드가 부족합니다!" << RESET << endl;
@@ -104,14 +103,14 @@ void Shop::visit(Player& player) {
                         // 가챠 당첨 포션들도 가방에 넣어줍니다
                         player.inventory.push_back(Item("체력 포션", 3, 50, 30));
                         player.inventory.push_back(Item("체력 포션", 3, 50, 30));
-                        player.inventory.push_back(Item("마나 포션", 3, 50, 30));
+                        player.inventory.push_back(Item("마나 포션", 4, 50, 30));
                     } else if (roll < 70) {
                         cout << CYAN << "🔨 신비한 망치가 무기를 내리칩니다! 무기 레벨 +1!" << RESET << endl;
                         player.weaponLevel++;
                     } else {
                         cout << RED << "😭 돌멩이뿐입니다... 쓸모없는 돌멩이를 가방에 챙겼습니다." << RESET << endl;
                         // ✨ 꽝에 당첨되면 인벤토리에 쓰레기를 넣어버립니다
-                        player.inventory.push_back(Item("쓸모없는 돌멩이", 4, 0, 0));
+                        player.inventory.push_back(Item("쓸모없는 돌멩이", 5, 0, 0));
                     }
                 } else {
                     cout << RED << "골드가 부족합니다!" << RESET << endl;

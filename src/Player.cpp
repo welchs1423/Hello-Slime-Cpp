@@ -177,21 +177,81 @@ void Player::load() {
     } else cout << RED << "❌ 저장 파일이 없습니다. 새로운 게임을 시작합니다." << RESET << endl;
 }
 
+// ✨ 인벤토리(가방) 사용/장착 시스템
 void Player::openInventory() {
-    system("cls");
-    cout << CYAN << "\n=== 가방 (인벤토리) ===" << RESET << endl;
+    bool inInventory = true;
 
-    if (inventory.empty()){
-        cout << "가방이 텅 비어있습니다." << endl;
-    } else {
+    while (inInventory) {
+        system("cls");
+        cout << CYAN << "\n=== 🎒 가방 (인벤토리) ===" << RESET << endl;
+        
+        if (inventory.empty()) {
+            cout << "가방이 텅 비어있습니다." << endl;
+            cout << "\n엔터를 누르면 닫습니다...";
+            cin.ignore();
+            cin.get();
+            return; // 가방이 비었으면 바로 나갑니다.
+        }
+
         cout << "총 " << inventory.size() << "개의 아이템이 있습니다.\n" << endl;
-        for (size_t i = 0; i < inventory.size(); i++){
-            cout << i + 1 << ". [" << inventory[i].getTypeName() << "] "
-                 << YELLOW << inventory[i].name << RESET
+        for (size_t i = 0; i < inventory.size(); i++) {
+            cout << i + 1 << ". [" << inventory[i].getTypeName() << "] " 
+                 << YELLOW << inventory[i].name << RESET 
                  << " (효과 수치: " << inventory[i].effectValue << ")" << endl;
         }
+
+        cout << "\n0. 가방 닫기\n사용/장착할 아이템 번호를 입력하세요: ";
+        int choice;
+        cin >> choice;
+
+        if (choice == 0) {
+            inInventory = false; // 0번을 누르면 루프 탈출
+        } 
+        else if (choice > 0 && choice <= inventory.size()) {
+            // 사용자가 입력한 번호는 1부터 시작하므로, 배열 인덱스에 맞게 -1 해줍니다.
+            int index = choice - 1; 
+            Item selectedItem = inventory[index];
+
+            // 1. 무기 장착
+            if (selectedItem.type == 1) { 
+                weaponDamage = selectedItem.effectValue;
+                cout << GREEN << "\n" << selectedItem.name << "을(를) 장착했습니다! (기본 공격력 " << weaponDamage << ")" << RESET << endl;
+            } 
+            // 2. 방어구 장착
+            else if (selectedItem.type == 2) { 
+                armorDefense = selectedItem.effectValue;
+                cout << GREEN << "\n" << selectedItem.name << "을(를) 장착했습니다! (기본 방어력 " << armorDefense << ")" << RESET << endl;
+            } 
+            // 3. 소모품 사용 (포션, 빵)
+            else if (selectedItem.type == 3) { 
+                hp += selectedItem.effectValue;
+                if (hp > maxHp) hp = maxHp;
+                if (potions > 0) potions--; // 기존 시스템 호환용
+                cout << GREEN << "\n" << selectedItem.name << "을(를) 사용해 체력을 " << selectedItem.effectValue << " 회복했습니다!" << RESET << endl;
+            } 
+            // 4. 마나 회복 (이름 상관없이 type이 4면 무조건 마나 회복)
+            else if (selectedItem.type == 4) {
+                mp += selectedItem.effectValue;
+                if (mp > maxMp) mp = maxMp;
+                if (manaPotions > 0) manaPotions--; // 기존 시스템 호환용
+                cout << CYAN << "\n" << selectedItem.name << "을(를) 사용해 마나를 " << selectedItem.effectValue << " 회복했습니다!" << RESET << endl;
+            } 
+            // 5. 기타 잡템
+            else { 
+                cout << RED << "\n" << selectedItem.name << "은(는) 당장 쓸 수 없습니다. 길가에 버렸습니다." << RESET << endl;
+            }
+
+            inventory.erase(inventory.begin() + index);
+
+            cout << "엔터를 누르면 계속합니다...";
+            cin.ignore();
+            cin.get();
+        } 
+        else {
+            cout << RED << "잘못된 번호입니다." << RESET << endl;
+            cout << "엔터를 누르면 계속합니다...";
+            cin.ignore();
+            cin.get();
+        }
     }
-    cout << "\n엔터를 누르면 닫습니다...";
-    cin.ignore();
-    cin.get();
 }
