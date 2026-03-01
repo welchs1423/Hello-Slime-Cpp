@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <algorithm> // ✨ 문자열 치환(공백 ↔ 언더바)을 위해 추가!
+#include <algorithm>
 
 using namespace std;
 
@@ -23,6 +23,9 @@ Player::Player() {
     armorLevel = 0;
     jobClass = 0;
     job = nullptr;
+
+    activeQuestId = 0;
+    questProgress = 0;
 
     // 게임 시작 시 기본 식량 제공
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
@@ -52,6 +55,8 @@ void Player::registerStats() {
     stats["weaponLevel"] = &weaponLevel;
     stats["armorLevel"] = &armorLevel;
     stats["jobClass"] = &jobClass;
+    stats["activeQuestId"] = &activeQuestId;
+    stats["questProgress"] = &questProgress;
 }
 
 void Player::updateJobLogic() {
@@ -88,6 +93,11 @@ void Player::printStatus() {
     cout << "ATK: " << weaponDamage << " (+" << weaponLevel * 5 << ") | "
          << "DEF: " << armorDefense << " (+" << armorLevel * 3 << ") | "
          << "Gold: " << YELLOW << gold << "G" << RESET << endl;
+
+    if (activeQuestId > 0) {
+        cout << YELLOW << "[📜 퀘스트 진행 중] 임무 번호: " << activeQuestId 
+             << " | 진척도: " << questProgress << RESET << endl;
+    }
 }
 
 int Player::attack() {
@@ -147,7 +157,6 @@ void Player::levelUp() {
     cout << GREEN << "🎉 레벨 업! Lv." << level << "이 되었습니다!" << RESET << endl;
 }
 
-// ✨ 가방 사용/장착 시스템 (직전 퀘스트 완료 버전)
 void Player::openInventory() {
     bool inInventory = true;
 
@@ -220,7 +229,6 @@ void Player::openInventory() {
     }
 }
 
-// ✨ 세이브 (인벤토리 저장 추가)
 void Player::save() {
     ofstream outFile("savefile.txt");
     if (outFile.is_open()) {
@@ -241,7 +249,6 @@ void Player::save() {
     } else cout << RED << "❌ 저장 파일을 열 수 없습니다!" << RESET << endl;
 }
 
-// ✨ 로드 (인벤토리 복구 추가)
 void Player::load() {
     ifstream inFile("savefile.txt");
     if (inFile.is_open()) {

@@ -14,11 +14,7 @@ void Battle::start(Player& player) {
     bool isBoss = (player.dungeonFloor % 5 == 0);
     if (!isBoss) {
         bool eventHappend = DungeonEvent::triggerEvent(player);
-
-        if (player.hp <= 0) {
-            return;
-        }
-
+        if (player.hp <= 0) return;
         if (eventHappend) {
             player.dungeonFloor++;
             return;
@@ -26,7 +22,6 @@ void Battle::start(Player& player) {
     }
 
     Monster* enemy = MonsterFactory::spawnMonster(player.dungeonFloor, player.level);
-
     cout << "야생의 " << RED << enemy->name << RESET << " (이)가 나타났다! (HP: " << RED << enemy->hp << RESET << ")" << endl;
 
     bool inCombat = true;
@@ -35,7 +30,6 @@ void Battle::start(Player& player) {
              << " | 마나: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
         
-        // ✨ 전투 메뉴 개편: 기존 포션 단축키들을 지우고 '가방 열기'를 3번에 배치!
         cout << "1. 기본 공격  2. 마법 공격 (20MP)  3. 🎒 가방 열기  4. 도망가기\n선택: ";
         
         int combatChoice;
@@ -47,23 +41,18 @@ void Battle::start(Player& player) {
             case 1: {
                 int damage = player.attack();
                 enemy->takeDamage(damage);
-                if (enemy->hp > 0) {
-                    player.takeDamage(enemy->attack());
-                }
+                if (enemy->hp > 0) player.takeDamage(enemy->attack());
                 break;
             }
             case 2: {
                 int magicDmg = player.magicAttack();
                 if (magicDmg != -1) {
                     enemy->takeDamage(magicDmg);
-                    if (enemy->hp > 0) {
-                        player.takeDamage(enemy->attack());
-                    }
+                    if (enemy->hp > 0) player.takeDamage(enemy->attack());
                 }
                 break;
             }
             case 3:
-                // ✨ 스카이림 식 먹방: 턴 소모 없이 가방을 열고 정비할 수 있습니다!
                 player.openInventory(); 
                 break;
             case 4:
@@ -79,6 +68,15 @@ void Battle::start(Player& player) {
     if (enemy->hp <= 0) {
         cout << YELLOW << "\n🎉 " << enemy->name << "을(를) 물리쳤습니다!" << RESET << endl;
         
+        // 1번, 2번 토벌 퀘스트 체크
+        if (player.activeQuestId == 1 && enemy->name == "초록 고블린") {
+            player.questProgress++;
+            cout << YELLOW << "[📜 퀘스트] 초록 고블린 토벌 진행도: " << player.questProgress << "/3" << RESET << endl;
+        } else if (player.activeQuestId == 2 && enemy->name == "푸른 슬라임") {
+            player.questProgress++;
+            cout << YELLOW << "[📜 퀘스트] 푸른 슬라임 토벌 진행도: " << player.questProgress << "/5" << RESET << endl;
+        }
+        
         int expGain = (player.dungeonFloor % 5 == 0) ? 200 : 50;
         player.gainExp(expGain);
         
@@ -88,6 +86,11 @@ void Battle::start(Player& player) {
 
         player.dungeonFloor++;
         cout << CYAN << "더 깊은 곳을 향해 " << player.dungeonFloor << "층으로 나아갑니다!" << RESET << endl;
+        
+        if (player.activeQuestId == 3 && player.dungeonFloor >= 5) {
+            player.questProgress = 1; // 달성 완료!
+            cout << YELLOW << "[📜 퀘스트] 던전 5층 도달 임무 완료! 길드로 돌아가 보상을 받으세요." << RESET << endl;
+        }
         
         cout << "\n엔터를 누르면 마을로 돌아갑니다...";
         cin.ignore();

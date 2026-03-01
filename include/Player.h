@@ -6,11 +6,10 @@
 #include <vector>
 #include "Item.h"
 
-class Job; // 전방 선언 (전략 패턴을 위해 필요)
+class Job;
 
 class Player {
 public:
-    // --- 플레이어 기본 스탯 ---
     std::string name;
     int level;
     int maxHp;
@@ -28,26 +27,24 @@ public:
     int weaponLevel;
     int armorLevel;
     
-    // --- 직업 관련 변수 ---
-    int jobClass;
-    Job* job;
+    int jobClass;   
+    Job* job;       
 
-    std::vector<Item> inventory;
-    void openInventory();
+    std::vector<Item> inventory; 
 
-    // --- 저장 시스템용 맵 ---
+    int activeQuestId;  // 0이면 진행 중인 퀘스트 없음
+    int questProgress;  // 현재 사냥한 몬스터 마리 수 등
+
     std::map<std::string, int*> stats;
 
-    // --- 생성자 및 소멸자 ---
     Player();
-    ~Player(); // 메모리 관리를 위해 추가됨
+    ~Player();
 
-    // --- 핵심 시스템 함수 ---
     void registerStats();
-    void updateJobLogic(); // 추가됨
-    void chooseClass();    // 추가됨
+    void updateJobLogic(); 
+    void chooseClass();    
+    void openInventory();  
     
-    // --- 행동 함수 ---
     void printStatus();
     int attack();
     int magicAttack();
@@ -55,9 +52,8 @@ public:
     void heal();
     void restoreMp();
     void gainExp(int amount);
-    void levelUp();        // 추가됨
+    void levelUp();        
 
-    // --- 세이브/로드 (void로 통일) ---
     void save();
     void load();
 };
