@@ -4,6 +4,7 @@
 #include "../include/Colors.h"
 #include <iostream>
 #include <cstdlib>
+#include <memory>
 
 using namespace std;
 
@@ -11,7 +12,6 @@ void Battle::start(Player &player, int difficulty)
 {
     system("cls");
 
-    // 난이도 계수 설정
     float statMultiplier = 1.0f;
     float rewardMultiplier = 1.0f;
     string diffName = "보통";
@@ -44,9 +44,9 @@ void Battle::start(Player &player, int difficulty)
         }
     }
 
-    Monster *enemy = MonsterFactory::spawnMonster(player.dungeonFloor, player.level);
+    // 스마트 포인터로 몬스터 객체 래핑 (함수 종료 시 자동 메모리 해제)
+    std::unique_ptr<Monster> enemy(MonsterFactory::spawnMonster(player.dungeonFloor, player.level));
 
-    // 몬스터 스탯에 난이도 배수 적용
     enemy->hp = (int)(enemy->hp * statMultiplier);
 
     cout << "야생의 " << RED << enemy->name << RESET << " (이)가 나타났다! (HP: " << RED << enemy->hp << RESET << ")" << endl;
@@ -72,7 +72,6 @@ void Battle::start(Player &player, int difficulty)
             enemy->takeDamage(damage);
             if (enemy->hp > 0)
             {
-                // 적 공격력에도 난이도 배수 적용
                 player.takeDamage((int)(enemy->attack() * statMultiplier));
             }
             break;
@@ -179,7 +178,6 @@ void Battle::start(Player &player, int difficulty)
             cout << YELLOW << "[퀘스트] 푸른 슬라임 토벌 진행도: " << player.questProgress << "/5" << RESET << endl;
         }
 
-        // 보상에 난이도 배수 적용
         int expGain = (int)(((isBoss) ? 200 : 50) * rewardMultiplier);
         player.gainExp(expGain);
 
@@ -230,6 +228,4 @@ void Battle::start(Player &player, int difficulty)
         cin.ignore();
         cin.get();
     }
-
-    delete enemy;
 }

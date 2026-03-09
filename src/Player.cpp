@@ -43,8 +43,6 @@ Player::Player()
 
 Player::~Player()
 {
-    if (job)
-        delete job;
 }
 
 void Player::registerStats()
@@ -76,30 +74,27 @@ void Player::registerStats()
 // 직업 세팅 및 기본 스킬 지급
 void Player::updateJobLogic()
 {
-    if (job)
-        delete job;
-
-    skills.clear(); // 직업이 바뀌면 기존 스킬 초기화
+    skills.clear();
 
     if (jobClass == 1)
     {
-        job = new Warrior();
-        skills.push_back(Skill("파워 스트라이크", 10, 20, 1)); // 전사 물리 스킬
+        job = std::make_unique<Warrior>();
+        skills.push_back(Skill("파워 스트라이크", 10, 20, 1));
     }
     else if (jobClass == 2)
     {
-        job = new Mage();
-        skills.push_back(Skill("파이어볼", 15, 25, 2)); // 마법사 마법 스킬
+        job = std::make_unique<Mage>();
+        skills.push_back(Skill("파이어볼", 15, 25, 2));
     }
     else if (jobClass == 3)
     {
-        job = new Rogue();
-        skills.push_back(Skill("독 찌르기", 10, 15, 1)); // 도적 물리 스킬
+        job = std::make_unique<Rogue>();
+        skills.push_back(Skill("독 찌르기", 10, 15, 1));
     }
     else
     {
-        job = new Beginner();
-        skills.push_back(Skill("달팽이 세마리", 5, 10, 1)); // 초보자 스킬
+        job = std::make_unique<Beginner>();
+        skills.push_back(Skill("달팽이 세마리", 5, 10, 1));
     }
 }
 
@@ -423,16 +418,14 @@ void Player::load()
         inFile.close();
 
         // 직업 포인터 복구 (기본 스킬이 덮어씌워지는 것을 방지)
-        if (job)
-            delete job;
         if (jobClass == 1)
-            job = new Warrior();
+            job = std::make_unique<Warrior>();
         else if (jobClass == 2)
-            job = new Mage();
+            job = std::make_unique<Mage>();
         else if (jobClass == 3)
-            job = new Rogue();
+            job = std::make_unique<Rogue>();
         else
-            job = new Beginner();
+            job = std::make_unique<Beginner>();
 
         cout << "게임을 성공적으로 불러왔습니다." << endl;
     }

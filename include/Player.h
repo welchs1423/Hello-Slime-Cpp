@@ -4,8 +4,9 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <memory>
 #include "Item.h"
-#include "Skill.h" // ✨ 스킬 설계도 추가
+#include "Skill.h"
 
 class Job;
 
@@ -35,7 +36,7 @@ public:
     int statPoints;
 
     int jobClass;
-    Job *job;
+    std::unique_ptr<Job> job; // 스마트 포인터로 전면 교체
 
     std::vector<Item> inventory;
     std::vector<Skill> skills;
