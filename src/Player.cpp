@@ -357,15 +357,23 @@ void Player::save()
         {
             string safeName = item.name;
             replace(safeName.begin(), safeName.end(), ' ', '_');
-            // ✨ 마지막에 item.isEquipped 추가
             outFile << safeName << " " << item.type << " " << item.effectValue << " " << item.price << " " << item.isEquipped << "\n";
         }
 
+        // 스킬북 정보 저장 추가
+        outFile << "SKILL_SIZE " << skills.size() << "\n";
+        for (const auto &skill : skills)
+        {
+            string safeName = skill.name;
+            replace(safeName.begin(), safeName.end(), ' ', '_');
+            outFile << safeName << " " << skill.mpCost << " " << skill.baseDamage << " " << skill.type << "\n";
+        }
+
         outFile.close();
-        cout << GREEN << "💾 게임이 성공적으로 저장되었습니다." << RESET << endl;
+        cout << "게임이 성공적으로 저장되었습니다." << endl;
     }
     else
-        cout << RED << "❌ 저장 파일을 열 수 없습니다!" << RESET << endl;
+        cout << "저장 파일을 열 수 없습니다!" << endl;
 }
 
 void Player::load()
@@ -377,6 +385,7 @@ void Player::load()
         int value;
 
         inventory.clear();
+        skills.clear();
 
         while (inFile >> key >> value)
         {
@@ -391,19 +400,44 @@ void Player::load()
                 {
                     string safeName;
                     int t, v, p;
-                    bool e; // ✨ 장착 여부
+                    bool e;
                     inFile >> safeName >> t >> v >> p >> e;
                     replace(safeName.begin(), safeName.end(), '_', ' ');
-                    inventory.push_back(Item(safeName, t, v, p, e)); // ✨ e 값 넣어서 아이템 복구!
+                    inventory.push_back(Item(safeName, t, v, p, e));
+                }
+            }
+            // 스킬북 복구 추가
+            else if (key == "SKILL_SIZE")
+            {
+                int size = value;
+                for (int i = 0; i < size; i++)
+                {
+                    string safeName;
+                    int cost, dmg, t;
+                    inFile >> safeName >> cost >> dmg >> t;
+                    replace(safeName.begin(), safeName.end(), '_', ' ');
+                    skills.push_back(Skill(safeName, cost, dmg, t));
                 }
             }
         }
         inFile.close();
-        updateJobLogic();
-        cout << GREEN << "📂 게임을 성공적으로 불러왔습니다." << RESET << endl;
+
+        // 직업 포인터 복구 (기본 스킬이 덮어씌워지는 것을 방지)
+        if (job)
+            delete job;
+        if (jobClass == 1)
+            job = new Warrior();
+        else if (jobClass == 2)
+            job = new Mage();
+        else if (jobClass == 3)
+            job = new Rogue();
+        else
+            job = new Beginner();
+
+        cout << "게임을 성공적으로 불러왔습니다." << endl;
     }
     else
-        cout << RED << "❌ 저장 파일이 없습니다. 새로운 게임을 시작합니다." << RESET << endl;
+        cout << "저장 파일이 없습니다. 새로운 게임을 시작합니다." << endl;
 }
 
 void Player::allocateStats()
