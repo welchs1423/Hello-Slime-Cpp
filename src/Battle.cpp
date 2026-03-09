@@ -7,10 +7,29 @@
 
 using namespace std;
 
-void Battle::start(Player &player)
+void Battle::start(Player &player, int difficulty)
 {
     system("cls");
-    cout << "\n=== 🏰 던전 " << player.dungeonFloor << "층 ===" << endl;
+
+    // 난이도 계수 설정
+    float statMultiplier = 1.0f;
+    float rewardMultiplier = 1.0f;
+    string diffName = "보통";
+
+    if (difficulty == 1)
+    {
+        statMultiplier = 0.8f;
+        rewardMultiplier = 0.8f;
+        diffName = "쉬움";
+    }
+    else if (difficulty == 3)
+    {
+        statMultiplier = 1.5f;
+        rewardMultiplier = 1.5f;
+        diffName = "어려움";
+    }
+
+    cout << "\n=== 던전 " << player.dungeonFloor << "층 [" << diffName << "] ===" << endl;
 
     bool isBoss = (player.dungeonFloor % 5 == 0);
     if (!isBoss)
@@ -26,21 +45,23 @@ void Battle::start(Player &player)
     }
 
     Monster *enemy = MonsterFactory::spawnMonster(player.dungeonFloor, player.level);
+
+    // 몬스터 스탯에 난이도 배수 적용
+    enemy->hp = (int)(enemy->hp * statMultiplier);
+
     cout << "야생의 " << RED << enemy->name << RESET << " (이)가 나타났다! (HP: " << RED << enemy->hp << RESET << ")" << endl;
 
     bool inCombat = true;
     while (inCombat && player.hp > 0 && enemy->hp > 0)
     {
-        cout << "\n[" << CYAN << "플레이어" << RESET << "] 체력: " << GREEN << player.hp << "/" << player.maxHp << RESET
+        cout << "\n[플레이어] 체력: " << GREEN << player.hp << "/" << player.maxHp << RESET
              << " | 마나: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
 
-        // ✨ 전투 메뉴 개편: 2번을 스킬북으로 변경
-        cout << "1. 기본 공격  2. ✨ 스킬북 펼치기  3. 🎒 가방 열기  4. 도망가기\n선택: ";
+        cout << "1. 기본 공격  2. 스킬북 펼치기  3. 가방 열기  4. 도망가기\n선택: ";
 
         int combatChoice;
         cin >> combatChoice;
-
         system("cls");
 
         switch (combatChoice)
@@ -50,19 +71,21 @@ void Battle::start(Player &player)
             int damage = player.attack();
             enemy->takeDamage(damage);
             if (enemy->hp > 0)
-                player.takeDamage(enemy->attack());
+            {
+                // 적 공격력에도 난이도 배수 적용
+                player.takeDamage((int)(enemy->attack() * statMultiplier));
+            }
             break;
         }
         case 2:
         {
-            // ✨ 신규 스킬북 시스템 연동
             if (player.skills.empty())
             {
                 cout << RED << "배운 스킬이 없습니다!" << RESET << endl;
                 break;
             }
 
-            cout << "\n=== 📖 스킬북 ===" << endl;
+            cout << "\n=== 스킬북 ===" << endl;
             for (size_t i = 0; i < player.skills.size(); ++i)
             {
                 cout << i + 1 << ". [" << player.skills[i].getTypeName() << "] "
@@ -76,53 +99,49 @@ void Battle::start(Player &player)
             cin >> skillChoice;
 
             if (skillChoice == 0)
-                break; // 취소 후 메뉴로 복귀
+                break;
 
             if (skillChoice > 0 && skillChoice <= player.skills.size())
             {
                 Skill &selectedSkill = player.skills[skillChoice - 1];
 
-                // 마나 확인
                 if (player.mp >= selectedSkill.mpCost)
                 {
                     player.mp -= selectedSkill.mpCost;
 
                     int damage = 0;
-                    // 물리 스킬 (무기 공격력 + 근력 비례)
                     if (selectedSkill.type == 1)
                     {
                         damage = (rand() % 10 + selectedSkill.baseDamage + player.weaponDamage + (player.weaponLevel * 5)) + (player.str * 3);
-                        cout << YELLOW << "⚔️ [" << selectedSkill.name << "] 물리 타격! " << damage << "의 데미지!" << RESET << endl;
+                        cout << YELLOW << "[" << selectedSkill.name << "] 물리 타격! " << damage << "의 데미지!" << RESET << endl;
                     }
-                    // 마법 스킬 (지능 비례 증폭)
                     else if (selectedSkill.type == 2)
                     {
                         damage = (rand() % 10 + selectedSkill.baseDamage) * 2 + (player.intel * 4);
-                        cout << CYAN << "☄️ [" << selectedSkill.name << "] 마법 폭발! " << damage << "의 데미지!" << RESET << endl;
+                        cout << CYAN << "[" << selectedSkill.name << "] 마법 폭발! " << damage << "의 데미지!" << RESET << endl;
                     }
-                    // 회복 스킬 (지능 비례 회복)
                     else if (selectedSkill.type == 3)
                     {
                         int healAmount = selectedSkill.baseDamage + (player.intel * 2);
                         player.hp += healAmount;
                         if (player.hp > player.maxHp)
                             player.hp = player.maxHp;
-                        cout << GREEN << "✨ [" << selectedSkill.name << "] 체력을 " << healAmount << " 회복했습니다!" << RESET << endl;
+                        cout << GREEN << "[" << selectedSkill.name << "] 체력을 " << healAmount << " 회복했습니다!" << RESET << endl;
                     }
 
-                    // 데미지 적용 및 적 반격 (회복 스킬이 아닐 경우에만 적 타격)
                     if (selectedSkill.type != 3)
                     {
                         enemy->takeDamage(damage);
                     }
 
-                    // 적이 살아있으면 플레이어 타격
                     if (enemy->hp > 0)
-                        player.takeDamage(enemy->attack());
+                    {
+                        player.takeDamage((int)(enemy->attack() * statMultiplier));
+                    }
                 }
                 else
                 {
-                    cout << RED << "❌ 마나가 부족합니다! (필요 MP: " << selectedSkill.mpCost << ")" << RESET << endl;
+                    cout << RED << "마나가 부족합니다! (필요 MP: " << selectedSkill.mpCost << ")" << RESET << endl;
                 }
             }
             else
@@ -146,29 +165,31 @@ void Battle::start(Player &player)
 
     if (enemy->hp <= 0)
     {
-        cout << YELLOW << "\n🎉 " << enemy->name << "을(를) 물리쳤습니다!" << RESET << endl;
+        cout << YELLOW << "\n"
+             << enemy->name << "을(를) 물리쳤습니다!" << RESET << endl;
 
         if (player.activeQuestId == 1 && enemy->name == "초록 고블린")
         {
             player.questProgress++;
-            cout << YELLOW << "[📜 퀘스트] 초록 고블린 토벌 진행도: " << player.questProgress << "/3" << RESET << endl;
+            cout << YELLOW << "[퀘스트] 초록 고블린 토벌 진행도: " << player.questProgress << "/3" << RESET << endl;
         }
         else if (player.activeQuestId == 2 && enemy->name == "푸른 슬라임")
         {
             player.questProgress++;
-            cout << YELLOW << "[📜 퀘스트] 푸른 슬라임 토벌 진행도: " << player.questProgress << "/5" << RESET << endl;
+            cout << YELLOW << "[퀘스트] 푸른 슬라임 토벌 진행도: " << player.questProgress << "/5" << RESET << endl;
         }
 
-        int expGain = (isBoss) ? 200 : 50;
+        // 보상에 난이도 배수 적용
+        int expGain = (int)(((isBoss) ? 200 : 50) * rewardMultiplier);
         player.gainExp(expGain);
 
-        int goldGain = (rand() % 30 + 10) + (player.dungeonFloor * 2);
+        int goldGain = (int)(((rand() % 30 + 10) + (player.dungeonFloor * 2)) * rewardMultiplier);
         player.gold += goldGain;
-        cout << YELLOW << "💰 " << goldGain << " 골드를 획득했습니다!" << RESET << endl;
+        cout << YELLOW << goldGain << " 골드를 획득했습니다!" << RESET << endl;
 
         if (isBoss)
         {
-            cout << YELLOW << "👑 보스가 빛나는 전리품을 남겼습니다!" << RESET << endl;
+            cout << YELLOW << "보스가 빛나는 전리품을 남겼습니다!" << RESET << endl;
             player.inventory.push_back(Item("슬라임의 왕관", 2, 30, 500));
             cout << GREEN << "가방에 [슬라임의 왕관]이 추가되었습니다!" << RESET << endl;
         }
@@ -181,17 +202,17 @@ void Battle::start(Player &player)
                 if (itemType == 0)
                 {
                     player.inventory.push_back(Item("체력 포션", 3, 50, 30));
-                    cout << GREEN << "🎁 몬스터가 [체력 포션]을 떨어뜨렸습니다!" << RESET << endl;
+                    cout << GREEN << "몬스터가 [체력 포션]을 떨어뜨렸습니다!" << RESET << endl;
                 }
                 else if (itemType == 1)
                 {
                     player.inventory.push_back(Item("마나 포션", 4, 50, 30));
-                    cout << CYAN << "🎁 몬스터가 [마나 포션]을 떨어뜨렸습니다!" << RESET << endl;
+                    cout << CYAN << "몬스터가 [마나 포션]을 떨어뜨렸습니다!" << RESET << endl;
                 }
                 else
                 {
                     player.inventory.push_back(Item("낡은 단검", 1, 3, 10));
-                    cout << YELLOW << "🎁 몬스터가 [낡은 단검]을 떨어뜨렸습니다!" << RESET << endl;
+                    cout << YELLOW << "몬스터가 [낡은 단검]을 떨어뜨렸습니다!" << RESET << endl;
                 }
             }
         }
@@ -202,7 +223,7 @@ void Battle::start(Player &player)
         if (player.activeQuestId == 3 && player.dungeonFloor >= 5)
         {
             player.questProgress = 1;
-            cout << YELLOW << "[📜 퀘스트] 던전 5층 도달 임무 완료! 길드로 돌아가 보상을 받으세요." << RESET << endl;
+            cout << YELLOW << "[퀘스트] 던전 5층 도달 임무 완료! 길드로 돌아가 보상을 받으세요." << RESET << endl;
         }
 
         cout << "\n엔터를 누르면 마을로 돌아갑니다...";
