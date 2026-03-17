@@ -283,8 +283,18 @@ void Battle::start(Player &player, int difficulty)
         if (isBoss)
         {
             cout << YELLOW << "보스가 빛나는 전리품을 남겼습니다!" << RESET << endl;
-            player.inventory.push_back(Item("슬라임의 왕관", 2, 30, 500));
-            cout << GREEN << "가방에 [슬라임의 왕관]이 추가되었습니다!" << RESET << endl;
+
+            // 전설 아이템 드랍 로직 (5% 확률)
+            if (rand() % 100 < 5)
+            {
+                player.inventory.push_back(Item("전설의 엑스칼리버", 1, 100, 2000));
+                cout << MAGENTA << "!!! 전설 등급 아이템 [전설의 엑스칼리버]를 획득했습니다 !!!" << RESET << endl;
+            }
+            else
+            {
+                player.inventory.push_back(Item("슬라임의 왕관", 2, 30, 500));
+                cout << GREEN << "가방에 [슬라임의 왕관]이 추가되었습니다!" << RESET << endl;
+            }
         }
         else
         {
