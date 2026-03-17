@@ -87,8 +87,22 @@ void Battle::start(Player &player, int difficulty)
             {
             case 1:
             {
-                int damage = player.attack();
-                enemy->takeDamage(damage);
+                int hitRoll = rand() % 100;
+                if (hitRoll < 10)
+                {
+                    cout << YELLOW << "공격이 빗나갔습니다! " << enemy->name << "이(가) 회피했습니다." << RESET << endl;
+                }
+                else
+                {
+                    int damage = player.attack();
+                    int critRoll = rand() % 100;
+                    if (critRoll < 15)
+                    {
+                        damage = (int)(damage * 1.5);
+                        cout << RED << "크리티컬 적중! 치명적인 피해를 입혔습니다!" << RESET << endl;
+                    }
+                    enemy->takeDamage(damage);
+                }
                 break;
             }
             case 2:
@@ -187,13 +201,29 @@ void Battle::start(Player &player, int difficulty)
 
         if (enemy->hp > 0 && inCombat)
         {
-            int enemyDmg = isFinalBoss ? 150 : (int)(enemy->attack() * statMultiplier);
-            player.takeDamage(enemyDmg);
-
-            if (isBoss && rand() % 100 < 20)
+            int dodgeRoll = rand() % 100;
+            if (dodgeRoll < 10)
             {
-                cout << RED << enemy->name << "의 강력한 일격! 플레이어가 기절했습니다!" << RESET << endl;
-                playerStunTurns = 1;
+                cout << GREEN << "회피 성공! 적의 공격을 날렵하게 피했습니다." << RESET << endl;
+            }
+            else
+            {
+                int enemyDmg = isFinalBoss ? 150 : (int)(enemy->attack() * statMultiplier);
+
+                int enemyCrit = rand() % 100;
+                if (enemyCrit < 15)
+                {
+                    enemyDmg = (int)(enemyDmg * 1.5);
+                    cout << RED << "치명타를 허용했습니다! 강력한 피해를 입었습니다." << RESET << endl;
+                }
+
+                player.takeDamage(enemyDmg);
+
+                if (isBoss && rand() % 100 < 20)
+                {
+                    cout << RED << enemy->name << "의 강력한 일격! 플레이어가 기절했습니다!" << RESET << endl;
+                    playerStunTurns = 1;
+                }
             }
         }
 
