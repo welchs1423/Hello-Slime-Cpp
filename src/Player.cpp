@@ -196,10 +196,25 @@ void Player::restoreMp()
 
 void Player::gainExp(int amount)
 {
+    if (level >= 50)
+    {
+        cout << "이미 최대 레벨에 도달하여 더 이상 경험치를 얻을 수 없습니다." << endl;
+        return;
+    }
+
     exp += amount;
-    cout << YELLOW << amount << "의 경험치를 획득했습니다!" << RESET << endl;
-    if (exp >= maxExp)
+    cout << amount << " 경험치를 획득했습니다. (" << exp << "/" << maxExp << ")" << endl;
+
+    while (exp >= maxExp && level < 50)
+    {
         levelUp();
+    }
+
+    if (level >= 50)
+    {
+        exp = 0;
+        cout << "만렙(Lv.50)을 달성했습니다. 축하합니다." << endl;
+    }
 }
 
 void Player::levelUp()
@@ -212,7 +227,7 @@ void Player::levelUp()
     maxMp += 5;
     mp = maxMp;
     statPoints += 5;
-    cout << GREEN << "레벨 업! Lv." << level << "이 되었습니다! (스탯 포인트 +5)" << RESET << endl;
+    cout << "레벨 업! Lv." << level << "이 되었습니다. (스탯 포인트 +5)" << endl;
 }
 
 void Player::openInventory()
