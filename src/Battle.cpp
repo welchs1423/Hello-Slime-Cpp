@@ -185,6 +185,7 @@ void Battle::start(Player &player, int difficulty)
                 player.openInventory();
                 continue;
             case 4:
+            {
                 if (isBoss)
                 {
                     cout << "보스전에서는 도망칠 수 없습니다!" << endl;
@@ -197,6 +198,7 @@ void Battle::start(Player &player, int difficulty)
                 cout << "겁에 질려 마을로 도망쳤습니다... (페널티: " << penaltyGold << " 골드 상실)" << endl;
                 inCombat = false;
                 continue;
+            }
             default:
                 cout << RED << "잘못된 입력입니다." << RESET << endl;
                 continue;
