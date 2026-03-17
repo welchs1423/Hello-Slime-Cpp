@@ -84,7 +84,9 @@ void GameManager::run()
         else if (townChoice == 9)
         {
             system("cls");
-            cout << "게임을 종료합니다..." << endl;
+            cout << "데이터 유실을 방지하기 위해 진행 상황을 안전하게 저장합니다..." << endl;
+            player.save();
+            cout << "게임을 종료합니다. 안녕히 가세요!" << endl;
             isPlaying = false;
         }
         else
