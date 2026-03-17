@@ -30,6 +30,8 @@ Player::Player()
     job = nullptr;
     activeQuestId = 0;
     questProgress = 0;
+    weaponDurability = 50;
+    armorDurability = 50;
     str = 5;
     intel = 5;
     vit = 5;
@@ -386,6 +388,8 @@ void Player::save()
         outFile << "ACH_RICH " << achRichMan << "\n";
 
         int checksum = (level * 13) + (gold * 7) + maxHp;
+        outFile << "W_DUR " << weaponDurability << "\n";
+        outFile << "A_DUR " << armorDurability << "\n";
         outFile << "CHECKSUM " << checksum << "\n";
 
         outFile.close();
@@ -446,6 +450,10 @@ void Player::load()
                 achRichMan = value;
             else if (key == "CHECKSUM")
                 loadedChecksum = value;
+            else if (key == "W_DUR")
+                weaponDurability = value;
+            else if (key == "A_DUR")
+                armorDurability = value;
         }
         inFile.close();
 

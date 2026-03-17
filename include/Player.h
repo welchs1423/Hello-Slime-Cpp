@@ -30,6 +30,9 @@ public:
     int weaponLevel;
     int armorLevel;
 
+    int weaponDurability;
+    int armorDurability;
+
     int str;
     int intel;
     int vit;

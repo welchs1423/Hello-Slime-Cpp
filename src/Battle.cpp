@@ -68,6 +68,7 @@ void Battle::start(Player &player, int difficulty)
     {
         cout << "\n[플레이어] 체력: " << GREEN << player.hp << "/" << player.maxHp << RESET
              << " | 마나: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
+        cout << YELLOW << "[장비 내구도] 무기: " << player.weaponDurability << " | 방어구: " << player.armorDurability << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
 
         if (playerStunTurns > 0)
@@ -94,7 +95,18 @@ void Battle::start(Player &player, int difficulty)
                 }
                 else
                 {
+                    if (player.weaponDurability > 0)
+                        player.weaponDurability--;
+
                     int damage = player.attack();
+                    if (player.weaponDurability <= 0)
+                    {
+                        damage -= player.weaponDamage;
+                        if (damage < 1)
+                            damage = 1;
+                        cout << RED << "경고: 무기 내구도가 0입니다! 무기 공격력이 무효화됩니다." << RESET << endl;
+                    }
+
                     int critRoll = rand() % 100;
                     if (critRoll < 15)
                     {
@@ -140,7 +152,14 @@ void Battle::start(Player &player, int difficulty)
                         int damage = 0;
                         if (selectedSkill.type == 1)
                         {
+                            if (player.weaponDurability > 0)
+                                player.weaponDurability--;
                             damage = (rand() % 10 + selectedSkill.baseDamage + player.weaponDamage + (player.weaponLevel * 5)) + (player.str * 3);
+                            if (player.weaponDurability <= 0)
+                            {
+                                damage -= player.weaponDamage;
+                                cout << RED << "경고: 무기 내구도가 0입니다! 물리 스킬 위력이 반감됩니다." << RESET << endl;
+                            }
                             cout << YELLOW << "[" << selectedSkill.name << "] 물리 타격! " << damage << "의 데미지!" << RESET << endl;
                         }
                         else if (selectedSkill.type == 2)
@@ -188,7 +207,7 @@ void Battle::start(Player &player, int difficulty)
             {
                 if (isBoss)
                 {
-                    cout << "보스전에서는 도망칠 수 없습니다!" << endl;
+                    cout << RED << "보스전에서는 도망칠 수 없습니다!" << RESET << endl;
                     continue;
                 }
 
@@ -221,6 +240,14 @@ void Battle::start(Player &player, int difficulty)
                 {
                     enemyDmg = (int)(enemyDmg * 1.5);
                     cout << RED << "치명타를 허용했습니다! 강력한 피해를 입었습니다." << RESET << endl;
+                }
+
+                if (player.armorDurability > 0)
+                    player.armorDurability--;
+                if (player.armorDurability <= 0)
+                {
+                    enemyDmg += player.armorDefense;
+                    cout << RED << "경고: 방어구 내구도가 0입니다! 추가 피해를 입습니다." << RESET << endl;
                 }
 
                 player.takeDamage(enemyDmg);
@@ -286,8 +313,6 @@ void Battle::start(Player &player, int difficulty)
         if (isBoss)
         {
             cout << YELLOW << "보스가 빛나는 전리품을 남겼습니다!" << RESET << endl;
-
-            // 전설 아이템 드랍 로직 (5% 확률)
             if (rand() % 100 < 5)
             {
                 player.inventory.push_back(Item("전설의 엑스칼리버", 1, 100, 2000));

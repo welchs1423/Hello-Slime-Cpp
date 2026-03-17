@@ -14,6 +14,7 @@ void Shop::visit(Player &player)
         system("cls");
         cout << CYAN << "\n=== 마을 상점 ===" << RESET << endl;
         player.printStatus();
+        cout << YELLOW << "[내구도 상태] 무기: " << player.weaponDurability << "/50 | 방어구: " << player.armorDurability << "/50" << RESET << endl;
 
         cout << "\n[ 회복 물약 ]" << endl;
         cout << "1. 체력 포션 (30G)" << endl;
@@ -28,15 +29,15 @@ void Shop::visit(Player &player)
         cout << "8. 방어구 강화 (+3 DEF) (50G)" << endl;
         cout << "9. 미스터리 박스 (50G)" << endl;
 
-        // 스킬북 메뉴 추가
         cout << "\n[ 스킬북 ]" << endl;
         cout << "10. 스킬북: 연속 베기 (물리) (150G)" << endl;
         cout << "11. 스킬북: 블리자드 (마법) (200G)" << endl;
         cout << "12. 스킬북: 응급 처치 (회복) (100G)" << endl;
 
-        cout << "\n[ 매입 ]" << endl;
+        cout << "\n[ 매입 및 수리 ]" << endl;
         cout << "13. 내 아이템 팔기" << endl;
-        cout << "\n14. 상점 나가기\n선택: ";
+        cout << "14. 장착 장비 전체 수리 (100G)" << endl;
+        cout << "\n15. 상점 나가기\n선택: ";
 
         int shopChoice;
         cin >> shopChoice;
@@ -163,9 +164,7 @@ void Shop::visit(Player &player)
                 }
             }
             else
-            {
                 cout << RED << "골드가 부족합니다!" << RESET << endl;
-            }
             break;
         case 10:
         {
@@ -243,7 +242,7 @@ void Shop::visit(Player &player)
             {
                 system("cls");
                 cout << YELLOW << "\n=== 아이템 판매 ===" << RESET << endl;
-                cout << "상인: \"어떤 물건을 팔텐가? 매입가는 원가의 절반이라네!\"\n"
+                cout << "상인: 어떤 물건을 팔텐가? 매입가는 원가의 절반이라네!\n"
                      << endl;
                 cout << "[ 현재 골드: " << player.gold << "G ]\n"
                      << endl;
@@ -282,7 +281,6 @@ void Shop::visit(Player &player)
                 else if (sellChoice > 0 && sellChoice <= player.inventory.size())
                 {
                     int index = sellChoice - 1;
-
                     if (player.inventory[index].isEquipped)
                     {
                         cout << RED << "\n장착 중인 아이템은 팔 수 없습니다! 가방에서 장착 해제 후 팔아주세요." << RESET << endl;
@@ -303,7 +301,6 @@ void Shop::visit(Player &player)
                         player.gold += sellPrice;
                         player.inventory.erase(player.inventory.begin() + index);
                     }
-
                     cout << "엔터를 누르면 계속합니다...";
                     cin.ignore();
                     cin.get();
@@ -319,6 +316,24 @@ void Shop::visit(Player &player)
             break;
         }
         case 14:
+            if (player.gold >= 100)
+            {
+                if (player.weaponDurability >= 50 && player.armorDurability >= 50)
+                {
+                    cout << YELLOW << "대장장이: 장비가 이미 완벽한 상태구만!" << RESET << endl;
+                }
+                else
+                {
+                    player.gold -= 100;
+                    player.weaponDurability = 50;
+                    player.armorDurability = 50;
+                    cout << GREEN << "대장장이: 뚝딱뚝딱... 모든 장비의 내구도를 완벽하게 수리했네!" << RESET << endl;
+                }
+            }
+            else
+                cout << RED << "골드가 부족합니다! (필요: 100G)" << RESET << endl;
+            break;
+        case 15:
             cout << "상점을 나섭니다..." << endl;
             shopping = false;
             break;
