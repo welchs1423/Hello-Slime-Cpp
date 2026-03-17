@@ -187,10 +187,14 @@ void Battle::start(Player &player, int difficulty)
             case 4:
                 if (isBoss)
                 {
-                    cout << RED << "보스전에서는 도망칠 수 없습니다!" << RESET << endl;
+                    cout << "보스전에서는 도망칠 수 없습니다!" << endl;
                     continue;
                 }
-                cout << "겁에 질려 마을로 도망쳤습니다..." << endl;
+
+                int penaltyGold = player.gold / 10;
+                player.gold -= penaltyGold;
+
+                cout << "겁에 질려 마을로 도망쳤습니다... (페널티: " << penaltyGold << " 골드 상실)" << endl;
                 inCombat = false;
                 continue;
             default:
