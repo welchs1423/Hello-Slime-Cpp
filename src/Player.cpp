@@ -373,7 +373,6 @@ void Player::save()
             outFile << safeName << " " << item.type << " " << item.effectValue << " " << item.price << " " << item.isEquipped << "\n";
         }
 
-        // 스킬북 정보 저장 추가
         outFile << "SKILL_SIZE " << skills.size() << "\n";
         for (const auto &skill : skills)
         {
@@ -381,6 +380,13 @@ void Player::save()
             replace(safeName.begin(), safeName.end(), ' ', '_');
             outFile << safeName << " " << skill.mpCost << " " << skill.baseDamage << " " << skill.type << "\n";
         }
+
+        outFile << "TOTAL_KILLS " << totalKills << "\n";
+        outFile << "ACH_HUNTER " << achMonsterHunter << "\n";
+        outFile << "ACH_RICH " << achRichMan << "\n";
+
+        int checksum = (level * 13) + (gold * 7) + maxHp;
+        outFile << "CHECKSUM " << checksum << "\n";
 
         outFile.close();
         cout << "게임이 성공적으로 저장되었습니다." << endl;
@@ -396,6 +402,7 @@ void Player::load()
     {
         string key;
         int value;
+        int loadedChecksum = -1;
 
         inventory.clear();
         skills.clear();
@@ -419,7 +426,6 @@ void Player::load()
                     inventory.push_back(Item(safeName, t, v, p, e));
                 }
             }
-            // 스킬북 복구 추가
             else if (key == "SKILL_SIZE")
             {
                 int size = value;
@@ -432,10 +438,24 @@ void Player::load()
                     skills.push_back(Skill(safeName, cost, dmg, t));
                 }
             }
+            else if (key == "TOTAL_KILLS")
+                totalKills = value;
+            else if (key == "ACH_HUNTER")
+                achMonsterHunter = value;
+            else if (key == "ACH_RICH")
+                achRichMan = value;
+            else if (key == "CHECKSUM")
+                loadedChecksum = value;
         }
         inFile.close();
 
-        // 직업 포인터 복구 (기본 스킬이 덮어씌워지는 것을 방지)
+        int calculatedChecksum = (level * 13) + (gold * 7) + maxHp;
+        if (loadedChecksum != -1 && loadedChecksum != calculatedChecksum)
+        {
+            cout << "경고: 세이브 파일 변조가 감지되었습니다! 소지 골드가 0으로 초기화됩니다." << endl;
+            gold = 0;
+        }
+
         if (jobClass == 1)
             job = std::make_unique<Warrior>();
         else if (jobClass == 2)
@@ -450,7 +470,6 @@ void Player::load()
     else
         cout << "저장 파일이 없습니다. 새로운 게임을 시작합니다." << endl;
 }
-
 void Player::allocateStats()
 {
     while (statPoints > 0)
