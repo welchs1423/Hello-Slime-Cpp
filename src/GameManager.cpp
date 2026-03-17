@@ -93,3 +93,8 @@ void GameManager::run()
             cout << "잘못된 입력입니다." << endl;
         }
     }
+    if (player.hp <= 0)
+    {
+        cout << "\n플레이어가 쓰러졌습니다... 게임 오버." << endl;
+    }
+}
