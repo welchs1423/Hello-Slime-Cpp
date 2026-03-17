@@ -25,11 +25,10 @@ void GameManager::run()
     while (isPlaying && player.hp > 0)
     {
         system("cls");
-        cout << "\n=== 🏡 마을 광장 ===" << endl;
+        cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // ✨ 6번 스탯 분배 추가!
-        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 모험가 길드  5. 가방 열기  6. 🌟 스탯 분배  7. 게임 저장  8. 게임 종료\n선택: ";
+        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 모험가 길드  5. 가방 열기  6. 스탯 분배  7. 스탯 초기화 (500G)  8. 게임 저장  9. 게임 종료\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -65,8 +64,16 @@ void GameManager::run()
         else if (townChoice == 5)
             player.openInventory();
         else if (townChoice == 6)
-            player.allocateStats(); // ✨ 스탯 분배 실행!
+            player.allocateStats();
         else if (townChoice == 7)
+        {
+            system("cls");
+            player.resetStats();
+            cout << "\n엔터를 누르면 계속합니다...";
+            cin.ignore();
+            cin.get();
+        }
+        else if (townChoice == 8)
         {
             system("cls");
             player.save();
@@ -74,7 +81,7 @@ void GameManager::run()
             cin.ignore();
             cin.get();
         }
-        else if (townChoice == 8)
+        else if (townChoice == 9)
         {
             system("cls");
             cout << "게임을 종료합니다..." << endl;
@@ -83,9 +90,6 @@ void GameManager::run()
         else
         {
             system("cls");
-            cout << RED << "잘못된 입력입니다." << RESET << endl;
+            cout << "잘못된 입력입니다." << endl;
         }
     }
-    if (player.hp <= 0)
-        cout << RED << "\n💀 플레이어가 쓰러졌습니다... 게임 오버." << RESET << endl;
-}

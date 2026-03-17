@@ -275,7 +275,6 @@ void Player::openInventory()
         {
             int index = choice - 1;
 
-            // ✨ 배열에 직접 접근해서 장착 상태를 바꿔야 하므로 참조자(&)를 사용합니다.
             Item &selectedItem = inventory[index];
 
             // 1. 무기 장착 (가방에서 삭제 안 됨)
@@ -500,4 +499,43 @@ void Player::allocateStats()
         cin.ignore();
         cin.get();
     }
+}
+
+void Player::resetStats()
+{
+    cout << "\n=== 스탯 초기화 ===" << endl;
+    if (gold < 500)
+    {
+        cout << "골드가 부족합니다! (필요: 500G)" << endl;
+        return;
+    }
+    if (str == 5 && intel == 5 && vit == 5)
+    {
+        cout << "초기화할 스탯이 없습니다." << endl;
+        return;
+    }
+
+    gold -= 500;
+
+    int investedStr = str - 5;
+    int investedIntel = intel - 5;
+    int investedVit = vit - 5;
+
+    maxMp -= (investedIntel * 5);
+    if (mp > maxMp)
+        mp = maxMp;
+
+    maxHp -= (investedVit * 10);
+    if (hp > maxHp)
+        hp = maxHp;
+
+    str = 5;
+    intel = 5;
+    vit = 5;
+
+    int refundedPoints = investedStr + investedIntel + investedVit;
+    statPoints += refundedPoints;
+
+    cout << "500G를 지불하여 스탯을 초기화했습니다." << endl;
+    cout << "반환된 스탯 포인트: " << refundedPoints << endl;
 }

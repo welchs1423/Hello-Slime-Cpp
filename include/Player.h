@@ -54,6 +54,7 @@ public:
     void chooseClass();
     void openInventory();
     void allocateStats();
+    void resetStats();
 
     void printStatus();
     int attack();
