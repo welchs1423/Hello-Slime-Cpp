@@ -35,6 +35,10 @@ Player::Player()
     vit = 5;
     statPoints = 0;
 
+    totalKills = 0;
+    achMonsterHunter = false;
+    achRichMan = false;
+
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
 
     updateJobLogic();
@@ -538,4 +542,29 @@ void Player::resetStats()
 
     cout << "500G를 지불하여 스탯을 초기화했습니다." << endl;
     cout << "반환된 스탯 포인트: " << refundedPoints << endl;
+}
+
+void Player::checkAchievements()
+{
+    if (!achMonsterHunter && totalKills >= 10)
+    {
+        achMonsterHunter = true;
+        cout << "\n========================================" << endl;
+        cout << " [업적 달성] 몬스터 학살자 (10마리 처치)" << endl;
+        cout << " 보상: 영구 근력(STR) +5 증가!" << endl;
+        cout << "========================================" << endl;
+        str += 5;
+    }
+
+    if (!achRichMan && gold >= 3000)
+    {
+        achRichMan = true;
+        cout << "\n========================================" << endl;
+        cout << " [업적 달성] 벼락부자 (3000 골드 보유)" << endl;
+        cout << " 보상: 영구 체력(VIT) +5 증가!" << endl;
+        cout << "========================================" << endl;
+        vit += 5;
+        maxHp += 50;
+        hp += 50;
+    }
 }

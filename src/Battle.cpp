@@ -280,6 +280,9 @@ void Battle::start(Player &player, int difficulty)
         player.gold += goldGain;
         cout << YELLOW << goldGain << " 골드를 획득했습니다!" << RESET << endl;
 
+        player.totalKills++;
+        player.checkAchievements();
+
         if (isBoss)
         {
             cout << YELLOW << "보스가 빛나는 전리품을 남겼습니다!" << RESET << endl;

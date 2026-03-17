@@ -36,13 +36,18 @@ public:
     int statPoints;
 
     int jobClass;
-    std::unique_ptr<Job> job; // 스마트 포인터로 전면 교체
+    std::unique_ptr<Job> job;
 
     std::vector<Item> inventory;
     std::vector<Skill> skills;
 
     int activeQuestId;
     int questProgress;
+
+    // 업적 시스템용 추적 변수 추가
+    int totalKills;
+    bool achMonsterHunter;
+    bool achRichMan;
 
     std::map<std::string, int *> stats;
 
@@ -55,6 +60,7 @@ public:
     void openInventory();
     void allocateStats();
     void resetStats();
+    void checkAchievements(); // 업적 검사 함수
 
     void printStatus();
     int attack();
