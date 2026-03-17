@@ -29,9 +29,11 @@ void Battle::start(Player &player, int difficulty)
         diffName = "어려움";
     }
 
+    bool isFinalBoss = (player.dungeonFloor == 100);
+    bool isBoss = (player.dungeonFloor % 5 == 0) || isFinalBoss;
+
     cout << "\n=== 던전 " << player.dungeonFloor << "층 [" << diffName << "] ===" << endl;
 
-    bool isBoss = (player.dungeonFloor % 5 == 0);
     if (!isBoss)
     {
         bool eventHappend = DungeonEvent::triggerEvent(player);
@@ -44,121 +46,163 @@ void Battle::start(Player &player, int difficulty)
         }
     }
 
-    // 스마트 포인터로 몬스터 객체 래핑 (함수 종료 시 자동 메모리 해제)
     std::unique_ptr<Monster> enemy(MonsterFactory::spawnMonster(player.dungeonFloor, player.level));
 
-    enemy->hp = (int)(enemy->hp * statMultiplier);
+    if (isFinalBoss)
+    {
+        enemy->name = "마왕 (최종 보스)";
+        enemy->hp = 5000;
+    }
+    else
+    {
+        enemy->hp = (int)(enemy->hp * statMultiplier);
+    }
 
     cout << "야생의 " << RED << enemy->name << RESET << " (이)가 나타났다! (HP: " << RED << enemy->hp << RESET << ")" << endl;
 
     bool inCombat = true;
+    int enemyPoisonTurns = 0;
+    int playerStunTurns = 0;
+
     while (inCombat && player.hp > 0 && enemy->hp > 0)
     {
         cout << "\n[플레이어] 체력: " << GREEN << player.hp << "/" << player.maxHp << RESET
              << " | 마나: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
 
-        cout << "1. 기본 공격  2. 스킬북 펼치기  3. 가방 열기  4. 도망가기\n선택: ";
-
-        int combatChoice;
-        cin >> combatChoice;
-        system("cls");
-
-        switch (combatChoice)
+        if (playerStunTurns > 0)
         {
-        case 1:
-        {
-            int damage = player.attack();
-            enemy->takeDamage(damage);
-            if (enemy->hp > 0)
-            {
-                player.takeDamage((int)(enemy->attack() * statMultiplier));
-            }
-            break;
+            cout << RED << "기절 상태입니다! 이번 턴은 행동할 수 없습니다." << RESET << endl;
+            playerStunTurns--;
         }
-        case 2:
+        else
         {
-            if (player.skills.empty())
+            cout << "1. 기본 공격  2. 스킬북 펼치기  3. 가방 열기  4. 도망가기\n선택: ";
+
+            int combatChoice;
+            cin >> combatChoice;
+            system("cls");
+
+            switch (combatChoice)
             {
-                cout << RED << "배운 스킬이 없습니다!" << RESET << endl;
+            case 1:
+            {
+                int damage = player.attack();
+                enemy->takeDamage(damage);
                 break;
             }
-
-            cout << "\n=== 스킬북 ===" << endl;
-            for (size_t i = 0; i < player.skills.size(); ++i)
+            case 2:
             {
-                cout << i + 1 << ". [" << player.skills[i].getTypeName() << "] "
-                     << YELLOW << player.skills[i].name << RESET
-                     << " (소모 MP: " << CYAN << player.skills[i].mpCost << RESET
-                     << " / 위력: " << player.skills[i].baseDamage << ")" << endl;
-            }
-            cout << "0. 취소\n사용할 스킬 번호를 선택하세요: ";
-
-            int skillChoice;
-            cin >> skillChoice;
-
-            if (skillChoice == 0)
-                break;
-
-            if (skillChoice > 0 && skillChoice <= player.skills.size())
-            {
-                Skill &selectedSkill = player.skills[skillChoice - 1];
-
-                if (player.mp >= selectedSkill.mpCost)
+                if (player.skills.empty())
                 {
-                    player.mp -= selectedSkill.mpCost;
+                    cout << RED << "배운 스킬이 없습니다!" << RESET << endl;
+                    continue;
+                }
 
-                    int damage = 0;
-                    if (selectedSkill.type == 1)
-                    {
-                        damage = (rand() % 10 + selectedSkill.baseDamage + player.weaponDamage + (player.weaponLevel * 5)) + (player.str * 3);
-                        cout << YELLOW << "[" << selectedSkill.name << "] 물리 타격! " << damage << "의 데미지!" << RESET << endl;
-                    }
-                    else if (selectedSkill.type == 2)
-                    {
-                        damage = (rand() % 10 + selectedSkill.baseDamage) * 2 + (player.intel * 4);
-                        cout << CYAN << "[" << selectedSkill.name << "] 마법 폭발! " << damage << "의 데미지!" << RESET << endl;
-                    }
-                    else if (selectedSkill.type == 3)
-                    {
-                        int healAmount = selectedSkill.baseDamage + (player.intel * 2);
-                        player.hp += healAmount;
-                        if (player.hp > player.maxHp)
-                            player.hp = player.maxHp;
-                        cout << GREEN << "[" << selectedSkill.name << "] 체력을 " << healAmount << " 회복했습니다!" << RESET << endl;
-                    }
+                cout << "\n=== 스킬북 ===" << endl;
+                for (size_t i = 0; i < player.skills.size(); ++i)
+                {
+                    cout << i + 1 << ". [" << player.skills[i].getTypeName() << "] "
+                         << YELLOW << player.skills[i].name << RESET
+                         << " (소모 MP: " << CYAN << player.skills[i].mpCost << RESET
+                         << " / 위력: " << player.skills[i].baseDamage << ")" << endl;
+                }
+                cout << "0. 취소\n사용할 스킬 번호를 선택하세요: ";
 
-                    if (selectedSkill.type != 3)
-                    {
-                        enemy->takeDamage(damage);
-                    }
+                int skillChoice;
+                cin >> skillChoice;
 
-                    if (enemy->hp > 0)
+                if (skillChoice == 0)
+                    continue;
+
+                if (skillChoice > 0 && skillChoice <= player.skills.size())
+                {
+                    Skill &selectedSkill = player.skills[skillChoice - 1];
+
+                    if (player.mp >= selectedSkill.mpCost)
                     {
-                        player.takeDamage((int)(enemy->attack() * statMultiplier));
+                        player.mp -= selectedSkill.mpCost;
+
+                        int damage = 0;
+                        if (selectedSkill.type == 1)
+                        {
+                            damage = (rand() % 10 + selectedSkill.baseDamage + player.weaponDamage + (player.weaponLevel * 5)) + (player.str * 3);
+                            cout << YELLOW << "[" << selectedSkill.name << "] 물리 타격! " << damage << "의 데미지!" << RESET << endl;
+                        }
+                        else if (selectedSkill.type == 2)
+                        {
+                            damage = (rand() % 10 + selectedSkill.baseDamage) * 2 + (player.intel * 4);
+                            cout << CYAN << "[" << selectedSkill.name << "] 마법 폭발! " << damage << "의 데미지!" << RESET << endl;
+                        }
+                        else if (selectedSkill.type == 3)
+                        {
+                            int healAmount = selectedSkill.baseDamage + (player.intel * 2);
+                            player.hp += healAmount;
+                            if (player.hp > player.maxHp)
+                                player.hp = player.maxHp;
+                            cout << GREEN << "[" << selectedSkill.name << "] 체력을 " << healAmount << " 회복했습니다!" << RESET << endl;
+                        }
+
+                        if (selectedSkill.type != 3)
+                        {
+                            enemy->takeDamage(damage);
+                        }
+
+                        if (selectedSkill.name == "독 찌르기")
+                        {
+                            enemyPoisonTurns = 3;
+                            cout << MAGENTA << enemy->name << "이(가) 독에 중독되었습니다! (3턴)" << RESET << endl;
+                        }
+                    }
+                    else
+                    {
+                        cout << RED << "마나가 부족합니다! (필요 MP: " << selectedSkill.mpCost << ")" << RESET << endl;
+                        continue;
                     }
                 }
                 else
                 {
-                    cout << RED << "마나가 부족합니다! (필요 MP: " << selectedSkill.mpCost << ")" << RESET << endl;
+                    cout << RED << "잘못된 번호입니다." << RESET << endl;
+                    continue;
                 }
+                break;
             }
-            else
-            {
-                cout << RED << "잘못된 번호입니다." << RESET << endl;
+            case 3:
+                player.openInventory();
+                continue;
+            case 4:
+                if (isBoss)
+                {
+                    cout << RED << "보스전에서는 도망칠 수 없습니다!" << RESET << endl;
+                    continue;
+                }
+                cout << "겁에 질려 마을로 도망쳤습니다..." << endl;
+                inCombat = false;
+                continue;
+            default:
+                cout << RED << "잘못된 입력입니다." << RESET << endl;
+                continue;
             }
-            break;
         }
-        case 3:
-            player.openInventory();
-            break;
-        case 4:
-            cout << "겁에 질려 마을로 도망쳤습니다..." << endl;
-            inCombat = false;
-            break;
-        default:
-            cout << RED << "잘못된 입력입니다." << RESET << endl;
-            break;
+
+        if (enemy->hp > 0 && inCombat)
+        {
+            int enemyDmg = isFinalBoss ? 150 : (int)(enemy->attack() * statMultiplier);
+            player.takeDamage(enemyDmg);
+
+            if (isBoss && rand() % 100 < 20)
+            {
+                cout << RED << enemy->name << "의 강력한 일격! 플레이어가 기절했습니다!" << RESET << endl;
+                playerStunTurns = 1;
+            }
+        }
+
+        if (enemyPoisonTurns > 0 && enemy->hp > 0 && inCombat)
+        {
+            int poisonDmg = 15;
+            enemy->hp -= poisonDmg;
+            cout << MAGENTA << enemy->name << "이(가) 독 피해를 " << poisonDmg << " 입었습니다. (남은 턴: " << enemyPoisonTurns - 1 << ")" << RESET << endl;
+            enemyPoisonTurns--;
         }
     }
 
@@ -166,6 +210,21 @@ void Battle::start(Player &player, int difficulty)
     {
         cout << YELLOW << "\n"
              << enemy->name << "을(를) 물리쳤습니다!" << RESET << endl;
+
+        if (isFinalBoss)
+        {
+            cout << "\n========================================" << endl;
+            cout << "                ENDING                  " << endl;
+            cout << "========================================" << endl;
+            cout << "마침내 마왕을 물리치고 세계에 평화를 가져왔습니다!" << endl;
+            cout << "당신의 전설은 영원히 기억될 것입니다." << endl;
+            cout << "플레이해주셔서 감사합니다." << endl;
+            cout << "========================================" << endl;
+            cout << "\n엔터를 누르면 게임이 종료됩니다...";
+            cin.ignore();
+            cin.get();
+            exit(0);
+        }
 
         if (player.activeQuestId == 1 && enemy->name == "초록 고블린")
         {
@@ -223,6 +282,9 @@ void Battle::start(Player &player, int difficulty)
             player.questProgress = 1;
             cout << YELLOW << "[퀘스트] 던전 5층 도달 임무 완료! 길드로 돌아가 보상을 받으세요." << RESET << endl;
         }
+
+        cout << "\n전투 결과를 자동 저장합니다..." << endl;
+        player.save();
 
         cout << "\n엔터를 누르면 마을로 돌아갑니다...";
         cin.ignore();
