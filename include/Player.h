@@ -55,6 +55,8 @@ public:
     int totalPlaySeconds;
     int autoPotionEnabled;
     int autoPotionThreshold;
+    int autoManaPotionEnabled;
+    int autoManaPotionThreshold;
 
     std::map<std::string, int *> stats;
 
@@ -76,6 +78,7 @@ public:
     void heal();
     bool tryAutoHeal();
     void restoreMp();
+    bool tryAutoRestoreMp();
     void openCombatSettings();
     void gainExp(int amount);
     void levelUp();

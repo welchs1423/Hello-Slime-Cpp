@@ -226,6 +226,7 @@ void Battle::start(Player &player, int difficulty)
         if (enemy->hp > 0 && inCombat)
         {
             player.tryAutoHeal();
+            player.tryAutoRestoreMp();
 
             int dodgeRoll = rand() % 100;
             if (dodgeRoll < 10)

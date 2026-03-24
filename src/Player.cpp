@@ -61,6 +61,8 @@ Player::Player()
     totalPlaySeconds = 0;
     autoPotionEnabled = 0;
     autoPotionThreshold = 30;
+    autoManaPotionEnabled = 0;
+    autoManaPotionThreshold = 30;
 
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
 
@@ -99,6 +101,8 @@ void Player::registerStats()
     stats["playSeconds"] = &totalPlaySeconds;
     stats["autoPotionEnabled"] = &autoPotionEnabled;
     stats["autoPotionThreshold"] = &autoPotionThreshold;
+    stats["autoManaPotionEnabled"] = &autoManaPotionEnabled;
+    stats["autoManaPotionThreshold"] = &autoManaPotionThreshold;
 }
 
 // 직업 세팅 및 기본 스킬 지급
@@ -155,9 +159,12 @@ void Player::printStatus()
          << "EXP: " << YELLOW << exp << "/" << maxExp << RESET << endl;
     cout << "던전 최고 도달 층: " << CYAN << dungeonFloor << "층" << RESET << " | "
          << "누적 플레이: " << formatPlayTime(totalPlaySeconds) << endl;
-    cout << "전투 자동 포션: " << (autoPotionEnabled ? GREEN : RED)
+    cout << "자동 체력 포션: " << (autoPotionEnabled ? GREEN : RED)
          << (autoPotionEnabled ? "ON" : "OFF") << RESET
-         << " (발동 기준: HP " << autoPotionThreshold << "% 이하)" << endl;
+         << " (HP " << autoPotionThreshold << "% 이하)" << " | "
+         << "자동 마나 포션: " << (autoManaPotionEnabled ? GREEN : RED)
+         << (autoManaPotionEnabled ? "ON" : "OFF") << RESET
+         << " (MP " << autoManaPotionThreshold << "% 이하)" << endl;
     cout << "ATK: " << weaponDamage << " (+" << weaponLevel * 5 << ") | "
          << "DEF: " << armorDefense << " (+" << armorLevel * 3 << ") | "
          << "Gold: " << YELLOW << gold << "G" << RESET << endl;
@@ -242,37 +249,74 @@ void Player::restoreMp()
         cout << RED << "마나 포션이 부족합니다!" << RESET << endl;
 }
 
+bool Player::tryAutoRestoreMp()
+{
+    if (!autoManaPotionEnabled || manaPotions <= 0 || maxMp <= 0)
+        return false;
+
+    int mpPercent = (mp * 100) / maxMp;
+    if (mpPercent <= autoManaPotionThreshold)
+    {
+        cout << YELLOW << "[자동 마나 포션] 마나가 부족 구간(" << mpPercent
+             << "%)에 진입해 마나 포션을 자동 사용합니다." << RESET << endl;
+        restoreMp();
+        return true;
+    }
+    return false;
+}
+
 void Player::openCombatSettings()
 {
     while (true)
     {
         system("cls");
         cout << CYAN << "\n=== 전투 보조 설정 ===" << RESET << endl;
-        cout << "1. 자동 포션 ON/OFF (현재: "
+        cout << "1. 자동 체력 포션 ON/OFF (현재: "
              << (autoPotionEnabled ? "ON" : "OFF") << ")\n";
-        cout << "2. 자동 포션 발동 기준 변경 (현재: HP "
+        cout << "2. 자동 체력 포션 발동 기준 (현재: HP "
              << autoPotionThreshold << "% 이하)\n";
+        cout << "3. 자동 마나 포션 ON/OFF (현재: "
+             << (autoManaPotionEnabled ? "ON" : "OFF") << ")\n";
+        cout << "4. 자동 마나 포션 발동 기준 (현재: MP "
+             << autoManaPotionThreshold << "% 이하)\n";
         cout << "0. 설정 종료\n선택: ";
 
-        int choice = readIntInRange(0, 2);
+        int choice = readIntInRange(0, 4);
         if (choice == 0)
             return;
 
         if (choice == 1)
         {
             autoPotionEnabled = autoPotionEnabled ? 0 : 1;
-            cout << YELLOW << "자동 포션이 "
+            cout << YELLOW << "자동 체력 포션이 "
                  << (autoPotionEnabled ? "활성화" : "비활성화")
+                 << "되었습니다." << RESET << endl;
+        }
+        else if (choice == 2)
+        {
+            cout << "체력 포션 발동 기준을 선택하세요. (20~70%)\n";
+            cout << "1. 20%  2. 30%  3. 40%  4. 50%  5. 60%  6. 70%\n선택: ";
+            int thresholdChoice = readIntInRange(1, 6);
+            autoPotionThreshold = thresholdChoice * 10 + 10;
+            cout << GREEN << "자동 체력 포션 발동 기준이 HP "
+                 << autoPotionThreshold << "% 이하로 변경되었습니다."
+                 << RESET << endl;
+        }
+        else if (choice == 3)
+        {
+            autoManaPotionEnabled = autoManaPotionEnabled ? 0 : 1;
+            cout << YELLOW << "자동 마나 포션이 "
+                 << (autoManaPotionEnabled ? "활성화" : "비활성화")
                  << "되었습니다." << RESET << endl;
         }
         else
         {
-            cout << "발동 기준을 선택하세요. (20~70%)\n";
+            cout << "마나 포션 발동 기준을 선택하세요. (20~70%)\n";
             cout << "1. 20%  2. 30%  3. 40%  4. 50%  5. 60%  6. 70%\n선택: ";
             int thresholdChoice = readIntInRange(1, 6);
-            autoPotionThreshold = thresholdChoice * 10 + 10;
-            cout << GREEN << "자동 포션 발동 기준이 HP "
-                 << autoPotionThreshold << "% 이하로 변경되었습니다."
+            autoManaPotionThreshold = thresholdChoice * 10 + 10;
+            cout << GREEN << "자동 마나 포션 발동 기준이 MP "
+                 << autoManaPotionThreshold << "% 이하로 변경되었습니다."
                  << RESET << endl;
         }
 
