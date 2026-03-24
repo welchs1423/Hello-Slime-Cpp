@@ -59,6 +59,8 @@ Player::Player()
     achMonsterHunter = false;
     achRichMan = false;
     totalPlaySeconds = 0;
+    autoPotionEnabled = 0;
+    autoPotionThreshold = 30;
 
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
 
@@ -95,6 +97,8 @@ void Player::registerStats()
     stats["vit"] = &vit;
     stats["statPoints"] = &statPoints;
     stats["playSeconds"] = &totalPlaySeconds;
+    stats["autoPotionEnabled"] = &autoPotionEnabled;
+    stats["autoPotionThreshold"] = &autoPotionThreshold;
 }
 
 // 직업 세팅 및 기본 스킬 지급
@@ -151,6 +155,9 @@ void Player::printStatus()
          << "EXP: " << YELLOW << exp << "/" << maxExp << RESET << endl;
     cout << "던전 최고 도달 층: " << CYAN << dungeonFloor << "층" << RESET << " | "
          << "누적 플레이: " << formatPlayTime(totalPlaySeconds) << endl;
+    cout << "전투 자동 포션: " << (autoPotionEnabled ? GREEN : RED)
+         << (autoPotionEnabled ? "ON" : "OFF") << RESET
+         << " (발동 기준: HP " << autoPotionThreshold << "% 이하)" << endl;
     cout << "ATK: " << weaponDamage << " (+" << weaponLevel * 5 << ") | "
          << "DEF: " << armorDefense << " (+" << armorLevel * 3 << ") | "
          << "Gold: " << YELLOW << gold << "G" << RESET << endl;
@@ -205,6 +212,22 @@ void Player::heal()
         cout << RED << "포션이 부족합니다!" << RESET << endl;
 }
 
+bool Player::tryAutoHeal()
+{
+    if (!autoPotionEnabled || potions <= 0 || maxHp <= 0)
+        return false;
+
+    int hpPercent = (hp * 100) / maxHp;
+    if (hpPercent <= autoPotionThreshold)
+    {
+        cout << YELLOW << "[자동 포션] 체력이 위험 구간(" << hpPercent
+             << "%)에 진입해 포션을 자동 사용합니다." << RESET << endl;
+        heal();
+        return true;
+    }
+    return false;
+}
+
 void Player::restoreMp()
 {
     if (manaPotions > 0)
@@ -217,6 +240,46 @@ void Player::restoreMp()
     }
     else
         cout << RED << "마나 포션이 부족합니다!" << RESET << endl;
+}
+
+void Player::openCombatSettings()
+{
+    while (true)
+    {
+        system("cls");
+        cout << CYAN << "\n=== 전투 보조 설정 ===" << RESET << endl;
+        cout << "1. 자동 포션 ON/OFF (현재: "
+             << (autoPotionEnabled ? "ON" : "OFF") << ")\n";
+        cout << "2. 자동 포션 발동 기준 변경 (현재: HP "
+             << autoPotionThreshold << "% 이하)\n";
+        cout << "0. 설정 종료\n선택: ";
+
+        int choice = readIntInRange(0, 2);
+        if (choice == 0)
+            return;
+
+        if (choice == 1)
+        {
+            autoPotionEnabled = autoPotionEnabled ? 0 : 1;
+            cout << YELLOW << "자동 포션이 "
+                 << (autoPotionEnabled ? "활성화" : "비활성화")
+                 << "되었습니다." << RESET << endl;
+        }
+        else
+        {
+            cout << "발동 기준을 선택하세요. (20~70%)\n";
+            cout << "1. 20%  2. 30%  3. 40%  4. 50%  5. 60%  6. 70%\n선택: ";
+            int thresholdChoice = readIntInRange(1, 6);
+            autoPotionThreshold = thresholdChoice * 10 + 10;
+            cout << GREEN << "자동 포션 발동 기준이 HP "
+                 << autoPotionThreshold << "% 이하로 변경되었습니다."
+                 << RESET << endl;
+        }
+
+        cout << "\n엔터를 누르면 계속합니다...";
+        cin.ignore();
+        cin.get();
+    }
 }
 
 void Player::gainExp(int amount)

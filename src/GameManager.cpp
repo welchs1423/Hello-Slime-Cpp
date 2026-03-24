@@ -52,8 +52,8 @@ void GameManager::run()
 
         cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 모험가 길드"
                 "  5. 가방 열기  6. 스탯 분배  7. 스탯 초기화 (500G)  8. 게임 저장"
-                "  9. 게임 종료\n선택: ";
-        int townChoice = readIntInRange(1, 9);
+                "  9. 게임 종료  10. 전투 보조 설정\n선택: ";
+        int townChoice = readIntInRange(1, 10);
 
         if (townChoice == 1)
         {
@@ -101,6 +101,10 @@ void GameManager::run()
             player.save();
             cout << "게임을 종료합니다. 안녕히 가세요!" << endl;
             isPlaying = false;
+        }
+        else if (townChoice == 10)
+        {
+            player.openCombatSettings();
         }
     }
 

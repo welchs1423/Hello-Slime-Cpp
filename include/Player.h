@@ -53,6 +53,8 @@ public:
     bool achRichMan;
 
     int totalPlaySeconds;
+    int autoPotionEnabled;
+    int autoPotionThreshold;
 
     std::map<std::string, int *> stats;
 
@@ -72,7 +74,9 @@ public:
     int magicAttack();
     void takeDamage(int damage);
     void heal();
+    bool tryAutoHeal();
     void restoreMp();
+    void openCombatSettings();
     void gainExp(int amount);
     void levelUp();
 
