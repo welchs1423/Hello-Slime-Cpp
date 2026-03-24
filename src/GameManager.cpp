@@ -4,8 +4,25 @@
 #include "../include/Guild.h"
 #include <iostream>
 #include <cstdlib>
+#include <chrono>
+#include <limits>
 
 using namespace std;
+
+static void addElapsedPlaySeconds(Player &player, chrono::steady_clock::time_point &lastTick)
+{
+    using namespace chrono;
+    auto now = steady_clock::now();
+    auto sec = duration_cast<seconds>(now - lastTick).count();
+    if (sec <= 0)
+        return;
+    long long sum = static_cast<long long>(player.totalPlaySeconds) + sec;
+    if (sum >= numeric_limits<int>::max())
+        player.totalPlaySeconds = numeric_limits<int>::max();
+    else
+        player.totalPlaySeconds = static_cast<int>(sum);
+    lastTick = now;
+}
 
 GameManager::GameManager() { isPlaying = true; }
 
@@ -13,17 +30,36 @@ void GameManager::run()
 {
     system("cls");
     cout << CYAN << "=== 슬라임 헌터 RPG ===" << RESET << endl;
-    cout << "1. 새로 하기  2. 이어 하기\n선택: ";
-    int startChoice;
-    cin >> startChoice;
+
+    int startChoice = 0;
+    while (true)
+    {
+        cout << "1. 새로 하기  2. 이어 하기\n선택: ";
+        if (cin >> startChoice)
+        {
+            if (startChoice == 1 || startChoice == 2)
+                break;
+            cout << "1 또는 2만 입력하세요.\n";
+        }
+        else
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "숫자를 입력해 주세요.\n";
+        }
+    }
 
     if (startChoice == 1)
         player.chooseClass();
     else if (startChoice == 2)
         player.load();
 
+    auto playClockLast = chrono::steady_clock::now();
+
     while (isPlaying && player.hp > 0)
     {
+        addElapsedPlaySeconds(player, playClockLast);
+
         system("cls");
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
@@ -95,6 +131,9 @@ void GameManager::run()
             cout << "잘못된 입력입니다." << endl;
         }
     }
+
+    addElapsedPlaySeconds(player, playClockLast);
+
     if (player.hp <= 0)
     {
         cout << "\n플레이어가 쓰러졌습니다... 게임 오버." << endl;

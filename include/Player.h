@@ -52,6 +52,8 @@ public:
     bool achMonsterHunter;
     bool achRichMan;
 
+    int totalPlaySeconds;
+
     std::map<std::string, int *> stats;
 
     Player();

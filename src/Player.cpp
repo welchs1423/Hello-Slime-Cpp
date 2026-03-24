@@ -5,8 +5,25 @@
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
+#include <string>
 
 using namespace std;
+
+static string formatPlayTime(int totalSec)
+{
+    if (totalSec < 0)
+        totalSec = 0;
+    int h = totalSec / 3600;
+    int m = (totalSec % 3600) / 60;
+    int s = totalSec % 60;
+    string out;
+    if (h > 0)
+        out += to_string(h) + "시간 ";
+    if (h > 0 || m > 0)
+        out += to_string(m) + "분 ";
+    out += to_string(s) + "초";
+    return out;
+}
 
 Player::Player()
 {
@@ -40,6 +57,7 @@ Player::Player()
     totalKills = 0;
     achMonsterHunter = false;
     achRichMan = false;
+    totalPlaySeconds = 0;
 
     inventory.push_back(Item("초보자의 빵", 3, 20, 10));
 
@@ -75,6 +93,7 @@ void Player::registerStats()
     stats["intel"] = &intel;
     stats["vit"] = &vit;
     stats["statPoints"] = &statPoints;
+    stats["playSeconds"] = &totalPlaySeconds;
 }
 
 // 직업 세팅 및 기본 스킬 지급
@@ -129,6 +148,8 @@ void Player::printStatus()
          << "HP: " << GREEN << hp << "/" << maxHp << RESET << " | "
          << "MP: " << CYAN << mp << "/" << maxMp << RESET << " | "
          << "EXP: " << YELLOW << exp << "/" << maxExp << RESET << endl;
+    cout << "던전 최고 도달 층: " << CYAN << dungeonFloor << "층" << RESET << " | "
+         << "누적 플레이: " << formatPlayTime(totalPlaySeconds) << endl;
     cout << "ATK: " << weaponDamage << " (+" << weaponLevel * 5 << ") | "
          << "DEF: " << armorDefense << " (+" << armorLevel * 3 << ") | "
          << "Gold: " << YELLOW << gold << "G" << RESET << endl;
@@ -141,9 +162,6 @@ void Player::printStatus()
 
     cout << "[스탯] STR: " << str << " | INT: " << intel << " | VIT: " << vit
          << " | " << YELLOW << "남은 포인트: " << statPoints << RESET << endl;
-
-    if (activeQuestId > 0)
-        cout << YELLOW << "[퀘스트] 임무 번호: " << activeQuestId << " | 진척도: " << questProgress << RESET << endl;
 }
 
 int Player::attack() { return job->attack(level, weaponDamage, weaponLevel, str); }
