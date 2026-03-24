@@ -2,6 +2,7 @@
 #include "../include/MonsterFactory.h"
 #include "../include/DungeonEvent.h"
 #include "../include/Colors.h"
+#include "../include/InputHelpers.h"
 #include <iostream>
 #include <cstdlib>
 #include <memory>
@@ -80,8 +81,7 @@ void Battle::start(Player &player, int difficulty)
         {
             cout << "1. 기본 공격  2. 스킬북 펼치기  3. 가방 열기  4. 도망가기\n선택: ";
 
-            int combatChoice;
-            cin >> combatChoice;
+            int combatChoice = readIntInRange(1, 4);
             system("cls");
 
             switch (combatChoice)
@@ -135,8 +135,7 @@ void Battle::start(Player &player, int difficulty)
                 }
                 cout << "0. 취소\n사용할 스킬 번호를 선택하세요: ";
 
-                int skillChoice;
-                cin >> skillChoice;
+                int skillChoice = readIntInRange(0, static_cast<int>(player.skills.size()));
 
                 if (skillChoice == 0)
                     continue;

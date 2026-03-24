@@ -1,5 +1,6 @@
 #include "GameManager.h"
 #include "Colors.h"
+#include "InputHelpers.h"
 #include "../include/Inn.h"
 #include "../include/Guild.h"
 #include <iostream>
@@ -31,23 +32,8 @@ void GameManager::run()
     system("cls");
     cout << CYAN << "=== 슬라임 헌터 RPG ===" << RESET << endl;
 
-    int startChoice = 0;
-    while (true)
-    {
-        cout << "1. 새로 하기  2. 이어 하기\n선택: ";
-        if (cin >> startChoice)
-        {
-            if (startChoice == 1 || startChoice == 2)
-                break;
-            cout << "1 또는 2만 입력하세요.\n";
-        }
-        else
-        {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "숫자를 입력해 주세요.\n";
-        }
-    }
+    cout << "1. 새로 하기  2. 이어 하기\n선택: ";
+    int startChoice = readIntInRange(1, 2);
 
     if (startChoice == 1)
         player.chooseClass();
@@ -64,10 +50,10 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 모험가 길드  5. 가방 열기  6. 스탯 분배  7. 스탯 초기화 (500G)  8. 게임 저장  9. 게임 종료\n선택: ";
-
-        int townChoice;
-        cin >> townChoice;
+        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 모험가 길드"
+                "  5. 가방 열기  6. 스탯 분배  7. 스탯 초기화 (500G)  8. 게임 저장"
+                "  9. 게임 종료\n선택: ";
+        int townChoice = readIntInRange(1, 9);
 
         if (townChoice == 1)
         {
@@ -78,18 +64,9 @@ void GameManager::run()
             cout << "3. 어려움 (적 능력치 150%, 보상 150%)" << endl;
             cout << "0. 마을로 돌아가기\n선택: ";
 
-            int diffChoice;
-            cin >> diffChoice;
-
+            int diffChoice = readIntInRange(0, 3);
             if (diffChoice >= 1 && diffChoice <= 3)
-            {
                 battle.start(player, diffChoice);
-            }
-            else if (diffChoice != 0)
-            {
-                cout << "잘못된 입력입니다. 보통 난이도로 진입합니다." << endl;
-                battle.start(player, 2);
-            }
         }
         else if (townChoice == 2)
             shop.visit(player);
@@ -124,11 +101,6 @@ void GameManager::run()
             player.save();
             cout << "게임을 종료합니다. 안녕히 가세요!" << endl;
             isPlaying = false;
-        }
-        else
-        {
-            system("cls");
-            cout << "잘못된 입력입니다." << endl;
         }
     }
 

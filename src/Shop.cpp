@@ -1,5 +1,6 @@
 #include "Shop.h"
 #include "Colors.h"
+#include "InputHelpers.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -39,8 +40,7 @@ void Shop::visit(Player &player)
         cout << "14. 장착 장비 전체 수리 (100G)" << endl;
         cout << "\n15. 상점 나가기\n선택: ";
 
-        int shopChoice;
-        cin >> shopChoice;
+        int shopChoice = readIntInRange(1, 15);
 
         system("cls");
 
@@ -271,8 +271,7 @@ void Shop::visit(Player &player)
                 }
 
                 cout << "\n0. 판매 종료 (상점 메뉴로)\n팔고 싶은 아이템 번호를 입력하세요: ";
-                int sellChoice;
-                cin >> sellChoice;
+                int sellChoice = readIntInRange(0, static_cast<int>(player.inventory.size()));
 
                 if (sellChoice == 0)
                 {

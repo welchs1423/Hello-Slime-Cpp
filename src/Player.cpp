@@ -1,6 +1,7 @@
 #include "../include/Player.h"
 #include "../include/Job.h"
 #include "../include/Colors.h"
+#include "../include/InputHelpers.h"
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -131,7 +132,7 @@ void Player::chooseClass()
     cout << "2. 🧙 마법사 (보너스: 최대 마나 +50, 강력한 마법 데미지)\n";
     cout << "3. 🗡️ 도적 (보너스: 크리티컬 확률 40%)\n";
     cout << "선택: ";
-    cin >> jobClass;
+    jobClass = readIntInRange(1, 3);
 
     updateJobLogic();
     job->applyBonus(maxHp, hp, maxMp, mp, weaponDamage);
