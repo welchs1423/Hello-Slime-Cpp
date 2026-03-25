@@ -7,8 +7,109 @@
 #include <cstdlib>
 #include <algorithm>
 #include <string>
+#include <vector>
 
 using namespace std;
+
+static bool copyFileBytes(const string &src, const string &dst)
+{
+    ifstream in(src, ios::binary);
+    if (!in.is_open())
+        return false;
+    ofstream out(dst, ios::binary | ios::trunc);
+    if (!out.is_open())
+        return false;
+    vector<char> buf(4096);
+    while (in)
+    {
+        in.read(buf.data(), static_cast<streamsize>(buf.size()));
+        streamsize got = in.gcount();
+        if (got > 0)
+            out.write(buf.data(), got);
+    }
+    return true;
+}
+
+static bool tryLoadFromPath(Player &player, const string &path, bool isBackup)
+{
+    ifstream inFile(path);
+    if (!inFile.is_open())
+        return false;
+
+    string key;
+    int value;
+    int loadedChecksum = -1;
+
+    player.inventory.clear();
+    player.skills.clear();
+
+    while (inFile >> key >> value)
+    {
+        if (player.stats.find(key) != player.stats.end())
+        {
+            *player.stats[key] = value;
+        }
+        else if (key == "INVENTORY_SIZE")
+        {
+            int size = value;
+            for (int i = 0; i < size; i++)
+            {
+                string safeName;
+                int t, v, p;
+                bool e;
+                inFile >> safeName >> t >> v >> p >> e;
+                replace(safeName.begin(), safeName.end(), '_', ' ');
+                player.inventory.push_back(Item(safeName, t, v, p, e));
+            }
+        }
+        else if (key == "SKILL_SIZE")
+        {
+            int size = value;
+            for (int i = 0; i < size; i++)
+            {
+                string safeName;
+                int cost, dmg, t;
+                inFile >> safeName >> cost >> dmg >> t;
+                replace(safeName.begin(), safeName.end(), '_', ' ');
+                player.skills.push_back(Skill(safeName, cost, dmg, t));
+            }
+        }
+        else if (key == "TOTAL_KILLS")
+            player.totalKills = value;
+        else if (key == "ACH_HUNTER")
+            player.achMonsterHunter = value;
+        else if (key == "ACH_RICH")
+            player.achRichMan = value;
+        else if (key == "CHECKSUM")
+            loadedChecksum = value;
+        else if (key == "W_DUR")
+            player.weaponDurability = value;
+        else if (key == "A_DUR")
+            player.armorDurability = value;
+    }
+    inFile.close();
+
+    int calculatedChecksum = (player.level * 13) + (player.gold * 7) + player.maxHp;
+    if (loadedChecksum != -1 && loadedChecksum != calculatedChecksum)
+    {
+        if (!isBackup)
+            return false;
+
+        cout << "경고: 백업 세이브 파일도 무결성 검증에 실패했습니다. 골드가 0으로 초기화됩니다." << endl;
+        player.gold = 0;
+    }
+
+    if (player.jobClass == 1)
+        player.job = std::make_unique<Warrior>();
+    else if (player.jobClass == 2)
+        player.job = std::make_unique<Mage>();
+    else if (player.jobClass == 3)
+        player.job = std::make_unique<Rogue>();
+    else
+        player.job = std::make_unique<Beginner>();
+
+    return true;
+}
 
 static string formatPlayTime(int totalSec)
 {
@@ -485,6 +586,9 @@ void Player::openInventory()
 
 void Player::save()
 {
+    // 저장 전 기존 세이브를 백업해 둔다.
+    copyFileBytes("savefile.txt", "savefile.bak");
+
     ofstream outFile("savefile.txt");
     if (outFile.is_open())
     {
@@ -527,82 +631,21 @@ void Player::save()
 
 void Player::load()
 {
-    ifstream inFile("savefile.txt");
-    if (inFile.is_open())
+    if (tryLoadFromPath(*this, "savefile.txt", false))
     {
-        string key;
-        int value;
-        int loadedChecksum = -1;
-
-        inventory.clear();
-        skills.clear();
-
-        while (inFile >> key >> value)
-        {
-            if (stats.find(key) != stats.end())
-            {
-                *stats[key] = value;
-            }
-            else if (key == "INVENTORY_SIZE")
-            {
-                int size = value;
-                for (int i = 0; i < size; i++)
-                {
-                    string safeName;
-                    int t, v, p;
-                    bool e;
-                    inFile >> safeName >> t >> v >> p >> e;
-                    replace(safeName.begin(), safeName.end(), '_', ' ');
-                    inventory.push_back(Item(safeName, t, v, p, e));
-                }
-            }
-            else if (key == "SKILL_SIZE")
-            {
-                int size = value;
-                for (int i = 0; i < size; i++)
-                {
-                    string safeName;
-                    int cost, dmg, t;
-                    inFile >> safeName >> cost >> dmg >> t;
-                    replace(safeName.begin(), safeName.end(), '_', ' ');
-                    skills.push_back(Skill(safeName, cost, dmg, t));
-                }
-            }
-            else if (key == "TOTAL_KILLS")
-                totalKills = value;
-            else if (key == "ACH_HUNTER")
-                achMonsterHunter = value;
-            else if (key == "ACH_RICH")
-                achRichMan = value;
-            else if (key == "CHECKSUM")
-                loadedChecksum = value;
-            else if (key == "W_DUR")
-                weaponDurability = value;
-            else if (key == "A_DUR")
-                armorDurability = value;
-        }
-        inFile.close();
-
-        int calculatedChecksum = (level * 13) + (gold * 7) + maxHp;
-        if (loadedChecksum != -1 && loadedChecksum != calculatedChecksum)
-        {
-            cout << "경고: 세이브 파일 변조가 감지되었습니다! 소지 골드가 0으로 초기화됩니다." << endl;
-            gold = 0;
-        }
-
-        if (jobClass == 1)
-            job = std::make_unique<Warrior>();
-        else if (jobClass == 2)
-            job = std::make_unique<Mage>();
-        else if (jobClass == 3)
-            job = std::make_unique<Rogue>();
-        else
-            job = std::make_unique<Beginner>();
-
         cout << "게임을 성공적으로 불러왔습니다." << endl;
+        return;
     }
-    else
-        cout << "저장 파일이 없습니다. 새로운 게임을 시작합니다." << endl;
+
+    cout << "경고: 세이브 파일이 손상되었거나 변조되었습니다. 백업 세이브로 복구를 시도합니다..." << endl;
+    if (tryLoadFromPath(*this, "savefile.bak", true))
+    {
+        cout << "백업 세이브로 복구에 성공했습니다. 진행 상황을 저장해 정상화합니다..." << endl;
+        save();
+        return;
+    }
+
+    cout << "저장 파일이 없습니다. 새로운 게임을 시작합니다." << endl;
 }
 void Player::allocateStats()
 {
