@@ -497,8 +497,7 @@ void Player::openInventory()
         }
 
         cout << "\n0. 가방 닫기\n사용/장착할 아이템 번호를 입력하세요: ";
-        int choice;
-        cin >> choice;
+        int choice = readIntInRange(0, static_cast<int>(inventory.size()));
 
         if (choice == 0)
         {
@@ -659,9 +658,7 @@ void Player::allocateStats()
         cout << "2. 지능(INT) 올리기 (현재 " << intel << ") - 마법 공격력 및 최대 마나 증가" << endl;
         cout << "3. 체력(VIT) 올리기 (현재 " << vit << ") - 최대 체력 증가" << endl;
         cout << "0. 분배 종료\n 선택: ";
-
-        int choice;
-        cin >> choice;
+        int choice = readIntInRange(0, 3);
 
         if (choice == 0)
             break;
