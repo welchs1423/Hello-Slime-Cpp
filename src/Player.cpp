@@ -36,6 +36,7 @@ Player::Player()
     achMonsterHunter = false;
     achRichMan = false;
     innkeeperAffinity = 0;
+    rebirthCount = 0;
 
     jobClass = 0;
     activeQuestId = 0;
@@ -94,7 +95,6 @@ void Player::chooseClass()
         job = std::make_unique<Beginner>();
     }
 
-    // 기존 Job.h의 매개변수 구조에 맞게 복구
     job->applyBonus(maxHp, hp, maxMp, mp, weaponDamage);
     hp = maxHp;
     mp = maxMp;
@@ -102,7 +102,6 @@ void Player::chooseClass()
 
 void Player::printStatus()
 {
-    // jobName 변수 대신 jobClass 번호를 통해 직업명 출력하도록 복구
     string jName = "초보자";
     if (jobClass == 1)
         jName = "전사";
@@ -110,8 +109,7 @@ void Player::printStatus()
         jName = "마법사";
     else if (jobClass == 3)
         jName = "도적";
-
-    cout << "\n[ " << name << " ] Lv." << level << " (" << jName << ")" << endl;
+    cout << "\n[ " << name << " ] Lv." << level << " (" << jName << ")" << (rebirthCount > 0 ? " [환생 " + to_string(rebirthCount) + "회]" : "") << endl;
     cout << "체력: " << hp << "/" << maxHp << " | 마나: " << mp << "/" << maxMp << endl;
     cout << "공격력: " << str * 3 << " (+" << weaponDamage + (weaponLevel * 5) << ") | 방어력: " << vit * 2 << " (+" << armorDefense + (armorLevel * 3) << ")" << endl;
     cout << "경험치: " << exp << "/" << maxExp << " | 골드: " << gold << "G" << endl;
@@ -165,6 +163,10 @@ void Player::openInventory()
                 cout << item.name << " 사용 완료!" << endl;
             }
         }
+        else if (item.type == 5)
+        {
+            cout << "만병통치약은 전투 중에만 사용할 수 있습니다." << endl;
+        }
         else if (item.type == 1 || item.type == 2)
         {
             if (item.isEquipped)
@@ -208,10 +210,7 @@ void Player::allocateStats()
     {
         system("cls");
         cout << "=== 스탯 분배 (남은 포인트: " << statPoints << ") ===" << endl;
-        cout << "1. 근력 (STR): " << str << " (+물리 공격력)" << endl;
-        cout << "2. 지능 (INT): " << intel << " (+마법 공격력, 최대 마나)" << endl;
-        cout << "3. 체력 (VIT): " << vit << " (+방어력, 최대 체력)" << endl;
-        cout << "0. 완료\n투자할 스탯 번호: ";
+        cout << "1. 근력 (STR): " << str << " (+물리 공격력)\n2. 지능 (INT): " << intel << " (+마법 공격력, 최대 마나)\n3. 체력 (VIT): " << vit << " (+방어력, 최대 체력)\n0. 완료\n투자할 스탯 번호: ";
         int choice;
         cin >> choice;
         if (choice == 0)
@@ -240,22 +239,25 @@ void Player::resetStats()
         cout << "골드가 부족합니다! (필요: 500G)" << endl;
         return;
     }
-    if (str == 5 && intel == 5 && vit == 5)
+    int baseStr = 5 + (rebirthCount * 10);
+    int baseInt = 5 + (rebirthCount * 10);
+    int baseVit = 5 + (rebirthCount * 10);
+    if (str == baseStr && intel == baseInt && vit == baseVit)
     {
         cout << "초기화할 스탯이 없습니다." << endl;
         return;
     }
     gold -= 500;
-    maxMp -= ((intel - 5) * 5);
+    maxMp -= ((intel - baseInt) * 5);
     if (mp > maxMp)
         mp = maxMp;
-    maxHp -= ((vit - 5) * 10);
+    maxHp -= ((vit - baseVit) * 10);
     if (hp > maxHp)
         hp = maxHp;
-    statPoints += (str - 5) + (intel - 5) + (vit - 5);
-    str = 5;
-    intel = 5;
-    vit = 5;
+    statPoints += (str - baseStr) + (intel - baseInt) + (vit - baseVit);
+    str = baseStr;
+    intel = baseInt;
+    vit = baseVit;
     cout << "500G를 지불하여 스탯을 초기화했습니다." << endl;
 }
 
@@ -277,6 +279,31 @@ void Player::checkAchievements()
     }
 }
 
+void Player::doRebirth()
+{
+    if (level < 50)
+    {
+        cout << RED << "환생은 50레벨 이상부터 가능합니다!" << RESET << endl;
+        return;
+    }
+    rebirthCount++;
+    level = 1;
+    exp = 0;
+    maxExp = 100;
+    str = 5 + (rebirthCount * 10);
+    intel = 5 + (rebirthCount * 10);
+    vit = 5 + (rebirthCount * 10);
+    maxHp = 100 + (rebirthCount * 50);
+    hp = maxHp;
+    maxMp = 50 + (rebirthCount * 20);
+    mp = maxMp;
+    statPoints = 0;
+    dungeonFloor = 1;
+    cout << MAGENTA << "\n!!! 환생의 불꽃이 타오릅니다 !!!" << RESET << endl;
+    cout << YELLOW << "육체가 재구성되어 레벨과 던전 진행도가 초기화되지만, 영구적인 기본 스탯이 폭발적으로 상승합니다!" << RESET << endl;
+    cout << GREEN << "현재 환생 횟수: " << rebirthCount << "회" << RESET << endl;
+}
+
 int Player::attack() { return str * 3 + weaponDamage + (weaponLevel * 5); }
 int Player::magicAttack() { return intel * 4; }
 void Player::takeDamage(int damage)
@@ -290,7 +317,6 @@ void Player::takeDamage(int damage)
 
 void Player::heal() { hp = maxHp; }
 void Player::restoreMp() { mp = maxMp; }
-
 void Player::gainExp(int amount)
 {
     if (level >= 50)
@@ -302,10 +328,9 @@ void Player::gainExp(int amount)
     if (level >= 50)
     {
         exp = 0;
-        cout << "만렙(Lv.50)을 달성했습니다." << endl;
+        cout << YELLOW << "만렙(Lv.50) 달성! 길드에서 환생할 수 있습니다." << RESET << endl;
     }
 }
-
 void Player::levelUp()
 {
     level++;
@@ -316,7 +341,7 @@ void Player::levelUp()
     maxMp += 5;
     mp = maxMp;
     statPoints += 5;
-    cout << "레벨 업! Lv." << level << " (스탯 포인트 +5)" << endl;
+    cout << GREEN << "레벨 업! Lv." << level << " (스탯 포인트 +5)" << RESET << endl;
 }
 
 void Player::save()
@@ -346,7 +371,8 @@ void Player::save()
         outFile << "TOTAL_KILLS " << totalKills << "\n";
         outFile << "ACH_HUNTER " << achMonsterHunter << "\n";
         outFile << "ACH_RICH " << achRichMan << "\n";
-        int checksum = (level * 13) + (gold * 7) + maxHp;
+        outFile << "REBIRTH_CNT " << rebirthCount << "\n";
+        int checksum = (level * 13) + (gold * 7) + maxHp + (rebirthCount * 3);
         outFile << "CHECKSUM " << checksum << "\n";
         outFile.close();
         cout << "게임이 성공적으로 저장되었습니다." << endl;
@@ -402,14 +428,16 @@ void Player::load()
                 achMonsterHunter = value;
             else if (key == "ACH_RICH")
                 achRichMan = value;
+            else if (key == "REBIRTH_CNT")
+                rebirthCount = value;
             else if (key == "CHECKSUM")
                 loadedChecksum = value;
         }
         inFile.close();
-        int calculatedChecksum = (level * 13) + (gold * 7) + maxHp;
+        int calculatedChecksum = (level * 13) + (gold * 7) + maxHp + (rebirthCount * 3);
         if (loadedChecksum != -1 && loadedChecksum != calculatedChecksum)
         {
-            cout << "경고: 세이브 파일 변조 감지! 소지 골드가 초기화됩니다." << endl;
+            cout << RED << "경고: 세이브 파일 변조 감지! 소지 골드가 초기화됩니다." << RESET << endl;
             gold = 0;
         }
         if (jobClass == 1)

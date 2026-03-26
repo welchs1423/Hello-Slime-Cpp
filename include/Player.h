@@ -41,6 +41,7 @@ public:
     bool achMonsterHunter;
     bool achRichMan;
     int innkeeperAffinity;
+    int rebirthCount;
 
     int jobClass;
     std::unique_ptr<Job> job;
@@ -57,12 +58,12 @@ public:
     ~Player();
 
     void registerStats();
-    void updateJobLogic();
     void chooseClass();
     void openInventory();
     void allocateStats();
     void resetStats();
     void checkAchievements();
+    void doRebirth();
 
     void printStatus();
     int attack();
