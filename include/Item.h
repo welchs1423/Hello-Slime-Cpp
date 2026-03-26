@@ -11,27 +11,13 @@ public:
     int effectValue;
     int price;
     bool isEquipped;
-    int socketGem; // 0: 없음, 1: 루비(공격력), 2: 사파이어(마나)
+    int socketGem; // 0: 없음, 1: 루비, 2: 사파이어
 
-    Item(std::string n, int t, int e, int p, bool eq = false)
-        : name(n), type(t), effectValue(e), price(p), isEquipped(eq), socketGem(0) {}
+    // 생성자 선언
+    Item(std::string n, int t, int e, int p, bool eq = false);
 
-    std::string getTypeName() const
-    {
-        if (type == 1)
-            return "무기";
-        if (type == 2)
-            return "방어구";
-        if (type == 3)
-            return "포션(HP)";
-        if (type == 4)
-            return "포션(MP)";
-        if (type == 5)
-            return "만병통치약";
-        if (type == 6)
-            return "보석";
-        return "기타";
-    }
+    // 타입 이름 반환 함수 선언
+    std::string getTypeName() const;
 };
 
 #endif
