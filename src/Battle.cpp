@@ -31,7 +31,23 @@ void Battle::start(Player &player, int difficulty)
     bool isFinalBoss = (player.dungeonFloor == 100);
     bool isBoss = (player.dungeonFloor % 5 == 0) || isFinalBoss;
 
-    cout << "\n=== 던전 " << player.dungeonFloor << "층 [" << diffName << "] ===" << endl;
+    // --- 미니맵 UI 렌더링 시스템 ---
+    cout << CYAN << "\n=== [ 던전 탐색도 ] ===" << RESET << endl;
+    int startFloor = ((player.dungeonFloor - 1) / 5) * 5 + 1;
+    for (int i = startFloor; i <= startFloor + 4; ++i)
+    {
+        if (i == player.dungeonFloor)
+            cout << GREEN << "[" << i << "층(현재)]" << RESET;
+        else if (i % 5 == 0)
+            cout << RED << "[BOSS(" << i << "층)]" << RESET;
+        else if (i < player.dungeonFloor)
+            cout << "\033[90m[클리어]\033[0m";
+        else
+            cout << YELLOW << "[" << i << "층]" << RESET;
+        if (i < startFloor + 4)
+            cout << " -- ";
+    }
+    cout << "\n=======================" << endl;
 
     if (!isBoss)
     {
@@ -44,6 +60,21 @@ void Battle::start(Player &player, int difficulty)
             return;
     }
 
+    // --- 랜덤 던전 환경(Environment) 시스템 ---
+    int envType = rand() % 4;
+    float envDmgMult = 1.0f;
+    if (envType == 1)
+        cout << MAGENTA << "\n[환경] 독안개가 자욱합니다. (매 턴 체력 미세 감소)" << RESET << endl;
+    else if (envType == 2)
+        cout << CYAN << "\n[환경] 마나의 기운이 흐릅니다. (매 턴 마나 지속 회복)" << RESET << endl;
+    else if (envType == 3)
+    {
+        cout << RED << "\n[환경] 피의 투기장! (서로가 입히는 모든 피해량 20% 증가)" << RESET << endl;
+        envDmgMult = 1.2f;
+    }
+    else
+        cout << "\n[환경] 평범하고 고요한 던전입니다." << endl;
+
     std::unique_ptr<Monster> enemy(MonsterFactory::spawnMonster(player.dungeonFloor, player.level));
     if (isFinalBoss)
     {
@@ -55,7 +86,7 @@ void Battle::start(Player &player, int difficulty)
         enemy->hp = (int)(enemy->hp * statMultiplier);
     }
 
-    cout << "야생의 " << RED << enemy->name << RESET << " (이)가 나타났다! (HP: " << RED << enemy->hp << RESET << ")" << endl;
+    cout << "\n야생의 " << RED << enemy->name << RESET << " (이)가 나타났다! (HP: " << RED << enemy->hp << RESET << ")" << endl;
 
     bool inCombat = true;
     int enemyPoisonTurns = 0;
@@ -81,6 +112,20 @@ void Battle::start(Player &player, int difficulty)
         cout << YELLOW << "[장비 내구도] 무기: " << player.weaponDurability << " | 방어구: " << player.armorDurability << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
 
+        // 환경 변수 턴 데미지/회복 로직
+        if (envType == 1 && rand() % 100 < 50)
+        {
+            player.hp -= 5;
+            cout << MAGENTA << "[독안개] 호흡이 가빠지며 체력이 5 감소했습니다." << RESET << endl;
+        }
+        else if (envType == 2)
+        {
+            player.mp += 5;
+            if (player.mp > player.maxMp)
+                player.mp = player.maxMp;
+            cout << CYAN << "[마나 샘] 마나가 5 회복되었습니다." << RESET << endl;
+        }
+
         if (playerPoisonTurns > 0)
         {
             int pDmg = 10 + player.dungeonFloor;
@@ -97,7 +142,7 @@ void Battle::start(Player &player, int difficulty)
         }
         if (player.hp <= 0)
         {
-            cout << RED << "상태 이상 피해로 쓰러졌습니다..." << RESET << endl;
+            cout << RED << "지속 피해로 쓰러졌습니다..." << RESET << endl;
             break;
         }
 
@@ -142,6 +187,7 @@ void Battle::start(Player &player, int difficulty)
                         if (player.jobClass == 3)
                             cout << MAGENTA << "[도적 패시브] 암살 발동! 치명타 피해가 증폭됩니다." << RESET << endl;
                     }
+                    damage = (int)(damage * envDmgMult); // 투기장 환경 데미지 증폭
                     enemy->takeDamage(damage);
                 }
                 break;
@@ -175,11 +221,13 @@ void Battle::start(Player &player, int difficulty)
                             damage = (rand() % 10 + s.baseDamage + player.weaponDamage + (player.weaponLevel * 5)) + (player.str * 3);
                             if (player.weaponDurability <= 0)
                                 damage -= player.weaponDamage;
+                            damage = (int)(damage * envDmgMult);
                             cout << YELLOW << "[" << s.name << "] 물리 타격! " << damage << " 피해!" << RESET << endl;
                         }
                         else if (s.type == 2)
                         {
                             damage = (rand() % 10 + s.baseDamage) * 2 + (player.intel * 4);
+                            damage = (int)(damage * envDmgMult);
                             cout << CYAN << "[" << s.name << "] 마법 폭발! " << damage << " 피해!" << RESET << endl;
                             if (player.jobClass == 2)
                             {
@@ -337,6 +385,7 @@ void Battle::start(Player &player, int difficulty)
                     }
                 }
 
+                enemyDmg = (int)(enemyDmg * envDmgMult); // 투기장 환경 적 데미지 증폭
                 player.takeDamage(enemyDmg);
                 if (isBoss && rand() % 100 < 20 && enemyDmg > 0)
                 {
@@ -346,12 +395,12 @@ void Battle::start(Player &player, int difficulty)
             }
         }
 
-        // 펫 자동 개입 로직 (매 턴 끝마다 발동)
         if (inCombat && enemy->hp > 0 && player.hp > 0)
         {
             if (player.activePet == 1)
             {
                 int petDmg = 15 + (player.level * 2);
+                petDmg = (int)(petDmg * envDmgMult);
                 enemy->hp -= petDmg;
                 cout << YELLOW << "[동행 펫] 전투 늑대가 " << enemy->name << "을(를) 물어뜯어 " << petDmg << "의 피해를 입혔습니다!" << RESET << endl;
             }
