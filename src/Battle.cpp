@@ -31,7 +31,6 @@ void Battle::start(Player &player, int difficulty)
     bool isFinalBoss = (player.dungeonFloor == 100);
     bool isBoss = (player.dungeonFloor % 5 == 0) || isFinalBoss;
 
-    // --- 미니맵 UI 렌더링 시스템 ---
     cout << CYAN << "\n=== [ 던전 탐색도 ] ===" << RESET << endl;
     int startFloor = ((player.dungeonFloor - 1) / 5) * 5 + 1;
     for (int i = startFloor; i <= startFloor + 4; ++i)
@@ -60,7 +59,6 @@ void Battle::start(Player &player, int difficulty)
             return;
     }
 
-    // --- 랜덤 던전 환경(Environment) 시스템 ---
     int envType = rand() % 4;
     float envDmgMult = 1.0f;
     if (envType == 1)
@@ -112,7 +110,6 @@ void Battle::start(Player &player, int difficulty)
         cout << YELLOW << "[장비 내구도] 무기: " << player.weaponDurability << " | 방어구: " << player.armorDurability << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
 
-        // 환경 변수 턴 데미지/회복 로직
         if (envType == 1 && rand() % 100 < 50)
         {
             player.hp -= 5;
@@ -179,15 +176,12 @@ void Battle::start(Player &player, int difficulty)
 
                     int critChance = (player.jobClass == 3) ? 30 : 15;
                     float critMult = (player.jobClass == 3) ? 2.0f : 1.5f;
-
                     if (rand() % 100 < critChance)
                     {
                         damage = (int)(damage * critMult);
                         cout << RED << "크리티컬! 치명적인 피해를 입혔습니다!" << RESET << endl;
-                        if (player.jobClass == 3)
-                            cout << MAGENTA << "[도적 패시브] 암살 발동! 치명타 피해가 증폭됩니다." << RESET << endl;
                     }
-                    damage = (int)(damage * envDmgMult); // 투기장 환경 데미지 증폭
+                    damage = (int)(damage * envDmgMult);
                     enemy->takeDamage(damage);
                 }
                 break;
@@ -229,14 +223,6 @@ void Battle::start(Player &player, int difficulty)
                             damage = (rand() % 10 + s.baseDamage) * 2 + (player.intel * 4);
                             damage = (int)(damage * envDmgMult);
                             cout << CYAN << "[" << s.name << "] 마법 폭발! " << damage << " 피해!" << RESET << endl;
-                            if (player.jobClass == 2)
-                            {
-                                int healAmount = s.mpCost / 2;
-                                player.hp += healAmount;
-                                if (player.hp > player.maxHp)
-                                    player.hp = player.maxHp;
-                                cout << MAGENTA << "[마법사 패시브] 마나 흡혈! 체력을 " << healAmount << " 회복했습니다." << RESET << endl;
-                            }
                         }
                         else if (s.type == 3)
                         {
@@ -262,10 +248,7 @@ void Battle::start(Player &player, int difficulty)
                     }
                 }
                 else
-                {
-                    cout << RED << "잘못된 번호입니다." << RESET << endl;
                     continue;
-                }
                 break;
             }
             case 3:
@@ -351,7 +334,6 @@ void Battle::start(Player &player, int difficulty)
             else
             {
                 int enemyDmg = isFinalBoss ? 150 : (int)(enemy->attack() * statMultiplier);
-
                 if (player.jobClass == 1 && rand() % 100 < 15)
                 {
                     cout << MAGENTA << "[전사 패시브] 방패 막기! 적의 공격을 완벽히 방어했습니다." << RESET << endl;
@@ -371,7 +353,6 @@ void Battle::start(Player &player, int difficulty)
                         enemyDmg += player.armorDefense;
                         cout << RED << "방어구 내구도가 0입니다! 추가 피해를 입습니다." << RESET << endl;
                     }
-
                     int statusRoll = rand() % 100;
                     if (statusRoll < 15)
                     {
@@ -384,8 +365,7 @@ void Battle::start(Player &player, int difficulty)
                         playerBurnTurns += 2;
                     }
                 }
-
-                enemyDmg = (int)(enemyDmg * envDmgMult); // 투기장 환경 적 데미지 증폭
+                enemyDmg = (int)(enemyDmg * envDmgMult);
                 player.takeDamage(enemyDmg);
                 if (isBoss && rand() % 100 < 20 && enemyDmg > 0)
                 {
@@ -402,7 +382,7 @@ void Battle::start(Player &player, int difficulty)
                 int petDmg = 15 + (player.level * 2);
                 petDmg = (int)(petDmg * envDmgMult);
                 enemy->hp -= petDmg;
-                cout << YELLOW << "[동행 펫] 전투 늑대가 " << enemy->name << "을(를) 물어뜯어 " << petDmg << "의 피해를 입혔습니다!" << RESET << endl;
+                cout << YELLOW << "[동행 펫] 전투 늑대가 적을 물어뜯어 " << petDmg << "의 피해를 입혔습니다!" << RESET << endl;
             }
             else if (player.activePet == 2)
             {
@@ -438,99 +418,27 @@ void Battle::start(Player &player, int difficulty)
                  << endl;
             cout << "\n========================================" << endl;
             cout << "마침내 마왕을 물리치고 세계에 평화를 가져왔습니다!" << endl;
-            cout << "당신의 전설은 영원히 기억될 것입니다." << endl;
-            cout << "플레이해주셔서 감사합니다." << endl;
-            cout << "========================================" << endl;
-            cout << "\n엔터를 누르면 게임이 완전히 종료됩니다...";
+            cout << "\n엔터를 누르면 게임이 종료됩니다...";
             cin.ignore();
             cin.get();
             exit(0);
         }
-        if (player.activeQuestId == 1 && enemy->name == "초록 고블린")
-            player.questProgress++;
-        else if (player.activeQuestId == 2 && enemy->name == "푸른 슬라임")
-            player.questProgress++;
 
         player.gainExp((int)(((isBoss) ? 200 : 50) * rewardMultiplier));
         int goldGain = (int)(((rand() % 30 + 10) + (player.dungeonFloor * 2)) * rewardMultiplier);
         player.gold += goldGain;
         cout << YELLOW << goldGain << " 골드 획득!" << RESET << endl;
 
+        // 은행 복리 이자 로직 적용
+        if (player.bankGold > 0)
+        {
+            int interest = player.bankGold * 3 / 100;
+            player.bankGold += interest;
+            cout << CYAN << "은행에 예금된 골드에 3%의 이자가 붙었습니다! (+" << interest << "G)" << RESET << endl;
+        }
+
         player.totalKills++;
         player.checkAchievements();
-
-        if (isBoss)
-        {
-            if (rand() % 100 < 5)
-            {
-                player.inventory.push_back(Item("전설의 엑스칼리버", 1, 100, 2000));
-                cout << MAGENTA << "!!! 전설 무기 [전설의 엑스칼리버] 획득 !!!" << RESET << endl;
-            }
-            else
-            {
-                player.inventory.push_back(Item("슬라임의 왕관", 2, 30, 500));
-                cout << GREEN << "[슬라임의 왕관] 획득!" << RESET << endl;
-            }
-        }
-        else
-        {
-            int dropRoll = rand() % 100;
-            if (dropRoll < 40)
-            {
-                int type = rand() % 5;
-                if (type == 0)
-                {
-                    player.inventory.push_back(Item("체력 포션", 3, 50, 30));
-                    cout << GREEN << "몬스터가 [체력 포션]을 떨어뜨렸습니다!" << RESET << endl;
-                }
-                else if (type == 1)
-                {
-                    player.inventory.push_back(Item("마나 포션", 4, 50, 30));
-                    cout << CYAN << "몬스터가 [마나 포션]을 떨어뜨렸습니다!" << RESET << endl;
-                }
-                else if (type == 2)
-                {
-                    player.inventory.push_back(Item("만병통치약", 5, 0, 50));
-                    cout << YELLOW << "몬스터가 [만병통치약]을 떨어뜨렸습니다!" << RESET << endl;
-                }
-                else
-                {
-                    int prefixRoll = rand() % 100;
-                    string prefix = "";
-                    int bonus = 0;
-                    int priceBonus = 0;
-                    if (prefixRoll < 10)
-                    {
-                        prefix = "전설의 ";
-                        bonus = 20;
-                        priceBonus = 300;
-                    }
-                    else if (prefixRoll < 30)
-                    {
-                        prefix = "불타는 ";
-                        bonus = 10;
-                        priceBonus = 150;
-                    }
-                    else if (prefixRoll < 60)
-                    {
-                        prefix = "날카로운 ";
-                        bonus = 5;
-                        priceBonus = 50;
-                    }
-
-                    if (type == 3)
-                    {
-                        player.inventory.push_back(Item(prefix + "강철 검", 1, 15 + bonus, 100 + priceBonus));
-                        cout << MAGENTA << "몬스터가 [" << prefix << "강철 검]을 떨어뜨렸습니다!" << RESET << endl;
-                    }
-                    else
-                    {
-                        player.inventory.push_back(Item(prefix + "가죽 갑옷", 2, 10 + bonus, 80 + priceBonus));
-                        cout << MAGENTA << "몬스터가 [" << prefix << "가죽 갑옷]을 떨어뜨렸습니다!" << RESET << endl;
-                    }
-                }
-            }
-        }
         player.dungeonFloor++;
         cout << CYAN << "\n"
              << player.dungeonFloor << "층으로 나아갑니다!" << RESET << endl;

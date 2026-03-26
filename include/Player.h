@@ -43,6 +43,7 @@ public:
     int innkeeperAffinity;
     int rebirthCount;
     int activePet;
+    int bankGold;
 
     int jobClass;
     std::unique_ptr<Job> job;

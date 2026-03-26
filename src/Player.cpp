@@ -29,7 +29,6 @@ Player::Player()
     intel = 5;
     vit = 5;
     statPoints = 0;
-
     weaponDurability = 50;
     armorDurability = 50;
     totalKills = 0;
@@ -38,7 +37,7 @@ Player::Player()
     innkeeperAffinity = 0;
     rebirthCount = 0;
     activePet = 0;
-
+    bankGold = 0;
     jobClass = 0;
     activeQuestId = 0;
     questProgress = 0;
@@ -72,6 +71,7 @@ void Player::registerStats()
     stats["JOB_CLASS"] = &jobClass;
     stats["ACTIVE_QUEST"] = &activeQuestId;
     stats["QUEST_PROG"] = &questProgress;
+    stats["BANK_GOLD"] = &bankGold;
 }
 
 void Player::chooseClass()
@@ -117,7 +117,7 @@ void Player::printStatus()
     cout << "동행 펫: " << pName << endl;
     cout << "체력: " << hp << "/" << maxHp << " | 마나: " << mp << "/" << maxMp << endl;
     cout << "공격력: " << str * 3 << " (+" << weaponDamage + (weaponLevel * 5) << ") | 방어력: " << vit * 2 << " (+" << armorDefense + (armorLevel * 3) << ")" << endl;
-    cout << "경험치: " << exp << "/" << maxExp << " | 골드: " << gold << "G" << endl;
+    cout << "경험치: " << exp << "/" << maxExp << " | 지갑: " << gold << "G | 예금: " << bankGold << "G" << endl;
 }
 
 void Player::openInventory()
@@ -215,7 +215,7 @@ void Player::allocateStats()
     {
         system("cls");
         cout << "=== 스탯 분배 (남은 포인트: " << statPoints << ") ===" << endl;
-        cout << "1. 근력 (STR): " << str << " (+물리 공격력)\n2. 지능 (INT): " << intel << " (+마법 공격력, 최대 마나)\n3. 체력 (VIT): " << vit << " (+방어력, 최대 체력)\n0. 완료\n투자할 스탯 번호: ";
+        cout << "1. 근력 (STR): " << str << "\n2. 지능 (INT): " << intel << "\n3. 체력 (VIT): " << vit << "\n0. 완료\n투자할 스탯 번호: ";
         int choice;
         cin >> choice;
         if (choice == 0)
@@ -274,7 +274,7 @@ void Player::checkAchievements()
         str += 5;
         cout << "\n[업적 달성] 몬스터 학살자! (영구 근력 +5)" << endl;
     }
-    if (!achRichMan && gold >= 3000)
+    if (!achRichMan && (gold + bankGold) >= 3000)
     {
         achRichMan = true;
         vit += 5;
@@ -304,9 +304,7 @@ void Player::doRebirth()
     mp = maxMp;
     statPoints = 0;
     dungeonFloor = 1;
-    cout << MAGENTA << "\n!!! 환생의 불꽃이 타오릅니다 !!!" << RESET << endl;
-    cout << YELLOW << "육체가 재구성되어 레벨과 던전 진행도가 초기화되지만, 영구적인 기본 스탯이 폭발적으로 상승합니다!" << RESET << endl;
-    cout << GREEN << "현재 환생 횟수: " << rebirthCount << "회" << RESET << endl;
+    cout << MAGENTA << "\n!!! 환생의 불꽃이 타오릅니다 !!!\n기본 스탯이 폭발적으로 상승합니다!" << RESET << endl;
 }
 
 int Player::attack() { return str * 3 + weaponDamage + (weaponLevel * 5); }
@@ -378,7 +376,7 @@ void Player::save()
         outFile << "ACH_RICH " << achRichMan << "\n";
         outFile << "REBIRTH_CNT " << rebirthCount << "\n";
         outFile << "PET " << activePet << "\n";
-        int checksum = (level * 13) + (gold * 7) + maxHp + (rebirthCount * 3);
+        int checksum = (level * 13) + (gold * 7) + maxHp + (rebirthCount * 3) + (bankGold * 2);
         outFile << "CHECKSUM " << checksum << "\n";
         outFile.close();
         cout << "게임이 성공적으로 저장되었습니다." << endl;
@@ -442,11 +440,12 @@ void Player::load()
                 loadedChecksum = value;
         }
         inFile.close();
-        int calculatedChecksum = (level * 13) + (gold * 7) + maxHp + (rebirthCount * 3);
+        int calculatedChecksum = (level * 13) + (gold * 7) + maxHp + (rebirthCount * 3) + (bankGold * 2);
         if (loadedChecksum != -1 && loadedChecksum != calculatedChecksum)
         {
-            cout << RED << "경고: 세이브 파일 변조 감지! 소지 골드가 초기화됩니다." << RESET << endl;
+            cout << RED << "경고: 세이브 파일 변조 감지! 소지 골드와 예금이 초기화됩니다." << RESET << endl;
             gold = 0;
+            bankGold = 0;
         }
         if (jobClass == 1)
             job = std::make_unique<Warrior>();
