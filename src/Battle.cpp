@@ -59,9 +59,22 @@ void Battle::start(Player &player, int difficulty)
     bool inCombat = true;
     int enemyPoisonTurns = 0;
     int playerStunTurns = 0;
+    bool enemyEnraged = false; // 보스 광폭화 상태 변수
 
     while (inCombat && player.hp > 0 && enemy->hp > 0)
     {
+        // 최종 보스 광폭화 트리거 (체력 30% 이하, 약 1500)
+        if (isFinalBoss && enemy->hp <= 1500 && !enemyEnraged)
+        {
+            enemyEnraged = true;
+            cout << MAGENTA << "\n========================================" << RESET << endl;
+            cout << RED << "[경고] 마왕이 광폭화(Enrage) 상태에 돌입합니다!" << RESET << endl;
+            cout << YELLOW << "마왕: 크아아악! 네놈 따위에게... 진정한 공포를 보여주마!!!" << RESET << endl;
+            cout << MAGENTA << "========================================\n"
+                 << RESET << endl;
+            statMultiplier *= 1.5f; // 공격력 1.5배 폭증
+        }
+
         cout << "\n[플레이어] 체력: " << GREEN << player.hp << "/" << player.maxHp << RESET << " | 마나: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
         cout << YELLOW << "[장비 내구도] 무기: " << player.weaponDurability << " | 방어구: " << player.armorDurability << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
@@ -97,7 +110,6 @@ void Battle::start(Player &player, int difficulty)
                         cout << RED << "무기 내구도가 0입니다! 공격력이 무효화됩니다." << RESET << endl;
                     }
 
-                    // 도적 패시브 적용
                     int critChance = (player.jobClass == 3) ? 30 : 15;
                     float critMult = (player.jobClass == 3) ? 2.0f : 1.5f;
 
@@ -147,8 +159,6 @@ void Battle::start(Player &player, int difficulty)
                         {
                             damage = (rand() % 10 + s.baseDamage) * 2 + (player.intel * 4);
                             cout << CYAN << "[" << s.name << "] 마법 폭발! " << damage << " 피해!" << RESET << endl;
-
-                            // 마법사 패시브 적용
                             if (player.jobClass == 2)
                             {
                                 int healAmount = s.mpCost / 2;
@@ -264,7 +274,6 @@ void Battle::start(Player &player, int difficulty)
             {
                 int enemyDmg = isFinalBoss ? 150 : (int)(enemy->attack() * statMultiplier);
 
-                // 전사 패시브 적용
                 if (player.jobClass == 1 && rand() % 100 < 15)
                 {
                     cout << MAGENTA << "[전사 패시브] 방패 막기! 적의 공격을 완벽히 방어했습니다." << RESET << endl;
@@ -309,9 +318,19 @@ void Battle::start(Player &player, int difficulty)
              << enemy->name << "을(를) 물리쳤습니다!" << RESET << endl;
         if (isFinalBoss)
         {
-            cout << "\n=== ENDING ===" << endl;
-            cout << "마왕을 물리치고 세계에 평화를 가져왔습니다!" << endl;
-            cout << "엔터를 누르면 종료됩니다...";
+            cout << YELLOW << R"(
+  __  __   _   ___ _____ ___ ___  
+ |  \/  | /_\ / __|_   _| __| _ \ 
+ | |\/| |/ _ \\__ \ | | | _||   / 
+ |_|  |_/_/ \_\___/ |_| |___|_|_\ 
+            )" << RESET
+                 << endl;
+            cout << "\n========================================" << endl;
+            cout << "마침내 마왕을 물리치고 세계에 평화를 가져왔습니다!" << endl;
+            cout << "당신의 전설은 영원히 기억될 것입니다." << endl;
+            cout << "플레이해주셔서 감사합니다." << endl;
+            cout << "========================================" << endl;
+            cout << "\n엔터를 누르면 게임이 완전히 종료됩니다...";
             cin.ignore();
             cin.get();
             exit(0);
