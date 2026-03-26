@@ -96,10 +96,17 @@ void Battle::start(Player &player, int difficulty)
                             damage = 1;
                         cout << RED << "무기 내구도가 0입니다! 공격력이 무효화됩니다." << RESET << endl;
                     }
-                    if (rand() % 100 < 15)
+
+                    // 도적 패시브 적용
+                    int critChance = (player.jobClass == 3) ? 30 : 15;
+                    float critMult = (player.jobClass == 3) ? 2.0f : 1.5f;
+
+                    if (rand() % 100 < critChance)
                     {
-                        damage = (int)(damage * 1.5);
+                        damage = (int)(damage * critMult);
                         cout << RED << "크리티컬! 치명적인 피해를 입혔습니다!" << RESET << endl;
+                        if (player.jobClass == 3)
+                            cout << MAGENTA << "[도적 패시브] 암살 발동! 치명타 피해가 증폭됩니다." << RESET << endl;
                     }
                     enemy->takeDamage(damage);
                 }
@@ -140,6 +147,16 @@ void Battle::start(Player &player, int difficulty)
                         {
                             damage = (rand() % 10 + s.baseDamage) * 2 + (player.intel * 4);
                             cout << CYAN << "[" << s.name << "] 마법 폭발! " << damage << " 피해!" << RESET << endl;
+
+                            // 마법사 패시브 적용
+                            if (player.jobClass == 2)
+                            {
+                                int healAmount = s.mpCost / 2;
+                                player.hp += healAmount;
+                                if (player.hp > player.maxHp)
+                                    player.hp = player.maxHp;
+                                cout << MAGENTA << "[마법사 패시브] 마나 흡혈! 체력을 " << healAmount << " 회복했습니다." << RESET << endl;
+                            }
                         }
                         else if (s.type == 3)
                         {
@@ -149,6 +166,7 @@ void Battle::start(Player &player, int difficulty)
                                 player.hp = player.maxHp;
                             cout << GREEN << "체력을 " << heal << " 회복했습니다!" << RESET << endl;
                         }
+
                         if (s.type != 3)
                             enemy->takeDamage(damage);
                         if (s.name == "독 찌르기")
@@ -245,20 +263,31 @@ void Battle::start(Player &player, int difficulty)
             else
             {
                 int enemyDmg = isFinalBoss ? 150 : (int)(enemy->attack() * statMultiplier);
-                if (rand() % 100 < 15)
+
+                // 전사 패시브 적용
+                if (player.jobClass == 1 && rand() % 100 < 15)
                 {
-                    enemyDmg = (int)(enemyDmg * 1.5);
-                    cout << RED << "치명타를 허용했습니다!" << RESET << endl;
+                    cout << MAGENTA << "[전사 패시브] 방패 막기! 적의 공격을 완벽히 방어했습니다." << RESET << endl;
+                    enemyDmg = 0;
                 }
-                if (player.armorDurability > 0)
-                    player.armorDurability--;
-                if (player.armorDurability <= 0)
+                else
                 {
-                    enemyDmg += player.armorDefense;
-                    cout << RED << "방어구 내구도가 0입니다! 추가 피해를 입습니다." << RESET << endl;
+                    if (rand() % 100 < 15)
+                    {
+                        enemyDmg = (int)(enemyDmg * 1.5);
+                        cout << RED << "치명타를 허용했습니다!" << RESET << endl;
+                    }
+                    if (player.armorDurability > 0)
+                        player.armorDurability--;
+                    if (player.armorDurability <= 0)
+                    {
+                        enemyDmg += player.armorDefense;
+                        cout << RED << "방어구 내구도가 0입니다! 추가 피해를 입습니다." << RESET << endl;
+                    }
                 }
+
                 player.takeDamage(enemyDmg);
-                if (isBoss && rand() % 100 < 20)
+                if (isBoss && rand() % 100 < 20 && enemyDmg > 0)
                 {
                     cout << RED << enemy->name << "의 강력한 일격! 기절했습니다!" << RESET << endl;
                     playerStunTurns = 1;
