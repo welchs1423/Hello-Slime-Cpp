@@ -200,8 +200,65 @@ void Battle::start(Player &player, int difficulty)
                 break;
             }
             case 3:
-                player.openInventory();
-                continue;
+            {
+                if (player.inventory.empty())
+                {
+                    cout << RED << "가방이 비어있습니다." << RESET << endl;
+                    continue;
+                }
+
+                cout << YELLOW << "\n=== 가방 ===" << RESET << endl;
+                for (size_t i = 0; i < player.inventory.size(); ++i)
+                {
+                    cout << i + 1 << ". [" << player.inventory[i].getTypeName() << "] "
+                         << player.inventory[i].name << " (효과: " << player.inventory[i].effectValue << ")" << endl;
+                }
+                cout << "0. 취소\n사용할 아이템 번호를 선택하세요: ";
+
+                int itemChoice;
+                cin >> itemChoice;
+
+                if (itemChoice == 0)
+                    continue;
+
+                if (itemChoice > 0 && itemChoice <= player.inventory.size())
+                {
+                    int index = itemChoice - 1;
+                    Item &selectedItem = player.inventory[index];
+
+                    if (selectedItem.type == 3)
+                    {
+                        player.hp += selectedItem.effectValue;
+                        if (player.hp > player.maxHp)
+                            player.hp = player.maxHp;
+                        cout << GREEN << selectedItem.name << "을(를) 사용했습니다! 체력 회복: " << selectedItem.effectValue << RESET << endl;
+                        if (player.potions > 0)
+                            player.potions--;
+                        player.inventory.erase(player.inventory.begin() + index);
+                    }
+                    else if (selectedItem.type == 4)
+                    {
+                        player.mp += selectedItem.effectValue;
+                        if (player.mp > player.maxMp)
+                            player.mp = player.maxMp;
+                        cout << CYAN << selectedItem.name << "을(를) 사용했습니다! 마나 회복: " << selectedItem.effectValue << RESET << endl;
+                        if (player.manaPotions > 0)
+                            player.manaPotions--;
+                        player.inventory.erase(player.inventory.begin() + index);
+                    }
+                    else
+                    {
+                        cout << RED << "전투 중에는 사용할 수 없는 장비 아이템입니다. 다른 아이템을 선택하세요." << RESET << endl;
+                        continue;
+                    }
+                }
+                else
+                {
+                    cout << RED << "잘못된 번호입니다." << RESET << endl;
+                    continue;
+                }
+                break;
+            }
             case 4:
             {
                 if (isBoss)
