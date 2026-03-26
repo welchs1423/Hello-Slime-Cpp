@@ -5,69 +5,147 @@
 
 using namespace std;
 
-void Guild::visit(Player& player){
-    system("cls");
-    cout << CYAN << "\n=== 모험가 길드 ===" << RESET << endl;
+void Guild::visit(Player &player)
+{
+    bool inGuild = true;
 
-    // 진행중인 퀘스트가 없을 때
-    if(player.activeQuestId == 0){
-        cout << "길드장: \"오, 새로운 모험가인가? 마침 일거리가 있네.\"\n" << endl;
-        cout << "1. [토벌] 초록 고블린 3마리 처치 (보상: 150G, 100EXP)" << endl;
-        cout << "2. [토벌] 푸른 슬라임 5마리 처치 (보상: 100G, 50EXP)" << endl;
-        cout << "3. [탐험] 던전 5층 도달하기 (보상: 300G, 철검 1개)" << endl;
-        cout << "4. 돌아간다\n 선택: ";
+    while (inGuild)
+    {
+        system("cls");
+        cout << CYAN << "\n=== 모험가 길드 ===" << RESET << endl;
+        cout << "길드 마스터: 오, 새로운 의뢰를 찾으러 왔는가?" << endl;
+
+        cout << "\n[ 현재 진행 중인 퀘스트 ]" << endl;
+        if (player.activeQuestId == 0)
+        {
+            cout << "진행 중인 퀘스트가 없습니다." << endl;
+        }
+        else if (player.activeQuestId == 1)
+        {
+            cout << "- 초록 고블린 3마리 토벌 (" << player.questProgress << "/3)" << endl;
+        }
+        else if (player.activeQuestId == 2)
+        {
+            cout << "- 푸른 슬라임 5마리 토벌 (" << player.questProgress << "/5)" << endl;
+        }
+        else if (player.activeQuestId == 3)
+        {
+            cout << "- 던전 5층 도달 (" << player.questProgress << "/1)" << endl;
+        }
+
+        cout << "\n1. 퀘스트 게시판 보기" << endl;
+        cout << "2. 퀘스트 보상 받기" << endl;
+        cout << "3. 길드 나가기\n선택: ";
 
         int choice;
         cin >> choice;
+        system("cls");
 
-        if(choice >= 1 && choice <= 3){
-            player.activeQuestId = choice;
-            player.questProgress = 0;
-            cout << GREEN << "\n길드장: \"좋아! 퀘스트를 수락했네. 행운을 비네!\"" << RESET << endl;
+        switch (choice)
+        {
+        case 1:
+        {
+            if (player.activeQuestId != 0)
+            {
+                cout << RED << "이미 진행 중인 퀘스트가 있습니다! 먼저 완료하거나 포기해야 합니다." << RESET << endl;
+                cout << "현재 퀘스트를 포기하시겠습니까? (1. 예 / 2. 아니오): ";
+                int giveUp;
+                cin >> giveUp;
+                if (giveUp == 1)
+                {
+                    player.activeQuestId = 0;
+                    player.questProgress = 0;
+                    cout << YELLOW << "현재 퀘스트를 포기했습니다." << RESET << endl;
+                }
+            }
+            else
+            {
+                cout << YELLOW << "\n=== 퀘스트 게시판 ===" << RESET << endl;
+                cout << "1. [토벌] 초록 고블린 3마리 처치 (보상: 150G, 100 EXP)" << endl;
+                cout << "2. [토벌] 푸른 슬라임 5마리 처치 (보상: 100G, 80 EXP)" << endl;
+                cout << "3. [탐험] 던전 5층 돌파 (보상: 300G, 200 EXP)" << endl;
+                cout << "0. 취소\n수주할 퀘스트 번호를 선택하세요: ";
+
+                int qChoice;
+                cin >> qChoice;
+
+                if (qChoice >= 1 && qChoice <= 3)
+                {
+                    player.activeQuestId = qChoice;
+                    player.questProgress = 0;
+                    cout << GREEN << "퀘스트를 성공적으로 수주했습니다! 행운을 빈다네." << RESET << endl;
+                }
+                else if (qChoice != 0)
+                {
+                    cout << RED << "잘못된 번호입니다." << RESET << endl;
+                }
+            }
+            break;
+        }
+        case 2:
+        {
+            if (player.activeQuestId == 0)
+            {
+                cout << RED << "완료할 퀘스트가 없습니다!" << RESET << endl;
+            }
+            else
+            {
+                bool isCompleted = false;
+                int rewardGold = 0;
+                int rewardExp = 0;
+
+                if (player.activeQuestId == 1 && player.questProgress >= 3)
+                {
+                    isCompleted = true;
+                    rewardGold = 150;
+                    rewardExp = 100;
+                }
+                else if (player.activeQuestId == 2 && player.questProgress >= 5)
+                {
+                    isCompleted = true;
+                    rewardGold = 100;
+                    rewardExp = 80;
+                }
+                else if (player.activeQuestId == 3 && player.questProgress >= 1)
+                {
+                    isCompleted = true;
+                    rewardGold = 300;
+                    rewardExp = 200;
+                }
+
+                if (isCompleted)
+                {
+                    cout << GREEN << "길드 마스터: 훌륭하게 해냈구만! 여기 약속한 보상일세." << RESET << endl;
+                    cout << YELLOW << rewardGold << " 골드와 " << rewardExp << " 경험치를 획득했습니다!" << RESET << endl;
+
+                    player.gold += rewardGold;
+                    player.gainExp(rewardExp);
+
+                    // 퀘스트 초기화
+                    player.activeQuestId = 0;
+                    player.questProgress = 0;
+                }
+                else
+                {
+                    cout << YELLOW << "길드 마스터: 아직 의뢰를 완수하지 못했구만. 조금 더 분발하게!" << RESET << endl;
+                }
+            }
+            break;
+        }
+        case 3:
+            cout << "길드를 나섭니다..." << endl;
+            inGuild = false;
+            break;
+        default:
+            cout << RED << "잘못된 입력입니다." << RESET << endl;
+            break;
+        }
+
+        if (inGuild)
+        {
+            cout << "\n엔터를 누르면 계속합니다...";
+            cin.ignore();
+            cin.get();
         }
     }
-    // 진행중인 퀘스트가 있을 때
-    else {
-        cout << "길드장: \"임무는 어떻게 되어가나?\"\n" << endl;
-
-        int target = 0;
-        if (player.activeQuestId == 1) target = 3;
-        else if (player.activeQuestId == 2) target = 5;
-        else if (player.activeQuestId == 3) target = 1; // 5층 도달은 달성 시 1로 처리
-
-        cout << "현재 임무 진척도: [" << player.questProgress << " / " << target << "]" << endl;
-
-        // 퀘스트 완료 시 보상 지급!
-        if (player.questProgress >= target) {
-            cout << YELLOW << "\n 길드장: \"훌륭해! 임무를 완수했군. 여기 보상일세!\"" << RESET << endl;
-
-            if(player.activeQuestId == 1){
-                player.gold += 150; player.gainExp(100);
-            } else if (player.activeQuestId == 2){
-                player.gold += 100; player.gainExp(50);
-            } else if (player.activeQuestId == 3){
-                player.gold += 300;
-                player.inventory.push_back(Item("철검",1,10,100));  // 가방에 철검 꽂아주기
-                cout << GREEN << "가방에 [철검] 이 추가되었습니다!" << RESET << endl;
-            }
-
-            // 퀘스트 초기화
-            player.activeQuestId = 0;
-            player.questProgress = 0;
-        } else {
-            cout << RED << "\n길드장: \"아직 임무를 완수하지 못했군. 더 분발하게!\"" << RESET << endl;
-            cout << "1. 퀘스트 포기하기 2. 계속 진행하기\n선택: ";
-            int choice;
-            cin >> choice;
-            if (choice == 1){
-                player.activeQuestId = 0;
-                player.questProgress = 0;
-                cout << "퀘스트를 포기했습니다." << endl;
-            }
-        }
-    }
-
-    cout << "\n엔터를 누르면 마을로 돌아갑니다...";
-    cin.ignore();
-    cin.get();
 }
