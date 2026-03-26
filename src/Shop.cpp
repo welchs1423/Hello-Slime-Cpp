@@ -113,15 +113,57 @@ void Shop::visit(Player &player)
                 cout << RED << "골드가 부족합니다!" << RESET << endl;
             break;
         case 7:
-            if (player.gold >= 50)
+        {
+            if (player.gold < 50)
             {
-                player.gold -= 50;
+                cout << "골드가 부족합니다!" << endl;
+                break;
+            }
+
+            player.gold -= 50;
+            int currentLevel = player.weaponLevel;
+            int roll = rand() % 100;
+
+            cout << "\n대장장이: 깡... 깡... 깡...!" << endl;
+
+            if (currentLevel < 3)
+            {
                 player.weaponLevel++;
-                cout << YELLOW << "무기가 강화되었습니다! (현재: +" << player.weaponLevel << ")" << RESET << endl;
+                cout << "강화 성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다." << endl;
+            }
+            else if (currentLevel < 6)
+            {
+                if (roll < 60)
+                {
+                    player.weaponLevel++;
+                    cout << "강화 성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다." << endl;
+                }
+                else
+                {
+                    cout << "강화 실패... 다행히 무기는 무사합니다. (현재: +" << player.weaponLevel << ")" << endl;
+                }
             }
             else
-                cout << RED << "골드가 부족합니다!" << RESET << endl;
+            {
+                if (roll < 30)
+                {
+                    player.weaponLevel++;
+                    cout << "대성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다!" << endl;
+                }
+                else if (roll < 70)
+                {
+                    player.weaponLevel--;
+                    cout << "강화 실패! 무기 레벨이 하락했습니다... (현재: +" << player.weaponLevel << ")" << endl;
+                }
+                else
+                {
+                    player.weaponLevel = 0;
+                    player.weaponDurability /= 2;
+                    cout << "파괴! 강화 중 무기가 크게 손상되어 레벨이 초기화되고 내구도가 반토막 났습니다!" << endl;
+                }
+            }
             break;
+        }
         case 8:
             if (player.gold >= 50)
             {
