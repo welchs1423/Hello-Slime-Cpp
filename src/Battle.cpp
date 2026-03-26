@@ -345,6 +345,26 @@ void Battle::start(Player &player, int difficulty)
                 }
             }
         }
+
+        // 펫 자동 개입 로직 (매 턴 끝마다 발동)
+        if (inCombat && enemy->hp > 0 && player.hp > 0)
+        {
+            if (player.activePet == 1)
+            {
+                int petDmg = 15 + (player.level * 2);
+                enemy->hp -= petDmg;
+                cout << YELLOW << "[동행 펫] 전투 늑대가 " << enemy->name << "을(를) 물어뜯어 " << petDmg << "의 피해를 입혔습니다!" << RESET << endl;
+            }
+            else if (player.activePet == 2)
+            {
+                int petHeal = 10 + player.level;
+                player.hp += petHeal;
+                if (player.hp > player.maxHp)
+                    player.hp = player.maxHp;
+                cout << GREEN << "[동행 펫] 치유의 요정이 마법을 걸어 체력을 " << petHeal << " 회복시켰습니다!" << RESET << endl;
+            }
+        }
+
         if (enemyPoisonTurns > 0 && enemy->hp > 0 && inCombat)
         {
             int poisonDmg = 15;

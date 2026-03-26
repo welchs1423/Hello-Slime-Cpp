@@ -37,6 +37,7 @@ Player::Player()
     achRichMan = false;
     innkeeperAffinity = 0;
     rebirthCount = 0;
+    activePet = 0;
 
     jobClass = 0;
     activeQuestId = 0;
@@ -77,10 +78,7 @@ void Player::chooseClass()
 {
     system("cls");
     cout << "=== 직업 선택 ===" << endl;
-    cout << "1. 전사 (강한 체력과 물리 공격력)" << endl;
-    cout << "2. 마법사 (강력한 마법 공격력과 마나)" << endl;
-    cout << "3. 도적 (빠른 공격과 치명타)" << endl;
-    cout << "선택: ";
+    cout << "1. 전사 (강한 체력과 물리 공격력)\n2. 마법사 (강력한 마법 공격력과 마나)\n3. 도적 (빠른 공격과 치명타)\n선택: ";
     cin >> jobClass;
 
     if (jobClass == 1)
@@ -109,7 +107,14 @@ void Player::printStatus()
         jName = "마법사";
     else if (jobClass == 3)
         jName = "도적";
+    string pName = "없음";
+    if (activePet == 1)
+        pName = "전투 늑대";
+    else if (activePet == 2)
+        pName = "치유의 요정";
+
     cout << "\n[ " << name << " ] Lv." << level << " (" << jName << ")" << (rebirthCount > 0 ? " [환생 " + to_string(rebirthCount) + "회]" : "") << endl;
+    cout << "동행 펫: " << pName << endl;
     cout << "체력: " << hp << "/" << maxHp << " | 마나: " << mp << "/" << maxMp << endl;
     cout << "공격력: " << str * 3 << " (+" << weaponDamage + (weaponLevel * 5) << ") | 방어력: " << vit * 2 << " (+" << armorDefense + (armorLevel * 3) << ")" << endl;
     cout << "경험치: " << exp << "/" << maxExp << " | 골드: " << gold << "G" << endl;
@@ -372,6 +377,7 @@ void Player::save()
         outFile << "ACH_HUNTER " << achMonsterHunter << "\n";
         outFile << "ACH_RICH " << achRichMan << "\n";
         outFile << "REBIRTH_CNT " << rebirthCount << "\n";
+        outFile << "PET " << activePet << "\n";
         int checksum = (level * 13) + (gold * 7) + maxHp + (rebirthCount * 3);
         outFile << "CHECKSUM " << checksum << "\n";
         outFile.close();
@@ -430,6 +436,8 @@ void Player::load()
                 achRichMan = value;
             else if (key == "REBIRTH_CNT")
                 rebirthCount = value;
+            else if (key == "PET")
+                activePet = value;
             else if (key == "CHECKSUM")
                 loadedChecksum = value;
         }

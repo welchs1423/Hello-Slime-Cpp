@@ -28,7 +28,8 @@ void Guild::visit(Player &player)
         cout << "\n1. 퀘스트 게시판 보기" << endl;
         cout << "2. 퀘스트 보상 받기" << endl;
         cout << MAGENTA << "3. 초월 환생 (Max Lv.50 필요, 영구 스탯 보너스)" << RESET << endl;
-        cout << "4. 길드 나가기\n선택: ";
+        cout << GREEN << "4. 펫 분양소 (동행 펫 고용)" << RESET << endl;
+        cout << "5. 길드 나가기\n선택: ";
 
         int choice;
         cin >> choice;
@@ -137,6 +138,34 @@ void Guild::visit(Player &player)
             break;
         }
         case 4:
+        {
+            cout << GREEN << "\n=== 펫 분양소 ===" << RESET << endl;
+            cout << "조련사: 던전 탐험을 도와줄 든든한 동료를 찾아보시겠소? (분양가: 1000G)" << endl;
+            cout << "현재 보유 골드: " << YELLOW << player.gold << "G" << RESET << endl;
+            cout << "1. 전투 늑대 (매 턴마다 적에게 고정 피해를 입힘)" << endl;
+            cout << "2. 치유의 요정 (매 턴마다 플레이어의 체력을 회복시킴)" << endl;
+            cout << "0. 취소\n선택: ";
+            int petChoice;
+            cin >> petChoice;
+            if (petChoice == 1 || petChoice == 2)
+            {
+                if (player.gold >= 1000)
+                {
+                    player.gold -= 1000;
+                    player.activePet = petChoice;
+                    if (petChoice == 1)
+                        cout << GREEN << "전투 늑대가 동행을 시작합니다!" << RESET << endl;
+                    else
+                        cout << GREEN << "치유의 요정이 동행을 시작합니다!" << RESET << endl;
+                }
+                else
+                {
+                    cout << RED << "골드가 부족합니다!" << RESET << endl;
+                }
+            }
+            break;
+        }
+        case 5:
             cout << "길드를 나섭니다..." << endl;
             inGuild = false;
             break;

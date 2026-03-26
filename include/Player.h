@@ -42,6 +42,7 @@ public:
     bool achRichMan;
     int innkeeperAffinity;
     int rebirthCount;
+    int activePet;
 
     int jobClass;
     std::unique_ptr<Job> job;
