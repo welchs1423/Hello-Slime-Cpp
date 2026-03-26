@@ -113,7 +113,7 @@ void Shop::visit(Player &player)
         {
             if (player.gold < 50)
             {
-                cout << "골드가 부족합니다!" << endl;
+                cout << RED << "골드가 부족합니다!" << RESET << endl;
                 break;
             }
             player.gold -= 50;
@@ -124,18 +124,18 @@ void Shop::visit(Player &player)
             if (currentLevel < 3)
             {
                 player.weaponLevel++;
-                cout << "강화 성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다." << endl;
+                cout << GREEN << "강화 성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다." << RESET << endl;
             }
             else if (currentLevel < 6)
             {
                 if (roll < 60)
                 {
                     player.weaponLevel++;
-                    cout << "강화 성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다." << endl;
+                    cout << GREEN << "강화 성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다." << RESET << endl;
                 }
                 else
                 {
-                    cout << "강화 실패... 무기는 무사합니다. (현재: +" << player.weaponLevel << ")" << endl;
+                    cout << YELLOW << "강화 실패... 무기는 무사합니다. (현재: +" << player.weaponLevel << ")" << RESET << endl;
                 }
             }
             else
@@ -143,18 +143,18 @@ void Shop::visit(Player &player)
                 if (roll < 30)
                 {
                     player.weaponLevel++;
-                    cout << "대성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다!" << endl;
+                    cout << MAGENTA << "대성공! 무기 레벨이 +" << player.weaponLevel << "이(가) 되었습니다!" << RESET << endl;
                 }
                 else if (roll < 70)
                 {
                     player.weaponLevel--;
-                    cout << "강화 실패! 무기 레벨이 하락했습니다... (현재: +" << player.weaponLevel << ")" << endl;
+                    cout << RED << "강화 실패! 무기 레벨이 하락했습니다... (현재: +" << player.weaponLevel << ")" << RESET << endl;
                 }
                 else
                 {
                     player.weaponLevel = 0;
                     player.weaponDurability /= 2;
-                    cout << "파괴! 무기가 손상되어 레벨이 초기화되고 내구도가 반토막 났습니다!" << endl;
+                    cout << RED << "파괴! 무기가 손상되어 레벨이 초기화되고 내구도가 반토막 났습니다!" << RESET << endl;
                 }
             }
             break;
@@ -200,10 +200,74 @@ void Shop::visit(Player &player)
                 cout << RED << "골드가 부족합니다!" << RESET << endl;
             break;
         case 10:
-        case 11:
-        case 12:
-            cout << "해당 스킬북을 배웁니다... (스킬 시스템 연동)" << endl;
+        {
+            if (player.gold >= 150)
+            {
+                bool hasSkill = false;
+                for (const auto &s : player.skills)
+                {
+                    if (s.name == "연속 베기")
+                        hasSkill = true;
+                }
+                if (hasSkill)
+                    cout << RED << "이미 배운 스킬입니다!" << RESET << endl;
+                else
+                {
+                    player.gold -= 150;
+                    player.skills.push_back(Skill("연속 베기", 15, 30, 1));
+                    cout << GREEN << "새로운 물리 스킬 [연속 베기]를 배웠습니다!" << RESET << endl;
+                }
+            }
+            else
+                cout << RED << "골드가 부족합니다!" << RESET << endl;
             break;
+        }
+        case 11:
+        {
+            if (player.gold >= 200)
+            {
+                bool hasSkill = false;
+                for (const auto &s : player.skills)
+                {
+                    if (s.name == "블리자드")
+                        hasSkill = true;
+                }
+                if (hasSkill)
+                    cout << RED << "이미 배운 스킬입니다!" << RESET << endl;
+                else
+                {
+                    player.gold -= 200;
+                    player.skills.push_back(Skill("블리자드", 30, 40, 2));
+                    cout << GREEN << "새로운 마법 스킬 [블리자드]를 배웠습니다!" << RESET << endl;
+                }
+            }
+            else
+                cout << RED << "골드가 부족합니다!" << RESET << endl;
+            break;
+        }
+        case 12:
+        {
+            if (player.gold >= 100)
+            {
+                bool hasSkill = false;
+                for (const auto &s : player.skills)
+                {
+                    if (s.name == "응급 처치")
+                        hasSkill = true;
+                }
+                if (hasSkill)
+                    cout << RED << "이미 배운 스킬입니다!" << RESET << endl;
+                else
+                {
+                    player.gold -= 100;
+                    player.skills.push_back(Skill("응급 처치", 20, 30, 3));
+                    cout << GREEN << "새로운 회복 스킬 [응급 처치]를 배웠습니다!" << RESET << endl;
+                }
+            }
+            else
+                cout << RED << "골드가 부족합니다!" << RESET << endl;
+            break;
+        }
         case 13:
             cout << "아이템 판매 메뉴는 가방에서 확인하세요." << endl;
             break;
