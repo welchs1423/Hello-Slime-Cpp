@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <memory>
+#include <string>
 
 using namespace std;
 
@@ -59,11 +60,12 @@ void Battle::start(Player &player, int difficulty)
     bool inCombat = true;
     int enemyPoisonTurns = 0;
     int playerStunTurns = 0;
-    bool enemyEnraged = false; // 보스 광폭화 상태 변수
+    int playerPoisonTurns = 0;
+    int playerBurnTurns = 0;
+    bool enemyEnraged = false;
 
     while (inCombat && player.hp > 0 && enemy->hp > 0)
     {
-        // 최종 보스 광폭화 트리거 (체력 30% 이하, 약 1500)
         if (isFinalBoss && enemy->hp <= 1500 && !enemyEnraged)
         {
             enemyEnraged = true;
@@ -72,12 +74,32 @@ void Battle::start(Player &player, int difficulty)
             cout << YELLOW << "마왕: 크아아악! 네놈 따위에게... 진정한 공포를 보여주마!!!" << RESET << endl;
             cout << MAGENTA << "========================================\n"
                  << RESET << endl;
-            statMultiplier *= 1.5f; // 공격력 1.5배 폭증
+            statMultiplier *= 1.5f;
         }
 
         cout << "\n[플레이어] 체력: " << GREEN << player.hp << "/" << player.maxHp << RESET << " | 마나: " << CYAN << player.mp << "/" << player.maxMp << RESET << endl;
         cout << YELLOW << "[장비 내구도] 무기: " << player.weaponDurability << " | 방어구: " << player.armorDurability << RESET << endl;
         cout << "[" << RED << enemy->name << RESET << "] 체력: " << RED << enemy->hp << RESET << endl;
+
+        if (playerPoisonTurns > 0)
+        {
+            int pDmg = 10 + player.dungeonFloor;
+            player.hp -= pDmg;
+            cout << MAGENTA << "독에 중독되어 " << pDmg << "의 피해를 입었습니다! (남은 턴: " << playerPoisonTurns << ")" << RESET << endl;
+            playerPoisonTurns--;
+        }
+        if (playerBurnTurns > 0)
+        {
+            int bDmg = 15 + (player.dungeonFloor * 2);
+            player.hp -= bDmg;
+            cout << RED << "화상으로 인해 " << bDmg << "의 피해를 입었습니다! (남은 턴: " << playerBurnTurns << ")" << RESET << endl;
+            playerBurnTurns--;
+        }
+        if (player.hp <= 0)
+        {
+            cout << RED << "상태 이상 피해로 쓰러졌습니다..." << RESET << endl;
+            break;
+        }
 
         if (playerStunTurns > 0)
         {
@@ -237,6 +259,14 @@ void Battle::start(Player &player, int difficulty)
                             player.manaPotions--;
                         player.inventory.erase(player.inventory.begin() + index);
                     }
+                    else if (item.type == 5)
+                    {
+                        playerPoisonTurns = 0;
+                        playerBurnTurns = 0;
+                        playerStunTurns = 0;
+                        cout << YELLOW << item.name << " 사용! 모든 상태 이상이 치료되었습니다." << RESET << endl;
+                        player.inventory.erase(player.inventory.begin() + index);
+                    }
                     else
                     {
                         cout << RED << "전투 중 사용할 수 없는 아이템입니다." << RESET << endl;
@@ -292,6 +322,18 @@ void Battle::start(Player &player, int difficulty)
                     {
                         enemyDmg += player.armorDefense;
                         cout << RED << "방어구 내구도가 0입니다! 추가 피해를 입습니다." << RESET << endl;
+                    }
+
+                    int statusRoll = rand() % 100;
+                    if (statusRoll < 15)
+                    {
+                        cout << MAGENTA << enemy->name << "의 맹독 공격! 독에 감염되었습니다." << RESET << endl;
+                        playerPoisonTurns += 3;
+                    }
+                    else if (statusRoll < 25)
+                    {
+                        cout << RED << enemy->name << "의 화염 공격! 몸에 불이 붙었습니다." << RESET << endl;
+                        playerBurnTurns += 2;
                     }
                 }
 
@@ -363,16 +405,61 @@ void Battle::start(Player &player, int difficulty)
         }
         else
         {
-            if (rand() % 100 < 30)
+            int dropRoll = rand() % 100;
+            if (dropRoll < 40)
             {
-                int type = rand() % 3;
+                int type = rand() % 5;
                 if (type == 0)
+                {
                     player.inventory.push_back(Item("체력 포션", 3, 50, 30));
+                    cout << GREEN << "몬스터가 [체력 포션]을 떨어뜨렸습니다!" << RESET << endl;
+                }
                 else if (type == 1)
+                {
                     player.inventory.push_back(Item("마나 포션", 4, 50, 30));
+                    cout << CYAN << "몬스터가 [마나 포션]을 떨어뜨렸습니다!" << RESET << endl;
+                }
+                else if (type == 2)
+                {
+                    player.inventory.push_back(Item("만병통치약", 5, 0, 50));
+                    cout << YELLOW << "몬스터가 [만병통치약]을 떨어뜨렸습니다!" << RESET << endl;
+                }
                 else
-                    player.inventory.push_back(Item("낡은 단검", 1, 3, 10));
-                cout << GREEN << "몬스터가 아이템을 떨어뜨렸습니다!" << RESET << endl;
+                {
+                    int prefixRoll = rand() % 100;
+                    string prefix = "";
+                    int bonus = 0;
+                    int priceBonus = 0;
+                    if (prefixRoll < 10)
+                    {
+                        prefix = "전설의 ";
+                        bonus = 20;
+                        priceBonus = 300;
+                    }
+                    else if (prefixRoll < 30)
+                    {
+                        prefix = "불타는 ";
+                        bonus = 10;
+                        priceBonus = 150;
+                    }
+                    else if (prefixRoll < 60)
+                    {
+                        prefix = "날카로운 ";
+                        bonus = 5;
+                        priceBonus = 50;
+                    }
+
+                    if (type == 3)
+                    {
+                        player.inventory.push_back(Item(prefix + "강철 검", 1, 15 + bonus, 100 + priceBonus));
+                        cout << MAGENTA << "몬스터가 [" << prefix << "강철 검]을 떨어뜨렸습니다!" << RESET << endl;
+                    }
+                    else
+                    {
+                        player.inventory.push_back(Item(prefix + "가죽 갑옷", 2, 10 + bonus, 80 + priceBonus));
+                        cout << MAGENTA << "몬스터가 [" << prefix << "가죽 갑옷]을 떨어뜨렸습니다!" << RESET << endl;
+                    }
+                }
             }
         }
         player.dungeonFloor++;
