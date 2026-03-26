@@ -30,13 +30,17 @@ public:
     int weaponLevel;
     int armorLevel;
 
-    int weaponDurability;
-    int armorDurability;
-
     int str;
     int intel;
     int vit;
     int statPoints;
+
+    int weaponDurability;
+    int armorDurability;
+    int totalKills;
+    bool achMonsterHunter;
+    bool achRichMan;
+    int innkeeperAffinity;
 
     int jobClass;
     std::unique_ptr<Job> job;
@@ -46,17 +50,6 @@ public:
 
     int activeQuestId;
     int questProgress;
-
-    // 업적 시스템용 추적 변수 추가
-    int totalKills;
-    bool achMonsterHunter;
-    bool achRichMan;
-
-    int totalPlaySeconds;
-    int autoPotionEnabled;
-    int autoPotionThreshold;
-    int autoManaPotionEnabled;
-    int autoManaPotionThreshold;
 
     std::map<std::string, int *> stats;
 
@@ -69,17 +62,14 @@ public:
     void openInventory();
     void allocateStats();
     void resetStats();
-    void checkAchievements(); // 업적 검사 함수
+    void checkAchievements();
 
     void printStatus();
     int attack();
     int magicAttack();
     void takeDamage(int damage);
     void heal();
-    bool tryAutoHeal();
     void restoreMp();
-    bool tryAutoRestoreMp();
-    void openCombatSettings();
     void gainExp(int amount);
     void levelUp();
 

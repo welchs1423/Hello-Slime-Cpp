@@ -1,29 +1,11 @@
-#include "GameManager.h"
-#include "Colors.h"
-#include "InputHelpers.h"
+#include "../include/GameManager.h"
+#include "../include/Colors.h"
 #include "../include/Inn.h"
 #include "../include/Guild.h"
 #include <iostream>
 #include <cstdlib>
-#include <chrono>
-#include <limits>
 
 using namespace std;
-
-static void addElapsedPlaySeconds(Player &player, chrono::steady_clock::time_point &lastTick)
-{
-    using namespace chrono;
-    auto now = steady_clock::now();
-    auto sec = duration_cast<seconds>(now - lastTick).count();
-    if (sec <= 0)
-        return;
-    long long sum = static_cast<long long>(player.totalPlaySeconds) + sec;
-    if (sum >= numeric_limits<int>::max())
-        player.totalPlaySeconds = numeric_limits<int>::max();
-    else
-        player.totalPlaySeconds = static_cast<int>(sum);
-    lastTick = now;
-}
 
 GameManager::GameManager() { isPlaying = true; }
 
@@ -31,29 +13,25 @@ void GameManager::run()
 {
     system("cls");
     cout << CYAN << "=== 슬라임 헌터 RPG ===" << RESET << endl;
-
     cout << "1. 새로 하기  2. 이어 하기\n선택: ";
-    int startChoice = readIntInRange(1, 2);
+    int startChoice;
+    cin >> startChoice;
 
     if (startChoice == 1)
         player.chooseClass();
     else if (startChoice == 2)
         player.load();
 
-    auto playClockLast = chrono::steady_clock::now();
-
     while (isPlaying && player.hp > 0)
     {
-        addElapsedPlaySeconds(player, playClockLast);
-
         system("cls");
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식 (30G)  4. 모험가 길드"
-                "  5. 가방 열기  6. 스탯 분배  7. 스탯 초기화 (500G)  8. 게임 저장"
-                "  9. 게임 종료  10. 전투 보조 설정\n선택: ";
-        int townChoice = readIntInRange(1, 10);
+        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식  4. 모험가 길드  5. 가방 열기  6. 스탯 분배  7. 스탯 초기화 (500G)  8. 게임 저장  9. 게임 종료\n선택: ";
+
+        int townChoice;
+        cin >> townChoice;
 
         if (townChoice == 1)
         {
@@ -64,9 +42,18 @@ void GameManager::run()
             cout << "3. 어려움 (적 능력치 150%, 보상 150%)" << endl;
             cout << "0. 마을로 돌아가기\n선택: ";
 
-            int diffChoice = readIntInRange(0, 3);
+            int diffChoice;
+            cin >> diffChoice;
+
             if (diffChoice >= 1 && diffChoice <= 3)
+            {
                 battle.start(player, diffChoice);
+            }
+            else if (diffChoice != 0)
+            {
+                cout << "잘못된 입력입니다. 보통 난이도로 진입합니다." << endl;
+                battle.start(player, 2);
+            }
         }
         else if (townChoice == 2)
             shop.visit(player);
@@ -102,13 +89,12 @@ void GameManager::run()
             cout << "게임을 종료합니다. 안녕히 가세요!" << endl;
             isPlaying = false;
         }
-        else if (townChoice == 10)
+        else
         {
-            player.openCombatSettings();
+            system("cls");
+            cout << "잘못된 입력입니다." << endl;
         }
     }
-
-    addElapsedPlaySeconds(player, playClockLast);
 
     if (player.hp <= 0)
     {
