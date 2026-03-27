@@ -3,9 +3,10 @@
 
 #include "Player.h"
 
-class Inn {
+class Inn
+{
 public:
-    static void visit(Player& player);
+    static void visit(Player &player);
 };
 
 #endif
