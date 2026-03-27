@@ -61,7 +61,7 @@ void Blacksmith::visit(Player &player)
                     {
                         if (roll < 60)
                         {
-                            cout << GREEN << "강화 성공! 무기가 더욱 날카로워졌습니다!" << RESET << endl;
+                            cout << GREEN << "강화 성공! 장비가 더욱 단단해졌습니다!" << RESET << endl;
                             if (isWeapon)
                                 player.weaponLevel++;
                             else
@@ -73,7 +73,7 @@ void Blacksmith::visit(Player &player)
                         }
                     }
                     else
-                    { // +6 이상부터는 하락 및 초기화 위험
+                    { // +6 이상부터는 하락 및 초기화 위험 (도파민 구간)
                         if (roll < 30)
                         {
                             cout << MAGENTA << "!!! 대성공 !!! 엄청난 기운이 장비에 깃듭니다!" << RESET << endl;
@@ -93,7 +93,7 @@ void Blacksmith::visit(Player &player)
                         else
                         {
                             cout << RED << "\n쩌적... 쨍그랑!" << RESET << endl;
-                            cout << MAGENTA << "장비가 강화의 힘을 버티지 못하고 산산조각 났습니다! (강화 수치 초기화)" << RESET << endl;
+                            cout << MAGENTA << "장비가 강화의 힘을 버티지 못하고 산산조각 났습니다! (수치 초기화)" << RESET << endl;
                             if (isWeapon)
                                 player.weaponLevel = 0;
                             else
