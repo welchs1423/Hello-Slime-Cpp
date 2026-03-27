@@ -3,6 +3,7 @@
 #include "../include/Inn.h"
 #include "../include/Guild.h"
 #include "../include/Bank.h"
+#include "../include/Blacksmith.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -29,8 +30,9 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        cout << "1. 던전 입장  2. 상점 방문  3. 여관 휴식  4. 모험가 길드\n";
-        cout << "5. 마을 은행  6. 가방 열기  7. 스탯 분배  8. 게임 저장  9. 게임 종료\n선택: ";
+        cout << "1. 던전 입장  2. 마을 상점  3. 여관 휴식  4. 모험가 길드\n";
+        cout << "5. 마을 은행  6. 드워프 대장간  7. 가방 열기  8. 스탯 분배\n";
+        cout << "9. 게임 저장  0. 게임 종료\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -59,10 +61,12 @@ void GameManager::run()
         else if (townChoice == 5)
             Bank::visit(player);
         else if (townChoice == 6)
-            player.openInventory();
+            Blacksmith::visit(player);
         else if (townChoice == 7)
-            player.allocateStats();
+            player.openInventory();
         else if (townChoice == 8)
+            player.allocateStats();
+        else if (townChoice == 9)
         {
             system("cls");
             player.save();
@@ -70,7 +74,7 @@ void GameManager::run()
             cin.ignore();
             cin.get();
         }
-        else if (townChoice == 9)
+        else if (townChoice == 0)
         {
             system("cls");
             cout << "진행 상황을 안전하게 저장합니다..." << endl;
