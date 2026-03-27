@@ -3,16 +3,21 @@
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
-
 Slime::Slime(int playerLevel) : Monster("푸른 슬라임", 30 + (playerLevel * 10), 5 + playerLevel) {}
 
-int Slime::attack(){
-    int chance = rand() % 100;
-    if(chance < 30){
-        int damage = baseDamage + 15;
-        cout << GREEN << name << "이(가) 부식성 산성액을 뱉습니다! [산성액] " << damage << " 피해!" << RESET << endl;
-        return damage;
+void Slime::takeAction(Player &player)
+{
+    int decision = rand() % 100;
+    // 체력이 30% 이하라면 50% 확률로 점액 재생
+    if (hp < maxHp * 0.3 && decision < 50)
+    {
+        int heal = 10 + (maxHp / 10);
+        hp += heal;
+        if (hp > maxHp)
+            hp = maxHp;
+        std::cout << GREEN << name << "이(가) 몸을 웅크리며 점액을 재생합니다! (HP +" << heal << ")" << RESET << std::endl;
+        return;
     }
-    return Monster::attack();
+    // 기본 행동
+    player.takeDamage(attack());
 }

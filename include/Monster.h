@@ -15,8 +15,11 @@ public:
     Monster(std::string n, int h, int a) : name(n), hp(h), maxHp(h), atk(a) {}
     virtual ~Monster() {}
 
-    // 몬스터의 사고 모델: 상황에 따라 다른 행동을 취함
-    virtual void takeAction(Player &player) = 0;
+    // 기본 행동: 그냥 공격 (자식 클래스에서 오버라이드 가능)
+    virtual void takeAction(Player &player)
+    {
+        player.takeDamage(attack());
+    }
 
     void takeDamage(int damage)
     {
@@ -26,21 +29,6 @@ public:
     }
 
     virtual int attack() { return atk; }
-};
-
-// 각 몬스터별 특화 AI 구현을 위한 서브클래스
-class Slime : public Monster
-{
-public:
-    Slime(int floor, int playerLevel);
-    void takeAction(Player &player) override;
-};
-
-class Goblin : public Monster
-{
-public:
-    Goblin(int floor, int playerLevel);
-    void takeAction(Player &player) override;
 };
 
 #endif

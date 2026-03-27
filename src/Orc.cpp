@@ -1,18 +1,16 @@
 #include "../include/Orc.h"
-#include "../include/Colors.h"
 #include <iostream>
 #include <cstdlib>
 
-using namespace std;
+Orc::Orc(int playerLevel) : Monster("오크 전사", 80 + (playerLevel * 15), 15 + (playerLevel * 3)) {}
 
-Orc::Orc(int playerLevel) : Monster("성난 오크", 100 + (playerLevel * 20), 20 + playerLevel) {}
-
-int Orc::attack(){
-    int chance = rand() % 100;
-    if(chance < 20){ 
-        int damage = (rand() % 10 + baseDamage) * 2;
-        cout << RED << name << "이(가) 거대한 몽둥이를 휘두릅니다! [강타] " << damage << " 피해!" << RESET << endl;
-        return damage;
+int Orc::attack()
+{
+    int decision = rand() % 100;
+    if (decision < 20)
+    {
+        std::cout << "오크 전사가 무자비하게 내려찍습니다!" << std::endl;
+        return (rand() % 10 + atk) * 2; // baseDamage 대신 atk 사용
     }
-    return Monster::attack();
+    return rand() % 5 + atk;
 }
