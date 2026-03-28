@@ -29,6 +29,7 @@ public:
     int dungeonFloor;
     int weaponLevel;
     int armorLevel;
+    bool isAwakened = false; // 신의 신전 각성 여부
 
     int str;
     int intel;

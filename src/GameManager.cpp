@@ -14,7 +14,8 @@
 #include "../include/Mine.h"
 #include "../include/Abyss.h"
 #include "../include/StockMarket.h"
-#include "../include/Auction.h" // 경매장 추가
+#include "../include/Auction.h"
+#include "../include/Temple.h" // 신전 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -41,15 +42,15 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 4열 그리드 완성판, 17번 제국경매장 편입
+        // UI 4열 5행 그리드 완성판, 18번 신의 신전 편입
         cout << "--------------------------------------------------------------\n";
         cout << " 1. 던전탐험   |  2. 피의투기장 |  3. 낚시터     |  4. 광산/세공소 \n";
         cout << " 5. 마을상점   |  6. 뒷골목암시장 |  7. 대장간     |  8. 마법탑     \n";
         cout << " 9. 마을은행   | 10. 모험가길드  | 11. 여관/도박  | 12. 개인영지(집) \n";
         cout << " 13. 연금술공방| 14. 보스레이드  | 15. 심연의틈   | 16. 주식거래소 \n";
-        cout << YELLOW << " 17. 제국경매장" << RESET << "| 18. 가방열기   | 19. 스탯분배   | 20. 게임저장   \n";
+        cout << " 17. 제국경매장| " << YELLOW << "18. 신의 신전" << RESET << "  | 19. 가방열기   | 20. 스탯분배   \n";
         cout << "--------------------------------------------------------------\n";
-        cout << " 0. 게임 종료\n선택: ";
+        cout << " 21. 게임저장  |  0. 게임 종료\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -95,12 +96,14 @@ void GameManager::run()
         else if (townChoice == 16)
             StockMarket::visit(player);
         else if (townChoice == 17)
-            Auction::visit(player); // 경매장 방문
+            Auction::visit(player);
         else if (townChoice == 18)
-            player.openInventory();
+            Temple::visit(player); // 신의 신전 방문
         else if (townChoice == 19)
-            player.allocateStats();
+            player.openInventory();
         else if (townChoice == 20)
+            player.allocateStats();
+        else if (townChoice == 21)
         {
             system("cls");
             player.save();
