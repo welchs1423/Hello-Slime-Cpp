@@ -45,6 +45,9 @@ public:
     int rebirthCount;
     int activePet;
     int bankGold;
+    int slimeShares = 0;  // 슬라임 운수 보유 주식
+    int goblinShares = 0; // 고블린 제약 보유 주식
+    int dragonShares = 0; // 드래곤 항공 보유 주식
 
     int jobClass;
     std::unique_ptr<Job> job;

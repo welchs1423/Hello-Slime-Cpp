@@ -12,7 +12,8 @@
 #include "../include/Estate.h"
 #include "../include/Alchemy.h"
 #include "../include/Mine.h"
-#include "../include/Abyss.h" // 심연의 틈 추가
+#include "../include/Abyss.h"
+#include "../include/StockMarket.h" // 거래소 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -39,13 +40,14 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 4열 그리드 확장, 심연(17번) 추가
+        // UI 4열 그리드, 주식거래소(16번) 편입
         cout << "--------------------------------------------------------------\n";
         cout << " 1. 던전탐험   |  2. 피의투기장 |  3. 낚시터     |  4. 광산/세공소 \n";
         cout << " 5. 마을상점   |  6. 뒷골목암시장 |  7. 대장간     |  8. 마법탑     \n";
         cout << " 9. 마을은행   | 10. 모험가길드  | 11. 여관/도박  | 12. 개인영지(집) \n";
-        cout << " 13. 연금술공방| 14. 보스레이드  | 15. 가방열기   | 16. 스탯분배   \n";
-        cout << MAGENTA << " 17. 심연의틈" << RESET << CYAN << "   | 18. 게임저장   " << RESET << "| 0. 종료        | \n";
+        cout << " 13. 연금술공방| 14. 보스레이드  | 15. 심연의틈   | 16. 주식거래소 \n";
+        cout << "--------------------------------------------------------------\n";
+        cout << " 17. 가방열기  | 18. 스탯분배    | 19. 게임저장   |  0. 종료       \n";
         cout << "--------------------------------------------------------------\n선택: ";
 
         int townChoice;
@@ -88,12 +90,14 @@ void GameManager::run()
         else if (townChoice == 14)
             Raid::visit(player);
         else if (townChoice == 15)
-            player.openInventory();
+            Abyss::visit(player);
         else if (townChoice == 16)
-            player.allocateStats();
+            StockMarket::visit(player); // 거래소 방문
         else if (townChoice == 17)
-            Abyss::visit(player); // 심연의 틈 방문
+            player.openInventory();
         else if (townChoice == 18)
+            player.allocateStats();
+        else if (townChoice == 19)
         {
             system("cls");
             player.save();
