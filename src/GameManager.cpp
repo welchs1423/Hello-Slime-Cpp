@@ -15,7 +15,8 @@
 #include "../include/Abyss.h"
 #include "../include/StockMarket.h"
 #include "../include/Auction.h"
-#include "../include/Temple.h" // 신전 추가
+#include "../include/Temple.h"
+#include "../include/Casino.h" // 카지노 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -42,15 +43,15 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 4열 5행 그리드 완성판, 18번 신의 신전 편입
-        cout << "--------------------------------------------------------------\n";
-        cout << " 1. 던전탐험   |  2. 피의투기장 |  3. 낚시터     |  4. 광산/세공소 \n";
-        cout << " 5. 마을상점   |  6. 뒷골목암시장 |  7. 대장간     |  8. 마법탑     \n";
-        cout << " 9. 마을은행   | 10. 모험가길드  | 11. 여관/도박  | 12. 개인영지(집) \n";
-        cout << " 13. 연금술공방| 14. 보스레이드  | 15. 심연의틈   | 16. 주식거래소 \n";
-        cout << " 17. 제국경매장| " << YELLOW << "18. 신의 신전" << RESET << "  | 19. 가방열기   | 20. 스탯분배   \n";
-        cout << "--------------------------------------------------------------\n";
-        cout << " 21. 게임저장  |  0. 게임 종료\n선택: ";
+        // UI 5열 압축 그리드 완성판, 19번 황립 카지노 편입
+        cout << "-----------------------------------------------------------------------\n";
+        cout << " 1.던전탐험   | 2.투기장     | 3.낚시터     | 4.광산/세공  | 5.마을상점   \n";
+        cout << " 6.암시장가챠 | 7.대장간강화 | 8.마법탑     | 9.마을은행   | 10.모험가길드\n";
+        cout << " 11.여관/도박 | 12.개인저택  | 13.연금술    | 14.보스레이드| 15.심연의틈  \n";
+        cout << " 16.주식거래  | 17.제국경매  | 18.신의신전  | " << YELLOW << "19.황립카지노" << RESET << "| 20.가방열기  \n";
+        cout << "-----------------------------------------------------------------------\n";
+        cout << " 21.스탯분배  | 22.게임저장  | 0.게임종료   | \n";
+        cout << "-----------------------------------------------------------------------\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -59,7 +60,7 @@ void GameManager::run()
         {
             system("cls");
             cout << "\n=== 던전 난이도 선택 ===" << endl;
-            cout << "1. 쉬움 (적 스탯 80%)\n2. 보통 (적 스탯 100%)\n3. 어려움 (적 스탯 150%)\n0. 취소\n선택: ";
+            cout << "1. 쉬움 (적 80%)\n2. 보통 (적 100%)\n3. 어려움 (적 150%)\n0. 취소\n선택: ";
             int diffChoice;
             cin >> diffChoice;
             if (diffChoice >= 1 && diffChoice <= 3)
@@ -98,12 +99,14 @@ void GameManager::run()
         else if (townChoice == 17)
             Auction::visit(player);
         else if (townChoice == 18)
-            Temple::visit(player); // 신의 신전 방문
+            Temple::visit(player);
         else if (townChoice == 19)
-            player.openInventory();
+            Casino::visit(player); // 카지노 방문
         else if (townChoice == 20)
-            player.allocateStats();
+            player.openInventory();
         else if (townChoice == 21)
+            player.allocateStats();
+        else if (townChoice == 22)
         {
             system("cls");
             player.save();
