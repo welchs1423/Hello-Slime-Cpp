@@ -10,7 +10,8 @@
 #include "../include/Raid.h"
 #include "../include/Fishing.h"
 #include "../include/Estate.h"
-#include "../include/Alchemy.h" // 연금술 공방 추가
+#include "../include/Alchemy.h"
+#include "../include/Mine.h" // 광산 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -37,14 +38,14 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 4열 그리드 유지, 연금술(13번) 추가
+        // UI 4열 그리드 확장
         cout << "--------------------------------------------------------------\n";
-        cout << " 1. 던전탐험   |  2. 피의투기장 |  3. 낚시터     |  4. 보스레이드 \n";
+        cout << " 1. 던전탐험   |  2. 피의투기장 |  3. 낚시터     |  4. 광산/세공소 \n";
         cout << " 5. 마을상점   |  6. 뒷골목암시장 |  7. 대장간     |  8. 마법탑     \n";
         cout << " 9. 마을은행   | 10. 모험가길드  | 11. 여관/도박  | 12. 개인영지(집) \n";
-        cout << " 13. 연금술공방| 14. 가방열기    | 15. 스탯분배   | 16. 게임저장   \n";
+        cout << " 13. 연금술공방| 14. 가방열기    | 15. 스탯분배   | 16. 보스레이드 \n";
         cout << "--------------------------------------------------------------\n";
-        cout << " 0. 게임 종료\n선택: ";
+        cout << " 17. 게임저장  |  0. 게임 종료\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -64,7 +65,7 @@ void GameManager::run()
         else if (townChoice == 3)
             Fishing::visit(player);
         else if (townChoice == 4)
-            Raid::visit(player);
+            Mine::visit(player); // 광산 방문
         else if (townChoice == 5)
             shop.visit(player);
         else if (townChoice == 6)
@@ -82,12 +83,14 @@ void GameManager::run()
         else if (townChoice == 12)
             Estate::visit(player);
         else if (townChoice == 13)
-            Alchemy::visit(player); // 연금술 방문
+            Alchemy::visit(player);
         else if (townChoice == 14)
             player.openInventory();
         else if (townChoice == 15)
             player.allocateStats();
         else if (townChoice == 16)
+            Raid::visit(player);
+        else if (townChoice == 17)
         {
             system("cls");
             player.save();
