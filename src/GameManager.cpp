@@ -4,7 +4,8 @@
 #include "../include/Guild.h"
 #include "../include/Bank.h"
 #include "../include/Blacksmith.h"
-#include "../include/MagicTower.h" // 마법탑 추가
+#include "../include/MagicTower.h"
+#include "../include/Arena.h" // 투기장 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -31,10 +32,10 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 번호 재배치 (7번 마법탑 추가)
-        cout << "1. 던전 입장  2. 마을 상점  3. 여관 휴식  4. 모험가 길드\n";
-        cout << "5. 마을 은행  6. 드워프 대장간  7. 신비한 마법탑  8. 가방 열기\n";
-        cout << "9. 스탯 분배  10. 게임 저장  0. 게임 종료\n선택: ";
+        // UI 2줄 정렬 및 투기장 배치
+        cout << " 1. 던전 탐험      2. 피의 투기장    3. 여관/도박장    4. 모험가 길드\n";
+        cout << " 5. 마을 상점      6. 마을 은행      7. 드워프 대장간  8. 신비한 마법탑\n";
+        cout << " 9. 가방 열기     10. 스탯 분배     11. 게임 저장      0. 게임 종료\n\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -43,38 +44,35 @@ void GameManager::run()
         {
             system("cls");
             cout << "\n=== 던전 난이도 선택 ===" << endl;
-            cout << "1. 쉬움 (적 능력치 80%, 보상 80%)\n2. 보통 (적 능력치 100%, 보상 100%)\n3. 어려움 (적 능력치 150%, 보상 150%)\n0. 마을로 돌아가기\n선택: ";
+            cout << "1. 쉬움 (적 스탯 80%)\n2. 보통 (적 스탯 100%)\n3. 어려움 (적 스탯 150%)\n0. 취소\n선택: ";
             int diffChoice;
             cin >> diffChoice;
             if (diffChoice >= 1 && diffChoice <= 3)
                 battle.start(player, diffChoice);
-            else if (diffChoice != 0)
-            {
-                cout << "잘못된 입력입니다." << endl;
-                battle.start(player, 2);
-            }
         }
         else if (townChoice == 2)
-            shop.visit(player);
+            Arena::visit(player);
         else if (townChoice == 3)
             Inn::visit(player);
         else if (townChoice == 4)
             Guild::visit(player);
         else if (townChoice == 5)
-            Bank::visit(player);
+            shop.visit(player);
         else if (townChoice == 6)
-            Blacksmith::visit(player);
+            Bank::visit(player);
         else if (townChoice == 7)
-            MagicTower::visit(player); // 마법탑 입장
+            Blacksmith::visit(player);
         else if (townChoice == 8)
-            player.openInventory();
+            MagicTower::visit(player);
         else if (townChoice == 9)
-            player.allocateStats();
+            player.openInventory();
         else if (townChoice == 10)
+            player.allocateStats();
+        else if (townChoice == 11)
         {
             system("cls");
             player.save();
-            cout << "\n엔터를 누르면 계속합니다...";
+            cout << "\n저장 완료! 엔터를 누르세요.";
             cin.ignore();
             cin.get();
         }
