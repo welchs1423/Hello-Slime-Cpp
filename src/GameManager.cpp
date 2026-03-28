@@ -11,7 +11,8 @@
 #include "../include/Fishing.h"
 #include "../include/Estate.h"
 #include "../include/Alchemy.h"
-#include "../include/Mine.h" // 광산 추가
+#include "../include/Mine.h"
+#include "../include/Abyss.h" // 심연의 틈 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -38,14 +39,14 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 4열 그리드 확장
+        // UI 4열 그리드 확장, 심연(17번) 추가
         cout << "--------------------------------------------------------------\n";
         cout << " 1. 던전탐험   |  2. 피의투기장 |  3. 낚시터     |  4. 광산/세공소 \n";
         cout << " 5. 마을상점   |  6. 뒷골목암시장 |  7. 대장간     |  8. 마법탑     \n";
         cout << " 9. 마을은행   | 10. 모험가길드  | 11. 여관/도박  | 12. 개인영지(집) \n";
-        cout << " 13. 연금술공방| 14. 가방열기    | 15. 스탯분배   | 16. 보스레이드 \n";
-        cout << "--------------------------------------------------------------\n";
-        cout << " 17. 게임저장  |  0. 게임 종료\n선택: ";
+        cout << " 13. 연금술공방| 14. 보스레이드  | 15. 가방열기   | 16. 스탯분배   \n";
+        cout << MAGENTA << " 17. 심연의틈" << RESET << CYAN << "   | 18. 게임저장   " << RESET << "| 0. 종료        | \n";
+        cout << "--------------------------------------------------------------\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -65,7 +66,7 @@ void GameManager::run()
         else if (townChoice == 3)
             Fishing::visit(player);
         else if (townChoice == 4)
-            Mine::visit(player); // 광산 방문
+            Mine::visit(player);
         else if (townChoice == 5)
             shop.visit(player);
         else if (townChoice == 6)
@@ -85,12 +86,14 @@ void GameManager::run()
         else if (townChoice == 13)
             Alchemy::visit(player);
         else if (townChoice == 14)
-            player.openInventory();
-        else if (townChoice == 15)
-            player.allocateStats();
-        else if (townChoice == 16)
             Raid::visit(player);
+        else if (townChoice == 15)
+            player.openInventory();
+        else if (townChoice == 16)
+            player.allocateStats();
         else if (townChoice == 17)
+            Abyss::visit(player); // 심연의 틈 방문
+        else if (townChoice == 18)
         {
             system("cls");
             player.save();
