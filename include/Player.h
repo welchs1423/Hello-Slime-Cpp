@@ -51,6 +51,7 @@ public:
     std::vector<Item> inventory;
     std::vector<Skill> skills;
 
+    bool hasEstate = false;
     int activeQuestId;
     int questProgress;
 
