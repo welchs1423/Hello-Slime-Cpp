@@ -8,7 +8,9 @@
 #include "../include/Arena.h"
 #include "../include/BlackMarket.h"
 #include "../include/Raid.h"
-#include "../include/Fishing.h" // 낚시터 추가
+#include "../include/Fishing.h"
+#include "../include/Estate.h"
+#include "../include/Alchemy.h" // 연금술 공방 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -35,13 +37,14 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 정렬 및 낚시터(14번) 추가
-        cout << " 1. 던전 탐험      2. 피의 투기장    3. 여관/도박장    4. 모험가 길드\n";
-        cout << " 5. 마을 상점      6. 마을 은행      7. 드워프 대장간  8. 신비한 마법탑\n";
-        cout << " 9. 가방 열기     10. 스탯 분배     11. 게임 저장     12. 뒷골목 암시장\n";
-        cout << MAGENTA << " 13. 월드 보스 레이드" << RESET << CYAN << "               14. 평화로운 낚시터\n"
-             << RESET;
-        cout << " 0. 게임 종료\n\n선택: ";
+        // UI 4열 그리드 유지, 연금술(13번) 추가
+        cout << "--------------------------------------------------------------\n";
+        cout << " 1. 던전탐험   |  2. 피의투기장 |  3. 낚시터     |  4. 보스레이드 \n";
+        cout << " 5. 마을상점   |  6. 뒷골목암시장 |  7. 대장간     |  8. 마법탑     \n";
+        cout << " 9. 마을은행   | 10. 모험가길드  | 11. 여관/도박  | 12. 개인영지(집) \n";
+        cout << " 13. 연금술공방| 14. 가방열기    | 15. 스탯분배   | 16. 게임저장   \n";
+        cout << "--------------------------------------------------------------\n";
+        cout << " 0. 게임 종료\n선택: ";
 
         int townChoice;
         cin >> townChoice;
@@ -59,22 +62,32 @@ void GameManager::run()
         else if (townChoice == 2)
             Arena::visit(player);
         else if (townChoice == 3)
-            Inn::visit(player);
+            Fishing::visit(player);
         else if (townChoice == 4)
-            Guild::visit(player);
+            Raid::visit(player);
         else if (townChoice == 5)
             shop.visit(player);
         else if (townChoice == 6)
-            Bank::visit(player);
+            BlackMarket::visit(player);
         else if (townChoice == 7)
             Blacksmith::visit(player);
         else if (townChoice == 8)
             MagicTower::visit(player);
         else if (townChoice == 9)
-            player.openInventory();
+            Bank::visit(player);
         else if (townChoice == 10)
-            player.allocateStats();
+            Guild::visit(player);
         else if (townChoice == 11)
+            Inn::visit(player);
+        else if (townChoice == 12)
+            Estate::visit(player);
+        else if (townChoice == 13)
+            Alchemy::visit(player); // 연금술 방문
+        else if (townChoice == 14)
+            player.openInventory();
+        else if (townChoice == 15)
+            player.allocateStats();
+        else if (townChoice == 16)
         {
             system("cls");
             player.save();
@@ -82,12 +95,6 @@ void GameManager::run()
             cin.ignore();
             cin.get();
         }
-        else if (townChoice == 12)
-            BlackMarket::visit(player);
-        else if (townChoice == 13)
-            Raid::visit(player);
-        else if (townChoice == 14)
-            Fishing::visit(player); // 낚시터 방문
         else if (townChoice == 0)
         {
             system("cls");
