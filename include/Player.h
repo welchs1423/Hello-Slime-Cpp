@@ -34,6 +34,7 @@ public:
     int intel;
     int vit;
     int statPoints;
+    int maxAbyssFloor = 0;
 
     int weaponDurability;
     int armorDurability;
