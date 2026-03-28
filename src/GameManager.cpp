@@ -6,7 +6,8 @@
 #include "../include/Blacksmith.h"
 #include "../include/MagicTower.h"
 #include "../include/Arena.h"
-#include "../include/BlackMarket.h" // 암시장 추가
+#include "../include/BlackMarket.h"
+#include "../include/Raid.h" // 레이드 추가
 #include <iostream>
 #include <cstdlib>
 
@@ -33,10 +34,11 @@ void GameManager::run()
         cout << "\n=== 마을 광장 ===" << endl;
         player.printStatus();
 
-        // UI 정렬 및 암시장(12번) 추가
+        // UI 정렬 및 월드 보스(13번) 추가
         cout << " 1. 던전 탐험      2. 피의 투기장    3. 여관/도박장    4. 모험가 길드\n";
         cout << " 5. 마을 상점      6. 마을 은행      7. 드워프 대장간  8. 신비한 마법탑\n";
         cout << " 9. 가방 열기     10. 스탯 분배     11. 게임 저장     12. 뒷골목 암시장\n";
+        cout << MAGENTA << " 13. 월드 보스 레이드 (DPS 측정기)" << RESET << "\n";
         cout << " 0. 게임 종료\n\n선택: ";
 
         int townChoice;
@@ -79,7 +81,9 @@ void GameManager::run()
             cin.get();
         }
         else if (townChoice == 12)
-            BlackMarket::visit(player); // 암시장 방문
+            BlackMarket::visit(player);
+        else if (townChoice == 13)
+            Raid::visit(player); // 레이드 방문
         else if (townChoice == 0)
         {
             system("cls");
