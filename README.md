@@ -1,3 +1,8 @@
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
+![Version](https://img.shields.io/badge/Version-v1.0.0-blue)
+![C++](https://img.shields.io/badge/Language-C%2B%2B-00599C?logo=c%2B%2B)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
 # ⚔️ Hello-Slime-Cpp (v1.0.0 Grand Release)
 
 C++ 기반의 한계를 돌파한 하이브리드 텍스트 로그라이크 RPG.
